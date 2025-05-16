@@ -1,0 +1,55 @@
+<%- include('partials/header') %>
+
+<h2>Lista de Productos</h2>
+
+<div class="mb-3">
+  <label for="filtroTipo">Filtrar por tipo:</label>
+  <select id="filtroTipo" class="form-control">
+    <option value="">Todos</option>
+  </select>
+</div>
+
+<div class="mb-3">
+  <label for="inputBusqueda">Buscar:</label>
+  <input type="text" id="inputBusqueda" class="form-control" placeholder="Marca, modelo o compatibilidad...">
+</div>
+
+<table id="tablaProductos" class="table table-striped">
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Marca</th>
+      <th>Modelo</th>
+      <th>Compatibilidad</th>
+      <th>
+        Cantidad
+        <button id="btnOrdenarCantidad" class="btn btn-sm btn-outline-secondary">⇅</button>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (productos.length === 0) { %>
+      <tr><td colspan="5" class="text-center">No hay productos para mostrar</td></tr>
+    <% } else { %>
+      <% productos.forEach(p => { %>
+        <tr>
+          <td><%= p.tipo %></td>
+          <td><%= p.marca %></td>
+          <td><%= p.modelo %></td>
+          <td><%= p.compatibilidad.join(', ') %></td>
+          <td><%= p.cantidad %></td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+  
+</table>
+
+<div class="d-flex justify-content-between mt-3">
+  <button id="btnAnterior" class="btn btn-secondary">Anterior</button>
+  <button id="btnSiguiente" class="btn btn-secondary">Siguiente</button>
+</div>
+
+
+
+<%- include('partials/footer') %>
