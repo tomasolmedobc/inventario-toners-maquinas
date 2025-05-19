@@ -15,7 +15,7 @@
 <body>
 
     <header>
-        <h1>Mi Sistema de Inventario</h1>
+        <h1>Sistema de Inventario</h1>
         <script src="/resources/js/themeMode.js"></script>
 
   <!-- Navbar -->
@@ -46,7 +46,15 @@
               </div>
             </div>
           </div>
-          
+                  <div class="d-flex align-items-center ms-3">
+                    <% if (usuario && usuario.nombre) { %>
+          <div class="d-flex align-items-center ms-3 text-white">
+            <span class="me-2">Hola, <strong><%= usuario.nombre %></strong></span>
+            <a href="/auth/logout" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
+          </div>
+        <% } %>
+
+          </div>
         </nav>
     </header>
 <main>
@@ -109,8 +117,6 @@
     </form>
   </div>
 </div>
-
-
 
 <!-- Modal: Salida de Producto -->
 <div class="modal fade" id="modalSalida" tabindex="-1" aria-labelledby="modalSalidaLabel" aria-hidden="true">

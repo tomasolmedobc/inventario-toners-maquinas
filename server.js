@@ -35,14 +35,20 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 2 }
 }));
 
-// Rutas
-app.use('/auth', authRoutes);  // Ruta para la autenticación
-app.use('/api', apiRoutes);    // Ruta para API (con JWT)
-app.use('/dev', devRoutes);    // Ruta para el desarrollo de funcionalidades (sin autenticación en este caso)
+// 🔥 Middleware global para pasar el usuario a todas las vistas
+app.use((req, res, next) => {
+  res.locals.usuario = req.session.usuario || null;
+  next();
+});
 
-// Rutas principales
+// Rutas
+app.use('/auth', authRoutes);
+app.use('/api', apiRoutes);
+app.use('/dev', devRoutes);
+
+// Ruta principal
 app.get('/', (req, res) => {
-  res.render('index', { usuario: req.session.usuario });
+  res.render('index');
 });
 
 const PORT = process.env.PORT || 5000;

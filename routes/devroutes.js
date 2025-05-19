@@ -9,6 +9,7 @@ const { mostrarDashboard } = require('../controllers/dashboardController');
 router.get('/dashboard', verificarSesion, mostrarDashboard);
 
 
+
 router.get('/inventario', verificarSesion, async (req, res) => {
   try {
     const productos = await Producto.find();

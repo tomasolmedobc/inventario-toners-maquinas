@@ -23,6 +23,7 @@ const verificarToken = (req, res, next) => {
   }
 };
 
+
 // Exportar ambos middlewares
 module.exports = {
   verificarSesion,
