@@ -1,11 +1,22 @@
 <%- include('partials/header', { title: 'Inicio' }) %>
+<div class="container mb-4">
+  <h2>Consumo de Tóners por Área</h2>
+  <canvas id="graficoToners" height="100"></canvas>
 
-<section>
-  <h2>Bienvenido al sistema</h2>
+  <h4 class="mt-4">Áreas con mayor consumo:</h4>
+  <ul class="list-group">
+    <% topAreas.forEach(item => { %>
+      <li class="list-group-item d-flex justify-content-between">
+        <span><%= item.area %></span>
+        <span><strong><%= item.total %> tóners</strong></span>
+      </li>
+    <% }) %>
+  </ul>
+</div>
 
-
-
-</section>
-
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  window.graficoData = <%- JSON.stringify(graficoData) %>;
+</script>
+<script src="/resources/js/chart.js"></script>
 <%- include('partials/footer') %>

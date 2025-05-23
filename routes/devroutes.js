@@ -13,7 +13,7 @@ router.get('/dashboard', verificarSesion, mostrarDashboard);
 router.get('/inventario', verificarSesion, async (req, res) => {
   try {
     const productos = await Producto.find();
-    res.render('inventario', { productos }); // ✅ Asegurate de tener inventario.ejs
+    res.render('inventario', { productos }); 
   } catch (error) {
     res.status(500).send('Error al cargar productos');
   }
@@ -79,5 +79,8 @@ router.get('/limpiar-movimientos-null', async (req, res) => {
   }
 });
 */
+
+
+
 
 module.exports = router;

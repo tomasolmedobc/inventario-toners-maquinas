@@ -1,7 +1,7 @@
 <%- include('partials/header', { title: 'Entregas de productos' }) %>
 
 <div class="container mt-4">
-  <h2>Registro de Entregas</h2>
+  <h2>Ultimas notas</h2>
 
   <div class="row my-3">
     <div class="col-md-6">
@@ -22,6 +22,7 @@
         <th>Marca</th>
         <th>Modelo</th>
         <th>Fecha</th>
+        <th>Imprimir</th>
       </tr>
     </thead>
     <tbody id="tablaEntregas">
@@ -34,6 +35,10 @@
           <td><%= e.producto && e.producto.marca ? e.producto.marca : '-' %></td>
           <td><%= e.producto && e.producto.modelo ? e.producto.modelo : '-' %></td>
           <td><%= new Date(e.fecha).toLocaleString() %></td>
+          <td>
+            <a href="/api/nota-entrega/<%= e._id %>" class="btn btn-sm btn-outline-secondary" target="_blank"> Imprimir
+          </td>
+          
         </tr>
       <% }) %>
     </tbody>

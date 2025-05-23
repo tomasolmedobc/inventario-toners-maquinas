@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Nota de Entrega</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @media print {
+      .no-print {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="p-4">
+
+  <div class="container border p-4">
+    <div class="d-flex justify-content-between mb-4">
+      <h2>Nota de Entrega</h2>
+      <button onclick="window.print()" class="btn btn-primary no-print">Imprimir</button>
+    </div>
+
+    <p><strong>Fecha:</strong> <%= new Date(movimiento.fecha).toLocaleDateString() %></p>
+    <p><strong>Entregado a:</strong> <%= movimiento.area %></p>
+    <p><strong>Producto:</strong> <%= movimiento.producto.tipo %> - <%= movimiento.producto.marca %> - <%= movimiento.producto.modelo %></p>
+    <p><strong>Cantidad:</strong> <%= movimiento.cantidad %></p>
+    <p><strong>Observación:</strong> <%= movimiento.observacion || 'Sin observaciones' %></p>
+    <p><strong>Responsable:</strong> <%= movimiento.usuario.nombre %></p>
+
+    <hr>
+
+    <p><strong>Firma Responsable:</strong> _____________________________</p>
+    <p><strong>Firma Receptor:</strong> ________________________________</p>
+  </div>
+
+</body>
+</html>

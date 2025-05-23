@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comprobantes</title>
+    <title>Inventario</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <!-- BoxIcons -->
@@ -19,43 +19,62 @@
         <script src="/resources/js/themeMode.js"></script>
 
   <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-          <div class="container-fluid">
-            
-            <a class="navbar-brand" href="/dev/dashboard">Inventario</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                  <a class="nav-link" href="/dev/inventario">Lista de productos</a>
-                </li>
-              </ul>
-                              <!-- Empieza el boton de modo de web-->
-                <div class="theme-switch checkbox">
-                  <input id="theme-checkbox" type="checkbox" id="theme-checkbox" />
-                  <label class="toggle" for="theme-checkbox"><span></span></label>
-                </div>
-
-              <div class="d-flex gap-2">
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCargaInicial">Carga Inicial</button>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalReabastecimiento">Reabastecer</button>
-                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalSalida">Registrar Salida</button>
-              </div>
-            </div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+  
+      <a class="navbar-brand" href="/">Gráfica</a>
+  
+      <% if (usuario) { %>
+        <a class="navbar-brand" href="/dev/dashboard">Historial de registro</a>
+      <% } %>
+  
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse" id="navbarNav">
+  
+        <% if (usuario) { %>
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="/dev/inventario">Lista de productos</a>
+            </li>
+            <li>
+              <a class="nav-link" href="/api/entregas">Informes</a>
+              
+            </li>
+          </ul>
+  
+          <!-- Modo oscuro -->
+          <div class="theme-switch checkbox me-3">
+            <input id="theme-checkbox" type="checkbox" />
+            <label class="toggle" for="theme-checkbox"><span></span></label>
           </div>
-                  <div class="d-flex align-items-center ms-3">
-                    <% if (usuario && usuario.nombre) { %>
-          <div class="d-flex align-items-center ms-3 text-white">
+  
+          <!-- Botones -->
+          <div class="d-flex gap-2 me-3">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCargaInicial">Carga Inicial</button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalReabastecimiento">Reabastecer</button>
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalSalida">Registrar Salida</button>
+          </div>
+  
+          <!-- Usuario logueado -->
+          <div class="d-flex align-items-center text-white">
             <span class="me-2">Hola, <strong><%= usuario.nombre %></strong></span>
             <a href="/auth/logout" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
           </div>
+        <% } else { %>
+          <!-- Si NO está logueado, mostrar solo acceso a login -->
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/auth/login">Iniciar sesión</a>
+            </li>
+          </ul>
         <% } %>
-
-          </div>
-        </nav>
+      </div>
+    </div>
+  </nav>
+  
     </header>
 <main>
   <!-- Modal: Carga Inicial -->
