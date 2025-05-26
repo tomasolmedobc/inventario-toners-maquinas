@@ -1,6 +1,7 @@
 <%- include('partials/header') %>
+<div class="container mt-4">
+  <h2>Ultimas notas</h2>
 
-<h2>Lista de Productos</h2>
 
 <div class="mb-3">
   <label for="filtroTipo">Filtrar por tipo:</label>
@@ -14,8 +15,10 @@
   <input type="text" id="inputBusqueda" class="form-control" placeholder="Marca, modelo o compatibilidad...">
 </div>
 
-<table id="tablaProductos" class="table table-striped">
-  <thead>
+
+  <table id="tablaProductos" class="table table-bordered table-hover">
+    <thead class="table-dark">
+
     <tr>
       <th>Tipo</th>
       <th>Marca</th>
@@ -45,12 +48,11 @@
   
 </table>
 
-<div class="d-flex justify-content-between mt-3">
-  <button id="btnAnterior" class="btn btn-secondary">Anterior</button>
-  <button id="btnSiguiente" class="btn btn-secondary">Siguiente</button>
+  <div class="d-flex justify-content-between mt-3">
+    <button id="btnAnterior" class="btn btn-secondary">Anterior</button>
+    <button id="btnSiguiente" class="btn btn-secondary">Siguiente</button>
+  </div>
 </div>
-
-
 <script>
   const productos = <%- JSON.stringify(productos) %>;
 </script>
