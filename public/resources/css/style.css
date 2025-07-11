@@ -9,7 +9,7 @@
 
 /* Estilos para el modo oscuro */
 [data-theme='dark'] {
-    --primary-bg-color: #202023;
+    --primary-bg-color: #282b2f;
     --primary-text-color: #acb3bf;
     --secondary-bg-color: #34363d;
     --secondary-text-color: #fff;
@@ -32,7 +32,7 @@ background-color: rgb(121 121 121);
 
 [data-theme='light'] a{
     color: #5d68fb;
-    }
+  }
 
 
 body {

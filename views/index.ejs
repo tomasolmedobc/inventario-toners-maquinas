@@ -1,22 +1,36 @@
 <%- include('partials/header', { title: 'Inicio' }) %>
-<div class="container mb-4">
-  <h2>Consumo de Tóners por Área</h2>
-  <canvas id="graficoToners" height="100"></canvas>
 
-  <h4 class="mt-4">Áreas con mayor consumo:</h4>
-  <ul class="list-group">
-    <% topAreas.forEach(item => { %>
-      <li class="list-group-item d-flex justify-content-between">
-        <span><%= item.area %></span>
-        <span><strong><%= item.total %> tóners</strong></span>
-      </li>
-    <% }) %>
-  </ul>
+
+<h4 class="mb-3">Consumo de Tóners por Área</h4>
+
+<div class="mb-3">
+  <div style="width: 100%; height: 400px;">
+    <canvas id="graficoTonersPorArea"></canvas>
+  </div>
+
+
+<select id="filtroRango" class="form-select mt-3" style="width: 200px;">
+  <option value="30" selected>Últimos 30 días</option>
+  <option value="1M">Mes actual</option>
+  <option value="90">Últimos 3 meses</option>
+</select>
 </div>
+<table id="tablaTopAreas" class="table mt-4">
+  <thead>
+    <tr>
+      <th>Área</th>
+      <th>Total de tóners</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Aquí se insertan las filas dinámicamente -->
+  </tbody>
+</table>
 
+<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  window.graficoData = <%- JSON.stringify(graficoData) %>;
-</script>
-<script src="/resources/js/chart.js"></script>
+<!-- Tu script personalizado -->
+<script src="/resources/js/graficoToners.js"></script>
+
+
 <%- include('partials/footer') %>

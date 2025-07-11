@@ -1,7 +1,7 @@
 <%- include('partials/header', { title: 'Entregas de productos' }) %>
 
 <div class="container mt-4">
-  <h2>Ultimas notas</h2>
+  <h2>Últimas notas</h2>
 
   <div class="row my-3">
     <div class="col-md-6">
@@ -9,6 +9,10 @@
     </div>
     <div class="col-md-3">
       <input type="date" class="form-control" id="filtroFecha">
+    </div>
+    <div class="form-check form-switch mt-2">
+      <input class="form-check-input" type="checkbox" id="toggleAnuladas" checked>
+      <label class="form-check-label" for="toggleAnuladas">Mostrar entregas anuladas</label>
     </div>
   </div>
 
@@ -22,7 +26,8 @@
         <th>Marca</th>
         <th>Modelo</th>
         <th>Fecha</th>
-        <th>Imprimir</th>
+        <th>Observación</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody id="tablaEntregas">
@@ -31,12 +36,22 @@
           <td><%= e.usuario?.nombre || 'N/A' %></td>
           <td><%= e.area %></td>
           <td><%= e.cantidad %></td>
-          <td><%= e.producto && e.producto.tipo ? e.producto.tipo : '-' %></td>
-          <td><%= e.producto && e.producto.marca ? e.producto.marca : '-' %></td>
-          <td><%= e.producto && e.producto.modelo ? e.producto.modelo : '-' %></td>
+          <td><%= e.producto?.tipo || '-' %></td>
+          <td><%= e.producto?.marca || '-' %></td>
+          <td><%= e.producto?.modelo || '-' %></td>
           <td><%= new Date(e.fecha).toLocaleString() %></td>
           <td>
-            <a href="/api/nota-entrega/<%= e._id %>" class="btn btn-sm btn-outline-secondary" target="_blank"> Imprimir
+            <% if (e.anulado) { %>
+              <span class="text-danger fw-bold">ANULADO</span>
+            <% } else { %>
+              <%= e.observacion || '-' %>
+            <% } %>
+          </td>
+          <td>
+            <a href="/api/nota-entrega/<%= e._id %>" class="btn btn-sm btn-outline-secondary" target="_blank">🖨️</a>
+            <button class="btn btn-sm btn-warning btn-editar-entrega" data-id="<%= e._id %>" data-cantidad="<%= e.cantidad %>">✏️</button>
+            <button class="btn btn-sm btn-outline-danger btn-anular-entrega"
+              data-id="<%= e._id %>">🗑️</button>
           </td>
           
         </tr>
@@ -50,5 +65,31 @@
   </div>
 </div>
 
+<!-- Modal para editar entrega -->
+<div class="modal fade" id="modalEditarEntrega" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="formEditarEntrega" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar entrega</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="movimientoId">
+        <div class="mb-3">
+          <label for="nuevaCantidad" class="form-label">Nueva cantidad entregada</label>
+          <input type="number" min="1" class="form-control" id="nuevaCantidad" required>
+        </div>
+        <div class="mb-3">
+          <label for="observacionEdit" class="form-label">Motivo del cambio</label>
+          <textarea id="observacionEdit" class="form-control" required></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <%- include('partials/footer') %>

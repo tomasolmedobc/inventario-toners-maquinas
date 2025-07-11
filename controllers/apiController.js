@@ -13,21 +13,39 @@ function actualizarStock(prod, tipo, cantidad) {
     throw new Error('Tipo de movimiento inválido');
   }
 }
-
-// Crear un nuevo producto (Carga inicial)
 const crearProducto = async (req, res) => {
   try {
-    const { tipo, marca, modelo, compatibilidad, cantidad } = req.body;
+    let { tipo, marca, modelo, compatibilidad, cantidad } = req.body;
 
     if (!tipo || !marca || !modelo || isNaN(cantidad)) {
       return res.status(400).json({ error: 'Datos incompletos o inválidos' });
     }
+
+    // Normalización
+    tipo = tipo.trim().toLowerCase();
+    tipo = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+
+    marca = marca.trim().toLowerCase();
+    marca = marca.charAt(0).toUpperCase() + marca.slice(1);
+
+    modelo = modelo.trim(); // No capitalizamos modelo, puede contener letras y números específicos
 
     const compatibilidadFinal = Array.isArray(compatibilidad)
       ? compatibilidad
       : typeof compatibilidad === 'string'
         ? compatibilidad.split(',').map(c => c.trim())
         : [];
+
+    // Buscar si ya existe ese producto
+    const productoExistente = await Producto.findOne({
+      tipo: { $regex: new RegExp(`^${tipo}$`, 'i') },
+      marca: { $regex: new RegExp(`^${marca}$`, 'i') },
+      modelo: { $regex: new RegExp(`^${modelo}$`, 'i') }
+    });
+
+    if (productoExistente) {
+      return res.status(400).json({ error: 'El producto ya existe con ese tipo, marca y modelo.' });
+    }
 
     const producto = new Producto({
       tipo,
@@ -86,7 +104,6 @@ const registrarMovimiento = async (req, res) => {
     res.status(500).json({ error: 'Error al registrar movimiento' });
   }
 };
-
 // Ver entregas (solo salidas)
 const verEntregas = async (req, res) => {
   try {
@@ -110,7 +127,6 @@ const listarProductos = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener productos' });
   }
 };
-
 const mostrarDashboard = async (req, res) => {
   try {
     const entradas = await Movimiento.find({ tipo: 'entrada' })
@@ -129,11 +145,229 @@ const mostrarDashboard = async (req, res) => {
     res.status(500).send('Error al cargar dashboard');
   }
 };
+const getGraficoToners = async (req, res) => {
+  const { rango = '30' } = req.query;
+
+  let fechaInicio;
+  const hoy = new Date();
+
+  if (rango === '30') {
+    fechaInicio = new Date(hoy.setDate(hoy.getDate() - 30));
+  } else if (rango === '90') {
+    fechaInicio = new Date(hoy.setDate(hoy.getDate() - 90));
+  } else if (rango === '1M') {
+    fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  } else {
+    fechaInicio = new Date(hoy.setDate(hoy.getDate() - 30));
+  }
+
+  try {
+    const movimientos = await Movimiento.aggregate([
+      {
+        $match: {
+          tipo: 'salida',
+          fecha: { $gte: fechaInicio }
+        }
+      },
+      {
+        $lookup: {
+          from: 'productos',
+          localField: 'producto',
+          foreignField: '_id',
+          as: 'producto'
+        }
+      },
+      { $unwind: '$producto' },
+      {
+        $match: {
+          'producto.tipo': { $regex: /^toner$/i }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            mes: { $month: '$fecha' },
+            año: { $year: '$fecha' },
+            area: '$area'
+          },
+          total: { $sum: '$cantidad' }
+        }
+      },
+      { $sort: { '_id.año': 1, '_id.mes': 1 } }
+    ]);
+
+
+
+    const mesesSet = new Set();
+    const areasMap = {};
+
+    movimientos.forEach(m => {
+      const { mes, año, area } = m._id;
+      const fechaKey = `${año}-${mes}`;
+      mesesSet.add(fechaKey);
+
+      if (!areasMap[area]) areasMap[area] = {};
+      areasMap[area][fechaKey] = m.total;
+    });
+
+    const mesesOrdenados = Array.from(mesesSet).sort();
+    const labels = mesesOrdenados.map(key => {
+      const [y, m] = key.split('-');
+      return new Date(y, m - 1).toLocaleString('es-ES', { month: 'short', year: 'numeric' });
+    });
+
+    const datasets = Object.entries(areasMap).map(([area, dataByMes]) => {
+      const data = mesesOrdenados.map(key => dataByMes[key] || 0);
+      const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+
+      return {
+        label: area || 'Sin área',
+        data,
+        backgroundColor: color
+      };
+    });
+
+    res.json({ labels, datasets });
+  } catch (err) {
+    console.error('Error al obtener datos del gráfico por áreas:', err);
+    res.status(500).json({ error: 'Error al generar gráfico por áreas' });
+  }
+};
+const editarMovimientoEntrega = async (req, res) => {
+  const { id } = req.params;
+  const { nuevaCantidad, observacion } = req.body;
+
+  if (!observacion || isNaN(nuevaCantidad) || nuevaCantidad < 0) {
+    return res.status(400).json({ error: 'Datos inválidos' });
+  }
+
+  try {
+    const movimiento = await Movimiento.findById(id).populate('producto');
+    if (!movimiento || movimiento.tipo !== 'salida') {
+      return res.status(404).json({ error: 'Movimiento no válido' });
+    }
+
+    const producto = movimiento.producto;
+    const diferencia = nuevaCantidad - movimiento.cantidad;
+
+    if (diferencia > 0 && producto.cantidad < diferencia) {
+      return res.status(400).json({ error: 'Stock insuficiente para aumentar entrega' });
+    }
+
+    // Ajustar stock
+    producto.cantidad -= diferencia;
+    movimiento.cantidad = nuevaCantidad;
+    movimiento.observacion += ` | EDITADO: ${observacion}`;
+    await producto.save();
+    await movimiento.save();
+
+    res.json({ success: true, message: 'Entrega modificada correctamente' });
+  } catch (err) {
+    console.error('Error al editar entrega:', err);
+    res.status(500).json({ error: 'Error interno al editar entrega' });
+  }
+};
+
+const registrarMultiplesMovimientos = async (req, res) => {
+  try {
+    const { productos, tipo, area, observacion } = req.body;
+
+    if (tipo !== 'salida' || !Array.isArray(productos) || productos.length === 0 || !area) {
+      return res.status(400).json({ error: 'Datos inválidos' });
+    }
+
+    for (const item of productos) {
+      const prod = await Producto.findById(item.producto);
+      if (!prod) continue;
+
+      const cantidad = parseInt(item.cantidad);
+      if (isNaN(cantidad) || cantidad <= 0) continue;
+
+      if (prod.cantidad < cantidad) {
+        return res.status(400).json({ error: `Stock insuficiente para ${prod.tipo} ${prod.marca} ${prod.modelo}` });
+      }
+
+      prod.cantidad -= cantidad;
+      await prod.save();
+
+      await Movimiento.create({
+        producto: prod._id,
+        tipo,
+        cantidad,
+        area,
+        observacion: observacion || '',
+        usuario: req.session.usuario?._id || null
+      });
+    }
+
+    res.status(201).json({ mensaje: 'Movimientos registrados correctamente' });
+  } catch (err) {
+    console.error('Error al registrar múltiples movimientos:', err);
+    res.status(500).json({ error: 'Error al registrar múltiples movimientos' });
+  }
+};
+
+const anularMovimiento = async (req, res) => {
+  try {
+    const movimiento = await Movimiento.findById(req.params.id);
+    if (!movimiento) return res.status(404).json({ error: 'Movimiento no encontrado' });
+
+    if (movimiento.tipo !== 'salida') {
+      return res.status(400).json({ error: 'Solo se pueden anular salidas' });
+    }
+
+    const producto = await Producto.findById(movimiento.producto);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+
+    producto.cantidad += movimiento.cantidad;
+    await producto.save();
+
+    await movimiento.deleteOne();
+
+    res.json({ mensaje: 'Entrega anulada y stock restituido correctamente' });
+  } catch (err) {
+    console.error('Error al anular entrega:', err);
+    res.status(500).json({ error: 'Error interno al anular entrega' });
+  }
+};
+const marcarComoAnulado = async (req, res) => {
+  try {
+    const movimiento = await Movimiento.findById(req.params.id);
+    if (!movimiento) return res.status(404).json({ error: 'Movimiento no encontrado' });
+
+    if (movimiento.anulado) return res.status(400).json({ error: 'Ya está anulado' });
+
+    if (movimiento.tipo !== 'salida') {
+      return res.status(400).json({ error: 'Solo se pueden anular salidas' });
+    }
+
+    const producto = await Producto.findById(movimiento.producto);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+
+    producto.cantidad += movimiento.cantidad;
+    await producto.save();
+
+    movimiento.anulado = true;
+    await movimiento.save();
+
+    res.json({ mensaje: 'Entrega anulada y stock restituido correctamente' });
+  } catch (err) {
+    console.error('Error al anular entrega:', err);
+    res.status(500).json({ error: 'Error interno al anular entrega' });
+  }
+};
+
+
 
 module.exports = {
   crearProducto,
   registrarMovimiento,
   verEntregas,
   listarProductos,
-  mostrarDashboard
+  mostrarDashboard,
+  getGraficoToners,
+  editarMovimientoEntrega,
+  registrarMultiplesMovimientos,
+  anularMovimiento,
+  marcarComoAnulado,
 };

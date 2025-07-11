@@ -7,7 +7,8 @@ const movimientoSchema = new mongoose.Schema({
   area: { type: String }, // solo obligatorio en salidas, se valida en el controlador
   observacion: { type: String },
   usuario: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  fecha: { type: Date, default: Date.now }
+  fecha: { type: Date, default: Date.now },
+  anulado: { type: Boolean, default: false }
 });
 
 module.exports = mongoose.model('Movimiento', movimientoSchema);

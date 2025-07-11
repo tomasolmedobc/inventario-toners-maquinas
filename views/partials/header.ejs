@@ -11,17 +11,15 @@
     <!-- Tu archivo CSS personalizado -->
     <link rel="stylesheet" href="/resources/css/style.css">
 
+
 </head>
 <body>
-
     <header>
         <h1>Sistema de Inventario</h1>
         <script src="/resources/js/themeMode.js"></script>
-
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
     <div class="container-fluid">
-  
       <a class="navbar-brand" href="/">Gráfica</a>
   
       <% if (usuario) { %>
@@ -43,6 +41,9 @@
               <a class="nav-link" href="/api/entregas">Informes</a>
               
             </li>
+            <li>
+              <a class="nav-link" href="/api/usuarios">Usuarios</a>
+            </li>
           </ul>
   
           <!-- Modo oscuro -->
@@ -53,8 +54,8 @@
   
           <!-- Botones -->
           <div class="d-flex gap-2 me-3">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCargaInicial">Carga Inicial</button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalReabastecimiento">Reabastecer</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCargaInicial">Nuevo Producto</button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalReabastecimiento">Ingreso Stock</button>
             <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalSalida">Registrar Salida</button>
           </div>
   
@@ -82,7 +83,7 @@
   <div class="modal-dialog">
     <form class="modal-content" id="formCargaInicial">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalCargaInicialLabel">Carga Inicial de Producto</h5>
+        <h5 class="modal-title" id="modalCargaInicialLabel">Nuevo Producto</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
@@ -104,7 +105,7 @@
   <div class="modal-dialog">
     <form class="modal-content" id="formEntradaStock">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalReabastecimientoLabel">Reabastecer Producto</h5>
+        <h5 class="modal-title" id="modalReabastecimientoLabel">Ingreso Stock</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
@@ -140,34 +141,20 @@
 <!-- Modal: Salida de Producto -->
 <div class="modal fade" id="modalSalida" tabindex="-1" aria-labelledby="modalSalidaLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form class="modal-content" id="formSalidaStock">
+    <form class="modal-content" id="formSalidaStock" data-multiple="true">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalSalidaLabel">Registrar Salida de Producto</h5>
+        <h5 class="modal-title">Registrar Salida de Productos</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-
-        <!-- Spinner -->
-        <div id="spinnerCarga" class="text-center my-2" style="display:none;">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
+        <div id="contenedorProductos">
+          <!-- Bloques de producto se insertarán aquí -->
         </div>
-
-        <!-- Select de Tipo -->
-        <select class="form-select mb-2" id="selectTipoProducto" required>
-          <option value="">Seleccionar tipo de producto</option>
-        </select>
-
-        <!-- Select de Producto -->
-        <select class="form-select mb-2" name="producto" id="selectProducto" required disabled>
-          <!-- Se llenará automáticamente -->
-        </select>
-
-        <input type="number" class="form-control mb-2" name="cantidad" placeholder="Cantidad a retirar" required>
-        <input class="form-control mb-2" name="area" placeholder="Área destino">
+    
+        <button type="button" class="btn btn-sm btn-secondary mb-3" id="agregarProductoBtn">+ Agregar otro producto</button>
+    
+        <input class="form-control mb-2" name="area" placeholder="Área destino" required>
         <input class="form-control mb-2" name="observacion" placeholder="Observación (opcional)">
-        <input type="hidden" name="tipo" value="salida">
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-warning">Registrar salida</button>
@@ -175,3 +162,4 @@
     </form>
   </div>
 </div>
+

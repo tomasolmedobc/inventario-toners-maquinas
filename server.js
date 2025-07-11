@@ -65,7 +65,7 @@ app.use((req, res, next) => {
   });
 });
 
-// --- 🔴 Manejo de errores generales ---
+//  Manejo de errores generales ---
 app.use((err, req, res, next) => {
   console.error('🛑 Error del servidor:', err);
   res.status(500).render('500', {
@@ -79,11 +79,5 @@ const HOST = '0.0.0.0'; // Esto escucha en todas las interfaces de red
 const PORT = 5000;
 
 app.listen(PORT, HOST, () => {
-    console.log(`✅ Servidor corriendo en http://${require('os').networkInterfaces().eth0?.[0]?.address || 'TU_IP_LOCAL'}:${PORT}`);
+    console.log(`✅ Servidor corriendo en http://${require('os').networkInterfaces().eth0?.[0]?.address || '10.240.21.226'}:${PORT}`);
 });
-
-// // Iniciar servidor
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
-// });

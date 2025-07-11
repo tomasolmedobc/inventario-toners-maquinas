@@ -9,7 +9,6 @@ const { mostrarDashboard } = require('../controllers/dashboardController');
 router.get('/dashboard', verificarSesion, mostrarDashboard);
 
 
-
 router.get('/inventario', verificarSesion, async (req, res) => {
   try {
     const productos = await Producto.find();
@@ -19,7 +18,7 @@ router.get('/inventario', verificarSesion, async (req, res) => {
   }
 });
 
-// Crear producto (opcional, si lo usás desde un formulario)
+// Crear producto
 router.post('/inventario', async (req, res) => {
   try {
     const nuevoProducto = new Producto(req.body);
@@ -56,7 +55,7 @@ router.post('/movimientos', async (req, res) => {
   }
 });
 
-// Mostrar movimientos (si tenés movimientos.ejs)
+// Mostrar movimientos
 router.get('/movimientos', verificarSesion, async (req, res) => {
   try {
     const movimientos = await Movimiento.find()
@@ -67,20 +66,5 @@ router.get('/movimientos', verificarSesion, async (req, res) => {
     res.status(500).send('Error al obtener movimientos');
   }
 });
-/*
-funcion para limpiar registros nulls
-router.get('/limpiar-movimientos-null', async (req, res) => {
-  try {
-    const resultado = await Movimiento.deleteMany({ usuario: null });
-    res.send(`Movimientos eliminados: ${resultado.deletedCount}`);
-  } catch (error) {
-    console.error('Error al eliminar movimientos sin usuario:', error);
-    res.status(500).send('Error al limpiar movimientos');
-  }
-});
-*/
-
-
-
 
 module.exports = router;

@@ -1,24 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Esta variable ya viene desde EJS: const productos = <%- JSON.stringify(productos) %>;
+
     let productosPorPagina = 10;
     let paginaActual = 1;
     let ordenAscendente = true;
   
     cargarTipos();
     filtrarYMostrar();
-  
+
     function cargarTipos() {
       const selectFiltro = document.getElementById('filtroTipo');
-      const tipos = [...new Set(productos.map(p => p.tipo))];
+    
+
+      selectFiltro.innerHTML = '<option value="">Todos</option>';
+    
+      
+      const tiposSet = new Set();
+    
+      productos.forEach(p => {
+        tiposSet.add(p.tipo); 
+      });
+    
   
-      tipos.forEach(tipo => {
+      const tiposOrdenados = Array.from(tiposSet).sort((a, b) => a.localeCompare(b));
+    
+ 
+      tiposOrdenados.forEach(tipo => {
         const option = document.createElement('option');
         option.value = tipo;
         option.textContent = tipo;
         selectFiltro.appendChild(option);
       });
     }
-  
+    
     function mostrarProductos(productosMostrar) {
       const tbody = document.querySelector('#tablaProductos tbody');
       tbody.innerHTML = '';
@@ -36,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
       productosPagina.forEach(p => {
         const fila = document.createElement('tr');
+        if (p.cantidad <= 5) fila.classList.add('table-danger'); 
+        
         fila.innerHTML = `
           <td>${p.tipo}</td>
           <td>${p.marca}</td>
@@ -45,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         tbody.appendChild(fila);
       });
+      
   
       actualizarPaginacion(productosMostrar.length);
     }
@@ -57,19 +73,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   
     function filtrarYMostrar() {
-      const tipoSeleccionado = document.getElementById('filtroTipo').value.toLowerCase();
+      const tipoSeleccionado = document.getElementById('filtroTipo').value;
       const busqueda = document.getElementById('inputBusqueda').value.toLowerCase();
-  
+    
       const filtrados = productos.filter(p => {
-        const cumpleTipo = tipoSeleccionado === '' || p.tipo.toLowerCase() === tipoSeleccionado;
+        const cumpleTipo = tipoSeleccionado === '' || p.tipo === tipoSeleccionado;
         const cumpleBusqueda = p.marca.toLowerCase().includes(busqueda)
           || p.modelo.toLowerCase().includes(busqueda)
           || (Array.isArray(p.compatibilidad) && p.compatibilidad.join(', ').toLowerCase().includes(busqueda));
         return cumpleTipo && cumpleBusqueda;
       });
-  
+    
       mostrarProductos(filtrados);
     }
+    
   
     document.getElementById('filtroTipo').addEventListener('change', () => {
       paginaActual = 1;

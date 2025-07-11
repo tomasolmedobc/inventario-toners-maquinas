@@ -1,0 +1,87 @@
+<%- include('partials/header') %>
+
+<div class="container mt-4">
+  <h2>Usuarios</h2>
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (usuarios.length === 0) { %>
+        <tr><td colspan="4" class="text-center">No hay usuarios registrados</td></tr>
+      <% } else { %>
+        <% usuarios.forEach(u => { %>
+          <tr>
+            <td><%= u.nombre %></td>
+            <td><%= u.email %></td>
+            <td><%= u.rol %></td>
+            <td>
+              <button class="btn btn-sm btn-warning btn-cambiar-pass" data-id="<%= u._id %>">🔒 Contraseña</button>
+              <button class="btn btn-sm btn-primary btn-editar-rol" data-id="<%= u._id %>" data-rol="<%= u.rol %>">📝 Rol</button>
+              <button class="btn btn-sm btn-danger btn-eliminar" data-id="<%= u._id %>">🗑️ Eliminar</button>
+            </td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal Cambiar Contraseña -->
+<div class="modal fade" id="modalPassword" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="formPassword" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cambiar contraseña</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="userIdPassword">
+        <div class="mb-3">
+          <label>Nueva contraseña:</label>
+          <input type="password" id="nuevaPassword" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label>Confirmar contraseña:</label>
+          <input type="password" id="confirmarPassword" class="form-control" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Cambio de Rol -->
+<div class="modal fade" id="modalRol" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="formRol" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cambiar Rol</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="userRol">
+        <select class="form-select" id="selectRolModal">
+          <option value="user">Usuario</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="/resources/js/adminUser.js"></script>
+<%- include('partials/footer') %>

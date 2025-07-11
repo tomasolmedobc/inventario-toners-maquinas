@@ -24,8 +24,17 @@ const verificarToken = (req, res, next) => {
 };
 
 
-// Exportar ambos middlewares
+const isAdmin = (req, res, next) => {
+  if (req.session.usuario?.rol === 'admin') {
+    return next();
+  }
+  res.status(403).send('Acceso denegado');
+};
+
+
+// Exportar middlewares
 module.exports = {
   verificarSesion,
-  verificarToken
+  verificarToken,
+  isAdmin, // ✅ exportar también
 };

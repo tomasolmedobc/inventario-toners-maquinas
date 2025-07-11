@@ -95,42 +95,66 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 📤 Salida de Stock
-  const formSalida = document.getElementById('formSalidaStock');
-  if (formSalida) {
-    formSalida.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(formSalida);
-      const data = Object.fromEntries(formData.entries());
-      data.tipo = 'salida';
-      data.cantidad = parseInt(data.cantidad);
+  // 📤 Salida de Stock (múltiples productos)
+const formSalida = document.getElementById('formSalidaStock');
+if (formSalida) {
+  formSalida.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      try {
-        mostrarCargando('Registrando salida...');
-        const res = await fetch('/api/movimientos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
+    const area = formSalida.querySelector('input[name="area"]').value.trim();
+    const observacion = formSalida.querySelector('input[name="observacion"]').value.trim();
 
-        if (res.ok) {
-          Swal.close();
-          mostrarMensaje('Éxito', 'Salida registrada correctamente', 'success');
-          formSalida.reset();
-          const modalEl = document.getElementById('modalSalida');
-          bootstrap.Modal.getOrCreateInstance(modalEl).hide();
-        } else {
-          Swal.close();
-          const err = await res.json();
-          mostrarMensaje('Error', err.error, 'error');
-        }
-      } catch (err) {
-        Swal.close();
-        console.error(err);
-        mostrarMensaje('Error', 'Ocurrió un error al registrar salida', 'error');
+    const lineas = formSalida.querySelectorAll('.producto-linea');
+    const productos = [];
+
+    for (const linea of lineas) {
+      const selectProducto = linea.querySelector('.producto');
+      const inputCantidad = linea.querySelector('.cantidad');
+
+      const productoId = selectProducto.value;
+      const cantidad = parseInt(inputCantidad.value);
+
+      if (!productoId || isNaN(cantidad) || cantidad <= 0) {
+        mostrarMensaje('Error', 'Verificá que todos los productos y cantidades sean válidos', 'error');
+        return;
       }
-    });
-  }
+
+      productos.push({ producto: productoId, cantidad });
+    }
+
+    const data = {
+      tipo: 'salida',
+      productos,
+      area,
+      observacion
+    };
+
+    try {
+      mostrarCargando('Registrando salida...');
+      const res = await fetch('/api/movimientos-multiples', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        Swal.close();
+        mostrarMensaje('Éxito', 'Salida registrada correctamente', 'success');
+        formSalida.reset();
+        const modalEl = document.getElementById('modalSalida');
+        bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+      } else {
+        Swal.close();
+        const err = await res.json();
+        mostrarMensaje('Error', err.error || 'Datos inválidos', 'error');
+      }
+    } catch (err) {
+      Swal.close();
+      console.error(err);
+      mostrarMensaje('Error', 'Ocurrió un error al registrar la salida', 'error');
+    }
+  });
+}
 
   // 🛒 Cargar productos dinámicamente al abrir modales
   let todosLosProductos = [];
@@ -192,6 +216,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function crearLineaProducto(index) {
+    const div = document.createElement('div');
+    div.classList.add('producto-linea', 'mb-2');
+    div.innerHTML = `
+      <select class="form-select tipo-producto" required>
+        <option value="">Seleccionar tipo de producto</option>
+      </select>
+      <select class="form-select producto" required disabled>
+        <option value="">Seleccionar producto</option>
+      </select>
+      <input type="number" class="form-control cantidad" placeholder="Cantidad" required min="1">
+      <button type="button" class="btn btn-danger btn-sm mt-1 quitar-producto">Quitar</button>
+      <hr>
+    `;
+    return div;
+  }
+  
+  function inicializarLinea(div) {
+    const selectTipo = div.querySelector('.tipo-producto');
+    const selectProducto = div.querySelector('.producto');
+    const btnQuitar = div.querySelector('.quitar-producto');
+  
+    // Llenar select tipo
+    const tiposUnicos = [...new Set(todosLosProductos.map(p => p.tipo))];
+    tiposUnicos.forEach(tipo => {
+      const option = document.createElement('option');
+      option.value = tipo;
+      option.textContent = tipo;
+      selectTipo.appendChild(option);
+    });
+  
+    selectTipo.addEventListener('change', () => {
+      const tipo = selectTipo.value;
+      selectProducto.innerHTML = '';
+      const filtrados = todosLosProductos.filter(p => p.tipo === tipo);
+  
+      if (filtrados.length > 0) {
+        selectProducto.disabled = false;
+        filtrados.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p._id;
+          opt.textContent = `${p.marca} ${p.modelo} (${p.cantidad})`;
+          selectProducto.appendChild(opt);
+        });
+      } else {
+        selectProducto.innerHTML = '<option disabled>No hay disponibles</option>';
+        selectProducto.disabled = true;
+      }
+    });
+  
+    btnQuitar.addEventListener('click', () => div.remove());
+  }
+      
+      document.getElementById('agregarProductoBtn').addEventListener('click', () => {
+        const container = document.getElementById('contenedorProductos');
+        const div = crearLineaProducto();
+        container.appendChild(div);
+        inicializarLinea(div);
+      });
+      
+      // Inicial al abrir modal
+      document.getElementById('modalSalida').addEventListener('show.bs.modal', async () => {
+        await cargarProductos(); // Asegura que todosLosProductos esté cargado
+      
+        const container = document.getElementById('contenedorProductos');
+        container.innerHTML = '';
+        const div = crearLineaProducto();
+        container.appendChild(div);
+        inicializarLinea(div);
+      })
+
   // Eventos para detectar cambios
   const selectTipoSalida = document.getElementById('selectTipoProducto');
   if (selectTipoSalida) {
@@ -207,13 +302,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Cuando abren los modales
-  const modales = ['modalReabastecimiento', 'modalSalida'];
-  modales.forEach(id => {
-    const modal = document.getElementById(id);
-    if (modal) {
-      modal.addEventListener('show.bs.modal', cargarProductos);
-    }
-  });
+  // Ocultar anuladas por defecto si el switch está destildado
+document.querySelectorAll('#tablaEntregas tr.table-danger').forEach(fila => {
+  fila.style.display = 'none';
+});
+
+
+  // // Cuando abren los modales
+  // const modales = ['modalReabastecimiento', 'modalSalida'];
+  // modales.forEach(id => {
+  //   const modal = document.getElementById(id);
+  //   if (modal) {
+  //     modal.addEventListener('show.bs.modal', cargarProductos);
+  //   }
+  // });
 
 });
