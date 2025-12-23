@@ -120,3 +120,9 @@ footer{
     transition: all 0.4s ease;
   }
   
+.modalCargaInicial,
+.modalReabastecimiento,
+.modalSalida{
+    --bs-btn-padding-x: 0.25rem;
+    --bs-btn-padding-y: 0.275rem;
+}

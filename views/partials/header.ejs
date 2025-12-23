@@ -10,9 +10,9 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <!-- Tu archivo CSS personalizado -->
     <link rel="stylesheet" href="/resources/css/style.css">
-
-
+  
 </head>
+
 <body>
     <header>
         <h1>Sistema de Inventario</h1>
@@ -38,11 +38,14 @@
               <a class="nav-link" href="/dev/inventario">Lista de productos</a>
             </li>
             <li>
-              <a class="nav-link" href="/api/entregas">Informes</a>
+              <a class="nav-link" href="/dev/entregas">Informes</a>
               
             </li>
             <li>
-              <a class="nav-link" href="/api/usuarios">Usuarios</a>
+              <a class="nav-link" href="/dev/usuarios">Usuarios</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/dev/bajo-stock">Bajo Stock</a>
             </li>
           </ul>
   
@@ -54,9 +57,9 @@
   
           <!-- Botones -->
           <div class="d-flex gap-2 me-3">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCargaInicial">Nuevo Producto</button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalReabastecimiento">Ingreso Stock</button>
-            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalSalida">Registrar Salida</button>
+            <button class="btn btn-success modalCargaInicial" data-bs-toggle="modal" data-bs-target="#modalCargaInicial">Nuevo Producto</button>
+            <button class="btn btn-primary modalReabastecimiento" data-bs-toggle="modal" data-bs-target="#modalReabastecimiento">Ingreso Stock</button>
+            <button class="btn btn-warning modalSalida" data-bs-toggle="modal" data-bs-target="#modalSalida">Registrar Salida</button>
           </div>
   
           <!-- Usuario logueado -->

@@ -32,7 +32,7 @@
     </thead>
     <tbody id="tablaEntregas">
       <% entregas.forEach(e => { %>
-        <tr>
+        <tr class="<%= e.anulado ? 'table-danger text-decoration-line-through' : '' %>">
           <td><%= e.usuario?.nombre || 'N/A' %></td>
           <td><%= e.area %></td>
           <td><%= e.cantidad %></td>
@@ -49,9 +49,23 @@
           </td>
           <td>
             <a href="/api/nota-entrega/<%= e._id %>" class="btn btn-sm btn-outline-secondary" target="_blank">🖨️</a>
-            <button class="btn btn-sm btn-warning btn-editar-entrega" data-id="<%= e._id %>" data-cantidad="<%= e.cantidad %>">✏️</button>
-            <button class="btn btn-sm btn-outline-danger btn-anular-entrega"
-              data-id="<%= e._id %>">🗑️</button>
+            <button
+            class="btn btn-sm btn-warning btn-editar-entrega"
+            data-id="<%= e._id %>"
+            data-cantidad="<%= e.cantidad %>"
+            <%= e.anulado ? 'disabled' : '' %>
+          >
+          ✏️
+          </button>
+          
+          <button
+            class="btn btn-sm btn-outline-danger btn-anular-entrega"
+            data-id="<%= e._id %>"
+            <%= e.anulado ? 'disabled' : '' %>
+          >
+          🗑️
+          </button>
+          
           </td>
           
         </tr>
@@ -91,5 +105,6 @@
     </form>
   </div>
 </div>
+<script src="/resources/js/viewEntregas.js"></script>
 
 <%- include('partials/footer') %>

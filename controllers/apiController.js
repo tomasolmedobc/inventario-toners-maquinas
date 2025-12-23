@@ -62,8 +62,6 @@ const crearProducto = async (req, res) => {
     res.status(500).json({ error: 'Error al crear producto' });
   }
 };
-
-// Registrar movimiento (entrada o salida)
 const registrarMovimiento = async (req, res) => {
   try {
     const { producto, tipo, cantidad, area, observacion } = req.body;
@@ -104,7 +102,6 @@ const registrarMovimiento = async (req, res) => {
     res.status(500).json({ error: 'Error al registrar movimiento' });
   }
 };
-// Ver entregas (solo salidas)
 const verEntregas = async (req, res) => {
   try {
     const entregas = await Movimiento.find({ tipo: 'salida' })
@@ -113,11 +110,12 @@ const verEntregas = async (req, res) => {
       .sort({ fecha: -1 });
 
     res.render('entregas', { entregas });
-  } catch (err) {
-    console.error('Error al obtener entregas:', err);
-    res.status(500).send('Error interno del servidor');
+  } catch (error) {
+    console.error('Error al obtener entregas:', error);
+    res.status(500).send('Error interno');
   }
 };
+
 const listarProductos = async (req, res) => {
   try {
     const productos = await Producto.find();
@@ -233,38 +231,47 @@ const getGraficoToners = async (req, res) => {
     res.status(500).json({ error: 'Error al generar gráfico por áreas' });
   }
 };
-const editarMovimientoEntrega = async (req, res) => {
+  const editarMovimientoEntrega = async (req, res) => {
   const { id } = req.params;
   const { nuevaCantidad, observacion } = req.body;
 
-  if (!observacion || isNaN(nuevaCantidad) || nuevaCantidad < 0) {
+  if (!observacion || isNaN(nuevaCantidad) || nuevaCantidad <= 0) {
     return res.status(400).json({ error: 'Datos inválidos' });
   }
 
   try {
     const movimiento = await Movimiento.findById(id).populate('producto');
+
     if (!movimiento || movimiento.tipo !== 'salida') {
       return res.status(404).json({ error: 'Movimiento no válido' });
     }
 
-    const producto = movimiento.producto;
-    const diferencia = nuevaCantidad - movimiento.cantidad;
-
-    if (diferencia > 0 && producto.cantidad < diferencia) {
-      return res.status(400).json({ error: 'Stock insuficiente para aumentar entrega' });
+    if (movimiento.anulado) {
+      return res.status(400).json({ error: 'No se puede editar una entrega anulada' });
     }
 
-    // Ajustar stock
+    const producto = movimiento.producto;
+
+    const diferencia = nuevaCantidad - movimiento.cantidad;
+
+    // Si aumenta la entrega, verificar stock
+    if (diferencia > 0 && producto.cantidad < diferencia) {
+      return res.status(400).json({ error: 'Stock insuficiente' });
+    }
+
+    // Ajuste real de stock
     producto.cantidad -= diferencia;
+
     movimiento.cantidad = nuevaCantidad;
     movimiento.observacion += ` | EDITADO: ${observacion}`;
+
     await producto.save();
     await movimiento.save();
 
-    res.json({ success: true, message: 'Entrega modificada correctamente' });
-  } catch (err) {
-    console.error('Error al editar entrega:', err);
-    res.status(500).json({ error: 'Error interno al editar entrega' });
+    res.json({ mensaje: 'Entrega editada correctamente' });
+  } catch (error) {
+    console.error('Error al editar entrega:', error);
+    res.status(500).json({ error: 'Error interno' });
   }
 };
 
@@ -306,7 +313,6 @@ const registrarMultiplesMovimientos = async (req, res) => {
     res.status(500).json({ error: 'Error al registrar múltiples movimientos' });
   }
 };
-
 const anularMovimiento = async (req, res) => {
   try {
     const movimiento = await Movimiento.findById(req.params.id);
@@ -330,33 +336,21 @@ const anularMovimiento = async (req, res) => {
     res.status(500).json({ error: 'Error interno al anular entrega' });
   }
 };
-const marcarComoAnulado = async (req, res) => {
+
+const getTonersBajoStock = async (req, res) => {
   try {
-    const movimiento = await Movimiento.findById(req.params.id);
-    if (!movimiento) return res.status(404).json({ error: 'Movimiento no encontrado' });
+    const umbral = 7; // configurable
+    const toners = await Producto.find({
+      tipo: /toner/i,
+      cantidad: { $lt: umbral }
+    });
 
-    if (movimiento.anulado) return res.status(400).json({ error: 'Ya está anulado' });
-
-    if (movimiento.tipo !== 'salida') {
-      return res.status(400).json({ error: 'Solo se pueden anular salidas' });
-    }
-
-    const producto = await Producto.findById(movimiento.producto);
-    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
-
-    producto.cantidad += movimiento.cantidad;
-    await producto.save();
-
-    movimiento.anulado = true;
-    await movimiento.save();
-
-    res.json({ mensaje: 'Entrega anulada y stock restituido correctamente' });
-  } catch (err) {
-    console.error('Error al anular entrega:', err);
-    res.status(500).json({ error: 'Error interno al anular entrega' });
+    res.json(toners);
+  } catch (error) {
+    console.error("Error al obtener tóners con bajo stock:", error);
+    res.status(500).json({ error: "Error al obtener los tóners con bajo stock" });
   }
 };
-
 
 
 module.exports = {
@@ -369,5 +363,5 @@ module.exports = {
   editarMovimientoEntrega,
   registrarMultiplesMovimientos,
   anularMovimiento,
-  marcarComoAnulado,
+  getTonersBajoStock
 };

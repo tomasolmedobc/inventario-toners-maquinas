@@ -1,5 +1,6 @@
 
   const Movimiento = require('../models/Movimiento');
+  const bcrypt = require('bcryptjs');
   const User = require('../models/User');
 
    const mostrarDashboard = async (req, res) => {
@@ -52,24 +53,33 @@
 };
 
 
-
 const cambiarPasswordManual = async (req, res) => {
-  const { id } = req.params;
-  const { nuevaPassword, confirmarPassword } = req.body;
+  try {
+    const { id } = req.params;
+    const { nuevaPassword, confirmarPassword } = req.body;
 
-  if (!nuevaPassword || nuevaPassword.length < 6) {
-    return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+    if (!nuevaPassword || nuevaPassword.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+    }
+
+    if (nuevaPassword !== confirmarPassword) {
+      return res.status(400).json({ error: 'Las contraseñas no coinciden.' });
+    }
+
+    const hash = await bcrypt.hash(nuevaPassword, 10);
+
+    const user = await User.findByIdAndUpdate(id, { password: hash }, { new: true });
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    res.json({ success: true, message: 'Contraseña actualizada correctamente.' });
+  } catch (error) {
+    console.error('Error al cambiar contraseña manual:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
   }
-
-  if (nuevaPassword !== confirmarPassword) {
-    return res.status(400).json({ error: 'Las contraseñas no coinciden.' });
-  }
-
-  const hash = await bcrypt.hash(nuevaPassword, 10);
-  await User.findByIdAndUpdate(id, { password: hash });
-
-  res.json({ success: true, message: 'Contraseña actualizada correctamente.' });
 };
+
 
 const cambiarRolManual = async (req, res) => {
   const { id } = req.params;
@@ -86,6 +96,21 @@ const cambiarRolManual = async (req, res) => {
   } catch (error) {
     console.error('Error al cambiar rol:', error);
     res.status(500).json({ error: 'Error al cambiar rol' });
+  }
+};
+exports.mostrarDashboard = async (req, res) => {
+  try {
+    const entradas = await Movimiento.find({ tipo: 'entrada' })
+      .populate('producto')
+      .populate('usuario');
+
+    const salidas = await Movimiento.find({ tipo: 'salida' })
+      .populate('producto')
+      .populate('usuario');
+
+    res.render('dashboard', { entradas, salidas });
+  } catch (err) {
+    res.status(500).send('Error dashboard');
   }
 };
 

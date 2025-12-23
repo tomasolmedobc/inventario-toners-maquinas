@@ -1,0 +1,254 @@
+<%- include('partials/header') %>
+
+<div class="container mt-4">
+
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Gestión de Equipos</h3>
+  
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoEquipo">
+      ➕ Nuevo Equipo
+    </button>
+  </div>
+  
+
+  <!-- FILTROS -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <input type="text" id="buscador" class="form-control" placeholder="Buscar equipo...">
+    </div>
+  
+    <div class="col-md-4">
+      <select id="selectArea" class="form-select">
+        <option value="">Todas las áreas</option>
+        <% areas.forEach(area => { %>
+          <option value="<%= area %>"><%= area %></option>
+        <% }) %>
+      </select>
+    </div>
+  
+    <div class="col-md-4">
+      <select id="selectDependencia" class="form-select">
+        <option value="">Todas las dependencias</option>
+        <% dependencias.forEach(dep => { %>
+          <option value="<%= dep %>"><%= dep %></option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+  
+  </div>
+
+  <!-- TABS -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <button class="nav-link active" id="tabActivos">Activos</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="tabBajas">Bajas</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="tabTraspasos">Traspasos</button>
+    </li>
+  </ul>
+
+
+  <!-- TABLA -->
+  <table class="table table-bordered table-hover" id="tablaEquipos">
+    <thead class="table-dark">
+      <tr>
+        <th>Área</th>
+        <th>Dependencia</th>
+        <th>Máquina</th>
+        <th>Código</th>
+        <th>Estado</th>
+        <th style="width:160px">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- JS -->
+    </tbody>
+  </table>
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal fade" id="modalDetalleEquipo" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalle del Equipo</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="detalleEquipo">
+        <!-- JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalNuevoEquipo" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <form class="modal-content" id="formNuevoEquipo">
+      <div class="modal-header">
+        <h5 class="modal-title">Nuevo Equipo</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-2">
+
+          <div class="col-md-6">
+            <label class="form-label">Área</label>
+            <input class="form-control" name="area" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Dependencia</label>
+            <input class="form-control" name="dependencia" required>
+          </div>
+          
+          <div class="col-md-6">
+            <label class="form-label">Máquina</label>
+            <input class="form-control" name="maquina" required placeholder="Ej: PC-ADMIN-01">
+          </div>
+          
+
+          <div class="col-md-6">
+            <label class="form-label">Código Identificación</label>
+            <input class="form-control" name="codigoIdentificacion" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Procesador</label>
+            <input class="form-control" name="procesador">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">RAM</label>
+            <input class="form-control" name="ram">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Disco</label>
+            <input class="form-control" name="disco">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">IP</label>
+            <input class="form-control" name="ip">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Hostname</label>
+            <input class="form-control" name="hostname">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Usuario</label>
+            <input class="form-control" name="usuario">
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-success" type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div class="modal fade" id="modalEditarEquipo" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Equipo</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="editId">
+
+        <div class="row g-2">
+          <div class="col-md-6">
+            <span>Procesador:</span>
+            <input class="form-control" id="editProcesador" placeholder="Procesador">
+          </div>
+          <div class="col-md-6">
+            <span>Memoria:</span>
+            <input class="form-control" id="editRam" placeholder="RAM">
+          </div>
+          <div class="col-md-6">
+            <span>Disco:</span>
+            <input class="form-control" id="editDisco" placeholder="Disco">
+          </div>
+          <div class="col-md-6">
+            <span>IP:</span>
+            <input class="form-control" id="editIp" placeholder="IP">
+          </div>
+          <div class="col-md-6">
+            <span>Hostname:</span>
+            <input class="form-control" id="editHostname" placeholder="Hostname">
+          </div>
+          <div class="col-md-6">
+            <span>User:</span>
+            <input class="form-control" id="editUsuario" placeholder="Usuario">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="guardarEdicion()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modalTraspaso" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Traspaso de Equipo</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="traspasoId">
+
+        <div class="mb-2">
+          <label>Área</label>
+          <input class="form-control" id="traspasoArea">
+        </div>
+
+        <div class="mb-2">
+          <label>Dependencia</label>
+          <input class="form-control" id="traspasoDependencia">
+        </div>
+
+        <div class="mb-2">
+          <label>Código</label>
+          <input class="form-control" id="traspasoCodigo">
+        </div>
+
+        <div class="alert alert-warning small mt-2">
+          Este cambio quedará registrado como traspaso
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-info" onclick="confirmarTraspaso()">
+          Confirmar traspaso
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<script src="/resources/js/equipos.js"></script>
+
+<%- include('partials/footer') %>

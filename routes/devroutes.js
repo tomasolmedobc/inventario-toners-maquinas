@@ -1,70 +1,72 @@
 const express = require('express');
 const router = express.Router();
+
 const Producto = require('../models/Producto');
 const Movimiento = require('../models/Movimiento');
+
 const { verificarSesion } = require('../middleware/auth');
-const { mostrarDashboard } = require('../controllers/dashboardController');
 
-// Dashboard
-router.get('/dashboard', verificarSesion, mostrarDashboard);
+const dashboardController = require('../controllers/dashboardController');
+const equiposController = require('../controllers/equiposController');
+const apiController = require('../controllers/apiController');
 
+/* ======================================================
+   DASHBOARD (VISTA)
+====================================================== */
+
+router.get(
+  '/dashboard',
+  verificarSesion,
+  dashboardController.mostrarDashboard
+);
+
+/* ======================================================
+   ENTREGAS (VISTA)
+====================================================== */
+
+router.get(
+  '/entregas',
+  verificarSesion,
+  apiController.verEntregas
+);
+
+/* ======================================================
+   EQUIPOS (VISTA)
+====================================================== */
+
+router.get(
+  '/equipos',
+  verificarSesion,
+  equiposController.verEquipos
+);
+
+/* ======================================================
+   INVENTARIO (VISTA)
+====================================================== */
 
 router.get('/inventario', verificarSesion, async (req, res) => {
-  try {
-    const productos = await Producto.find();
-    res.render('inventario', { productos }); 
-  } catch (error) {
-    res.status(500).send('Error al cargar productos');
-  }
+  const productos = await Producto.find();
+  res.render('inventario', { productos });
 });
 
-// Crear producto
-router.post('/inventario', async (req, res) => {
-  try {
-    const nuevoProducto = new Producto(req.body);
-    await nuevoProducto.save();
-    res.redirect('/dev/inventario');
-  } catch (error) {
-    res.status(400).send('Error al crear producto');
-  }
-});
+/* ======================================================
+   MOVIMIENTOS (VISTA)
+====================================================== */
 
-// Registrar movimiento
-router.post('/movimientos', async (req, res) => {
-  try {
-    const { tipo, producto, cantidad } = req.body;
-    const prod = await Producto.findById(producto);
-    if (!prod) return res.status(404).send('Producto no encontrado');
-
-    if (tipo === 'entrada') {
-      prod.cantidad += cantidad;
-    } else if (tipo === 'salida') {
-      if (prod.cantidad < cantidad) {
-        return res.status(400).send('Stock insuficiente');
-      }
-      prod.cantidad -= cantidad;
-    }
-
-    await prod.save();
-    const nuevoMovimiento = new Movimiento(req.body);
-    await nuevoMovimiento.save();
-
-    res.redirect('/dev/dashboard');
-  } catch (error) {
-    res.status(400).send('Error al registrar movimiento');
-  }
-});
-
-// Mostrar movimientos
 router.get('/movimientos', verificarSesion, async (req, res) => {
-  try {
-    const movimientos = await Movimiento.find()
-      .populate('producto')
-      .populate('usuario');
-    res.render('movimientos', { movimientos });
-  } catch (error) {
-    res.status(500).send('Error al obtener movimientos');
-  }
+  const movimientos = await Movimiento.find()
+    .populate('producto')
+    .populate('usuario');
+
+  res.render('movimientos', { movimientos });
+});
+
+/* ======================================================
+   BAJO STOCK (VISTA)
+====================================================== */
+
+router.get('/bajo-stock', verificarSesion, (req, res) => {
+  res.render('bajo-stock');
 });
 
 module.exports = router;
