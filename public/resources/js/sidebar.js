@@ -1,36 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.getElementById('sidebar');
+    const sidebar = document.getElementById('sidebarMenu');
     const toggleBtn = document.getElementById('toggleSidebar');
-    const navLinks = document.querySelectorAll('#sidebar .nav-link');
-    const currentPath = window.location.pathname;
   
-    /* ======================
-       Link activo
-    ====================== */
-    navLinks.forEach(link => {
-      if (link.getAttribute('href') === currentPath) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
-    });
+    if (!sidebar || !toggleBtn) return;
   
-    /* ======================
-       Restaurar estado
-    ====================== */
+    // Restaurar estado
     if (localStorage.getItem('sidebar') === 'collapsed') {
-      sidebar.classList.add('collapsed');
+      sidebar.classList.remove('show');
     }
   
-    /* ======================
-       Toggle sidebar
-    ====================== */
     toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('collapsed');
+      sidebar.classList.toggle('show');
   
       localStorage.setItem(
         'sidebar',
-        sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded'
+        sidebar.classList.contains('show') ? 'expanded' : 'collapsed'
       );
     });
   });

@@ -15,7 +15,7 @@ const EquipoSchema = new mongoose.Schema(
     
     },
 
-    maquina: {
+    usernamePc: {
       type: String, // Ej: PC-ADMIN-01
       required: true,
       trim: true
@@ -46,7 +46,7 @@ const EquipoSchema = new mongoose.Schema(
       default: ''
     },
 
-    usuario: {
+    nombreApellido: {
       type: String, // Usuario asignado al equipo
       default: ''
     },

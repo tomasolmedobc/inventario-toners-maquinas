@@ -9,11 +9,14 @@ const TraspasoEquipoSchema = new mongoose.Schema({
 
   areaAnterior: String,
   dependenciaAnterior: String,
-  codigoAnterior: String,
+  usernamePcAnterior: String,
+  nombreApellidoAnterior: String,
+
 
   areaNueva: String,
   dependenciaNueva: String,
-  codigoNuevo: String,
+  usernamePcNueva:String,
+  nombreApellidoNuevo: String,
 
   usuario: {
     type: String // o ObjectId User si querés

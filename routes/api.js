@@ -131,14 +131,11 @@ router.get(
   equiposController.historialEquipo
 );
 
-
-
-router.get('/equipos/filtros', async (req, res) => {
-  const areas = await Equipo.distinct('area', { estado: 'ACTIVO' });
-  const dependencias = await Equipo.distinct('dependencia', { estado: 'ACTIVO' });
-
-  res.json({ areas, dependencias });
-});
+router.get(
+  '/equipos/filtros',
+  verificarSesion,
+  equiposController.obtenerFiltros
+);
 
 
 

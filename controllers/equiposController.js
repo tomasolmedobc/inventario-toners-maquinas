@@ -38,7 +38,7 @@ exports.listarEquipos = async (req, res) => {
     if (dependencia) filtro.dependencia = dependencia;
 
     if (search?.trim()) {
-      filtro.maquina = { $regex: search, $options: 'i' };
+      filtro.usernamePc = { $regex: search, $options: 'i' };
     }
 
     const equipos = await Equipo.find(filtro).sort({ area: 1 });
@@ -58,17 +58,17 @@ exports.crearEquipo = async (req, res) => {
       const {
         area,
         dependencia,
-        maquina,
+        usernamePc,
         codigoIdentificacion,
         procesador,
         ram,
         disco,
         ip,
         hostname,
-        usuario
+        nombreApellido
       } = req.body;
   
-      if (!area || !dependencia || !maquina || !codigoIdentificacion) {
+      if (!area || !dependencia || !usernamePc || !codigoIdentificacion) {
         return res.status(400).json({
           error: 'Faltan campos obligatorios'
         });
@@ -77,14 +77,14 @@ exports.crearEquipo = async (req, res) => {
       const equipo = await Equipo.create({
         area,
         dependencia,
-        maquina,
+        usernamePc,
         codigoIdentificacion,
         procesador,
         ram,
         disco,
         ip,
         hostname,
-        usuario
+        nombreApellido
       });
   
       await registrarAuditoria({
@@ -92,7 +92,7 @@ exports.crearEquipo = async (req, res) => {
         modulo: 'EQUIPOS',
         referencia: equipo._id,
         referenciaModelo: 'Equipo',
-        descripcion: `Alta de equipo ${equipo.maquina}`,
+        descripcion: `Alta de equipo ${equipo.usernamePc}`,
         usuario: req.session.usuario
       });
   
@@ -117,7 +117,13 @@ exports.editarEquipo = async (req, res) => {
       return res.status(403).json({ error: 'Equipo dado de baja' });
     }
 
-    Object.assign(equipo, req.body);
+    const camposPermitidos = [
+      'procesador','ram','disco','ip','hostname','usernamePc','nombreApellido'
+    ];
+    camposPermitidos.forEach(c => {
+      if (req.body[c] !== undefined) equipo[c] = req.body[c];
+    });
+    
     await equipo.save();
 
     await registrarAuditoria({
@@ -125,7 +131,7 @@ exports.editarEquipo = async (req, res) => {
       modulo: 'EQUIPOS',
       referencia: equipo._id,
       referenciaModelo: 'Equipo',
-      descripcion: `Edición de equipo ${equipo.maquina}`,
+      descripcion: `Edición de equipo ${equipo.usernamePc}`,
       usuario: req.session.usuario
     });
 
@@ -148,23 +154,38 @@ exports.traspasarEquipo = async (req, res) => {
       return res.status(403).json({ error: 'Equipo dado de baja' });
     }
 
-    const { area, dependencia, codigoIdentificacion } = req.body;
+    const { area, dependencia, usernamePc, nombreApellido } = req.body;
+
+    if (
+      equipo.area === area &&
+      equipo.dependencia === dependencia &&
+      equipo.usernamePc === usernamePc &&
+      equipo.nombreApellido === nombreApellido
+    ) {
+      return res.status(400).json({ error: 'No hay cambios para registrar' });
+    }
+    
+
 
     await TraspasoEquipo.create({
       equipo: equipo._id,
       areaAnterior: equipo.area,
       dependenciaAnterior: equipo.dependencia,
-      codigoAnterior: equipo.codigoIdentificacion,
+      usernamePcAnterior: equipo.usernamePc,
+      nombreApellidoAnterior: equipo.nombreApellido,
       areaNueva: area,
       dependenciaNueva: dependencia,
-      codigoNuevo: codigoIdentificacion,
+      usernamePcNueva: usernamePc,
+      nombreApellidoNuevo: nombreApellido,
       usuario: req.session.usuario.nombre
     });
 
     equipo.area = area;
     equipo.dependencia = dependencia;
-    equipo.codigoIdentificacion = codigoIdentificacion;
+    equipo.usernamePc = usernamePc;
+    equipo.nombreApellido = nombreApellido;
     await equipo.save();
+    
 
     await registrarAuditoria({
       accion: 'TRASPASO_EQUIPO',
@@ -185,7 +206,7 @@ exports.traspasarEquipo = async (req, res) => {
 exports.listarTraspasos = async (req, res) => {
     try {
       const traspasos = await TraspasoEquipo.find()
-        .populate('equipo', 'maquina')
+        .populate('equipo', 'usernamePc')
         .sort({ fecha: -1 });
   
       res.json(traspasos);
@@ -211,7 +232,7 @@ exports.darDeBaja = async (req, res) => {
       modulo: 'EQUIPOS',
       referencia: equipo._id,
       referenciaModelo: 'Equipo',
-      descripcion: `Baja de equipo ${equipo.maquina}`,
+      descripcion: `Baja de equipo ${equipo.usernamePc}`,
       usuario: req.session.usuario
     });
 
@@ -238,3 +259,19 @@ exports.historialEquipo = async (req, res) => {
     res.status(500).json({ error: 'Error obteniendo historial' });
   }
 };
+
+
+exports.obtenerFiltros = async (req, res) => {
+  try {
+    const areas = await Equipo.distinct('area', { estado: 'ACTIVO' });
+    const dependencias = await Equipo.distinct('dependencia', { estado: 'ACTIVO' });
+
+    res.json({ areas, dependencias });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener filtros' });
+  }
+};
+
+
+

@@ -1,370 +1,276 @@
-let vistaActual = 'activos'; // activos | bajas | traspasos
-let equiposCache = [];
+document.addEventListener('DOMContentLoaded', () => {
 
+  let vistaActual = 'activos'; // activos | bajas | traspasos
+  let equiposCache = [];
 
-//let estadoActual = 'alta';
-const tbody = document.querySelector('#tablaEquipos tbody');
-const buscador = document.getElementById('buscador');
-const selectArea = document.getElementById('selectArea');
-const tabActivos = document.getElementById('tabActivos');
-const tabBajas = document.getElementById('tabBajas');
-const selectDependencia = document.getElementById('selectDependencia');
-const tabTraspasos = document.getElementById('tabTraspasos');
+  /* ==========================
+    ELEMENTOS DOM
+  ========================== */
+  const tbody = document.querySelector('#tablaEquipos tbody');
+  const thead = document.querySelector('#tablaEquipos thead');
 
+  const buscador = document.getElementById('buscador');
+  const selectArea = document.getElementById('selectArea');
+  const selectDependencia = document.getElementById('selectDependencia');
 
+  const tabActivos = document.getElementById('tabActivos');
+  const tabBajas = document.getElementById('tabBajas');
+  const tabTraspasos = document.getElementById('tabTraspasos');
 
-/* ==========================
-        CREAR EQUIPOS
-========================== */
+  if (!tbody || !thead) return;
 
-const formNuevoEquipo = document.getElementById('formNuevoEquipo');
+  /* ==========================
+    THEADs
+  ========================== */
+  const theadEquipos = `
+    <tr>
+      <th>Área</th>
+      <th>Dependencia</th>
+      <th>Usuario PC</th>
+      <th>Código</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  `;
 
-formNuevoEquipo.onsubmit = async (e) => {
-  e.preventDefault();
+  const theadTraspasos = `
+    <tr>
+      <th>Área</th>
+      <th>Dependencia</th>
+      <th>Usuario PC</th>
+      <th>Responsable</th>
+      <th>Fecha</th>
+    </tr>
+  `;
 
-  const data = Object.fromEntries(new FormData(formNuevoEquipo));
+  /* ==========================
+    FILTROS
+  ========================== */
+  async function cargarFiltros() {
+    if (!selectArea || !selectDependencia) return;
 
-  const res = await fetch('/api/equipos', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
+    const res = await fetch('/api/equipos/filtros');
+    const { areas, dependencias } = await res.json();
 
-  if (!res.ok) {
-    alert('Error al guardar el equipo');
-    return;
+    selectArea.innerHTML = '<option value="">Todas</option>';
+    selectDependencia.innerHTML = '<option value="">Todas</option>';
+
+    areas.forEach(a => selectArea.append(new Option(a, a)));
+    dependencias.forEach(d => selectDependencia.append(new Option(d, d)));
   }
 
-  bootstrap.Modal.getInstance(
-    document.getElementById('modalNuevoEquipo')
-  ).hide();
+  function refrescarFiltros() {
+    if (!selectArea || !selectDependencia) return;
 
-  formNuevoEquipo.reset();
-  cargarEquipos();
-};
+    const areaActual = selectArea.value;
+    const depActual = selectDependencia.value;
 
+    const areas = [...new Set(equiposCache.map(e => e.area).filter(Boolean))];
+    const deps = [...new Set(equiposCache.map(e => e.dependencia).filter(Boolean))];
 
+    selectArea.innerHTML = '<option value="">Todas</option>';
+    selectDependencia.innerHTML = '<option value="">Todas</option>';
 
+    areas.forEach(a => {
+      selectArea.append(new Option(a, a, false, a === areaActual));
+    });
 
-
-
-/* ==========================
-        CARGAR EQUIPOS
-========================== */
-async function cargarEquipos() {
-  if (vistaActual === 'traspasos') return;
-
-  const area = selectArea.value;
-  const dependencia = selectDependencia.value;
-  const search = buscador.value;
-
-  const estado = vistaActual === 'activos' ? 'ACTIVO' : 'BAJA';
-
-  const res = await fetch(
-    `/api/equipos?estado=${estado}&area=${area}&dependencia=${dependencia}&search=${search}`
-  );
-
-  equiposCache = await res.json();
-
-  tbody.innerHTML = '';
-
-  if (equiposCache.length === 0) {
-
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center text-muted">
-          No hay equipos para mostrar
-        </td>
-      </tr>
-    `;
-    refrescarFiltros(); 
-    return;
+    deps.forEach(d => {
+      selectDependencia.append(new Option(d, d, false, d === depActual));
+    });
   }
 
-  equiposCache.forEach(e => {
-    tbody.innerHTML += `
-      <tr class="${e.estado === 'BAJA' ? 'table-danger' : ''}">
-        <td>${e.area}</td>
-        <td>${e.dependencia}</td>
-        <td>
-          ${e.maquina}
-          <button class="btn btn-sm btn-link" onclick="verDetalle('${e._id}')">🔍</button>
-        </td>
-        <td>${e.codigoIdentificacion}</td>
-        <td>
-          <span class="badge ${e.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}">
-            ${e.estado}
-          </span>
-        </td>
-        <td>
-          ${e.estado === 'ACTIVO'
-            ? `
-              <button class="btn btn-sm btn-primary" onclick="abrirEditar('${e._id}')">✏️</button>
-              <button class="btn btn-sm btn-info" onclick="abrirTraspaso('${e._id}')">🔁</button>
-              <button class="btn btn-sm btn-warning" onclick="darBaja('${e._id}')">⬇️</button>
-            `
-            : '<span class="text-muted">No editable</span>'
-          }
-        </td>
-      </tr>
-    `;
-  });
-  refrescarFiltros(); 
-}
+  /* ==========================
+    CARGAR EQUIPOS
+  ========================== */
+  async function cargarEquipos() {
+    if (vistaActual === 'traspasos') return;
 
+    const estado = vistaActual === 'activos' ? 'ACTIVO' : 'BAJA';
 
-/* ==========================
-  ACCIONES
-========================== */
-async function refrescarFiltros() {
-  const areaActual = selectArea.value;
-  const depActual = selectDependencia.value;
+    const area = selectArea ? selectArea.value : '';
+    const dependencia = selectDependencia ? selectDependencia.value : '';
+    const search = buscador ? buscador.value : '';
 
-  const areas = [...new Set(equiposCache.map(e => e.area).filter(Boolean))];
-  const deps = [...new Set(equiposCache.map(e => e.dependencia).filter(Boolean))];
+    const res = await fetch(
+      `/api/equipos?estado=${estado}&area=${area}&dependencia=${dependencia}&search=${search}`
+    );
 
-  selectArea.innerHTML = '<option value="">Todas</option>';
-  selectDependencia.innerHTML = '<option value="">Todas</option>';
+    equiposCache = await res.json();
+    tbody.innerHTML = '';
 
-  areas.forEach(a => {
-    const opt = document.createElement('option');
-    opt.value = a;
-    opt.textContent = a;
-    if (a === areaActual) opt.selected = true;
-    selectArea.appendChild(opt);
-  });
+    if (!equiposCache.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center text-muted">
+            No hay equipos para mostrar
+          </td>
+        </tr>
+      `;
+      refrescarFiltros();
+      return;
+    }
 
-  deps.forEach(d => {
-    const opt = document.createElement('option');
-    opt.value = d;
-    opt.textContent = d;
-    if (d === depActual) opt.selected = true;
-    selectDependencia.appendChild(opt);
-  });
-}
+    equiposCache.forEach(e => {
+      tbody.innerHTML += `
+        <tr class="${e.estado === 'BAJA' ? 'table-danger' : ''}">
+          <td>${e.area}</td>
+          <td>${e.dependencia}</td>
+          <td>
+            ${e.usernamePc}
+            <button class="btn btn-sm btn-link" onclick="verDetalle('${e._id}')">🔍</button>
+          </td>
+          <td>${e.codigoIdentificacion}</td>
+          <td>
+            <span class="badge ${e.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}">
+              ${e.estado}
+            </span>
+          </td>
+          <td>
+            ${
+              e.estado === 'ACTIVO'
+                ? `
+                  <button class="btn btn-sm btn-primary" onclick="modalEditarEquipo('${e._id}')">✏️</button>
+                  <button class="btn btn-sm btn-info" onclick="abrirTraspaso('${e._id}')">🔁</button>
+                  <button class="btn btn-sm btn-warning" onclick="darBaja('${e._id}')">⬇️</button>
+                `
+                : '<span class="text-muted">No editable</span>'
+            }
+          </td>
+        </tr>
+      `;
+    });
 
+    refrescarFiltros();
+  }
 
+  /* ==========================
+    TRASPASOS
+  ========================== */
+  async function cargarTraspasos() {
+    const res = await fetch('/api/equipos-traspasos');
+    const traspasos = await res.json();
 
-async function darBaja(id) {
-  if (!confirm('¿Dar de baja el equipo?')) return;
-  await fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' });
+    tbody.innerHTML = '';
+
+    if (!traspasos.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center text-muted">
+            No hay traspasos registrados
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    traspasos.forEach(t => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${t.areaAnterior} → ${t.areaNueva}</td>
+          <td>${t.dependenciaAnterior} → ${t.dependenciaNueva}</td>
+          <td>${t.usernamePcAnterior} → ${t.usernamePcNueva}</td>
+          <td>${t.nombreApellidoAnterior} → ${t.nombreApellidoNuevo}</td>
+          <td>${new Date(t.fecha).toLocaleString()}</td>
+        </tr>
+      `;
+    });
+  }
+
+  /* ==========================
+    TABS
+  ========================== */
+  function activarTab(tab) {
+    document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  }
+
+  function toggleFiltros(mostrar) {
+    const filtros = document.querySelector('.row.mb-3');
+    if (filtros) filtros.style.display = mostrar ? 'flex' : 'none';
+  }
+
+  tabActivos.onclick = () => {
+    vistaActual = 'activos';
+    activarTab(tabActivos);
+    toggleFiltros(true);
+    thead.innerHTML = theadEquipos;
+    cargarEquipos();
+  };
+
+  tabBajas.onclick = () => {
+    vistaActual = 'bajas';
+    activarTab(tabBajas);
+    toggleFiltros(true);
+    thead.innerHTML = theadEquipos;
+    cargarEquipos();
+  };
+
+  tabTraspasos.onclick = () => {
+    vistaActual = 'traspasos';
+    activarTab(tabTraspasos);
+    toggleFiltros(false);
+    thead.innerHTML = theadTraspasos;
+    cargarTraspasos();
+  };
+
+  /* ==========================
+    EVENTOS
+  ========================== */
+  if (buscador) {
+    buscador.oninput = () =>
+      vistaActual !== 'traspasos' && cargarEquipos();
+  }
+
+  if (selectArea) {
+    selectArea.onchange = () =>
+      vistaActual !== 'traspasos' && cargarEquipos();
+  }
+
+  if (selectDependencia) {
+    selectDependencia.onchange = () =>
+      vistaActual !== 'traspasos' && cargarEquipos();
+  }
+
+  /* ==========================
+    INIT
+  ========================== */
+  thead.innerHTML = theadEquipos;
+  cargarFiltros();
   cargarEquipos();
-}
 
-async function eliminarEquipo(id) {
-  if (!confirm('¿Eliminar definitivamente el equipo?')) return;
-  await fetch(`/api/equipos/${id}`, { method: 'DELETE' });
-  cargarEquipos();
-}
+});
 
-/* ==========================
-  DETALLE
-========================== */
-async function verDetalle(id) {
+window.verDetalle = async function (id) {
   const res = await fetch(`/api/equipos?detalle=${id}`);
   const e = await res.json();
 
   document.getElementById('detalleEquipo').innerHTML = `
-  <ul class="list-group">
-    <li class="list-group-item"><strong>Área:</strong> ${e.area}</li>
-    <li class="list-group-item"><strong>Dependencia:</strong> ${e.dependencia}</li>
-    <li class="list-group-item"><strong>Procesador:</strong> ${e.procesador}</li>
-    <li class="list-group-item"><strong>RAM:</strong> ${e.ram}</li>
-    <li class="list-group-item"><strong>Disco:</strong> ${e.disco}</li>
-    <li class="list-group-item"><strong>IP:</strong> ${e.ip}</li>
-    <li class="list-group-item"><strong>Hostname:</strong> ${e.hostname}</li>
-    <li class="list-group-item"><strong>Usuario:</strong> ${e.usuario}</li>
-  </ul>
-`;
+    <ul class="list-group">
+      <li class="list-group-item"><b>Área:</b> ${e.area}</li>
+      <li class="list-group-item"><b>Dependencia:</b> ${e.dependencia}</li>
+      <li class="list-group-item"><b>Usuario PC:</b> ${e.usernamePc}</li>
+      <li class="list-group-item"><b>Código:</b> ${e.codigoIdentificacion}</li>
+      <li class="list-group-item"><b>Estado:</b> ${e.estado}</li>
+    </ul>
+  `;
 
-
-  new bootstrap.Modal(document.getElementById('modalDetalleEquipo')).show();
-}
-
-
-/* ==========================
-  EDITAR
-========================== */
-async function abrirEditar(id) {
-  const res = await fetch(`/api/equipos?detalle=${id}`);
-  const e = await res.json();
-
-  document.getElementById('editId').value = e._id;
-  document.getElementById('editProcesador').value = e.procesador || '';
-  document.getElementById('editRam').value = e.ram || '';
-  document.getElementById('editDisco').value = e.disco || '';
-  document.getElementById('editIp').value = e.ip || '';
-  document.getElementById('editHostname').value = e.hostname || '';
-  document.getElementById('editUsuario').value = e.usuario || '';
-
-  new bootstrap.Modal(
-    document.getElementById('modalEditarEquipo')
-  ).show();
-}
-
-async function guardarEdicion() {
-  const id = document.getElementById('editId').value;
-
-  const data = {
-    procesador: document.getElementById('editProcesador').value,
-    ram: document.getElementById('editRam').value,
-    disco: document.getElementById('editDisco').value,
-    ip: document.getElementById('editIp').value,
-    hostname: document.getElementById('editHostname').value,
-    usuario: document.getElementById('editUsuario').value
-  };
-
-  const res = await fetch(`/api/equipos/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-
-  if (!res.ok) {
-    alert('No se pudo editar el equipo');
-    return;
-  }
-
-  bootstrap.Modal.getInstance(
-    document.getElementById('modalEditarEquipo')
-  ).hide();
-
-  cargarEquipos();
-}
-/* ==========================
-  Traspaso de area
-========================== */
-
-async function abrirTraspaso(id) {
-  const res = await fetch(`/api/equipos?detalle=${id}`);
-  const e = await res.json();
-
-  document.getElementById('traspasoId').value = e._id;
-  document.getElementById('traspasoArea').value = e.area;
-  document.getElementById('traspasoDependencia').value = e.dependencia;
-  document.getElementById('traspasoCodigo').value = e.codigoIdentificacion;
-
-  new bootstrap.Modal(
-    document.getElementById('modalTraspaso')
-  ).show();
-}
-
-async function confirmarTraspaso() {
-  const id = document.getElementById('traspasoId').value;
-
-  const data = {
-    area: document.getElementById('traspasoArea').value,
-    dependencia: document.getElementById('traspasoDependencia').value,
-    codigoIdentificacion: document.getElementById('traspasoCodigo').value
-  };
-
-  if (!confirm('¿Confirmar traspaso del equipo?')) return;
-
-  const res = await fetch(`/api/equipos/${id}/traspaso`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-
-  if (!res.ok) {
-    alert('No se pudo realizar el traspaso');
-    return;
-  }
-
-  bootstrap.Modal.getInstance(
-    document.getElementById('modalTraspaso')
-  ).hide();
-
-  cargarEquipos();
-}
-
-async function cargarTraspasos() {
-  const res = await fetch('/api/equipos-traspasos');
-  const traspasos = await res.json();
-
-  tbody.innerHTML = '';
-
-  if (traspasos.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" class="text-center text-muted">
-          No hay traspasos registrados
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  traspasos.forEach(t => {
-    tbody.innerHTML += `
-      <tr>
-      <td>${t.areaAnterior} → ${t.areaNueva}</td>
-      <td>${t.dependenciaAnterior} → ${t.dependenciaNueva}</td>
-        <td>${t.equipo?.maquina || '-'}</td>
-        <td>${t.codigoAnterior} → ${t.codigoNuevo}</td>
-        <td>${new Date(t.fecha).toLocaleString()}</td>
-      </tr>
-    `;
-  });
-}
-
-
-
-/* ==========================
-  EVENTOS
-========================== */
-function resetFiltros() {
-  buscador.value = '';
-  selectArea.value = '';
-  selectDependencia.value = '';
-}
-
-
-tabTraspasos.onclick = () => {
-  vistaActual = 'traspasos';
-  activarTab(tabTraspasos);
-  toggleFiltros(false);
-  cargarTraspasos();
+  new bootstrap.Modal('#modalDetalleEquipo').show();
 };
 
-tabActivos.onclick = () => {
-  vistaActual = 'activos';
-  activarTab(tabActivos);
-  toggleFiltros(true);
-  resetFiltros();
-  cargarEquipos();
+window.darBaja = async function (id) {
+  if (!confirm('¿Dar de baja este equipo?')) return;
+
+  await fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' });
+  location.reload();
 };
 
-tabBajas.onclick = () => {
-  vistaActual = 'bajas';
-  activarTab(tabBajas);
-  resetFiltros();
-  cargarEquipos();
+window.modalEditarEquipo = function (id) {
+  document.getElementById('editId').value = id;
+  new bootstrap.Modal('#modalEditarEquipo').show();
 };
 
-
-
-
-function toggleFiltros(mostrar) {
-  document.querySelector('.row.mb-3').style.display = mostrar ? 'flex' : 'none';
-}
-
-function activarTab(tab) {
-  document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
-  tab.classList.add('active');
-}
-buscador.oninput = () => {
-  if (vistaActual !== 'traspasos') cargarEquipos();
+window.abrirTraspaso = function (id) {
+  document.getElementById('traspasoId').value = id;
+  new bootstrap.Modal('#modalTraspaso').show();
 };
-
-selectArea.onchange = () => {
-  if (vistaActual !== 'traspasos') cargarEquipos();
-};
-
-selectDependencia.onchange = () => {
-  if (vistaActual !== 'traspasos') cargarEquipos();
-};
-
-
-/* INIT */
-cargarEquipos();
