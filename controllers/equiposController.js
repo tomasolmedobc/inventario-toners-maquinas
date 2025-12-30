@@ -4,7 +4,7 @@ const Auditoria = require('../models/Auditoria');
 const registrarAuditoria = require('../utils/registrarAuditoria');
 
 /* ==========================
-   VISTA
+  VISTA
 ========================== */
 exports.verEquipos = async (req, res) => {
   try {
@@ -19,7 +19,7 @@ exports.verEquipos = async (req, res) => {
 };
 
 /* ==========================
-   LISTAR / DETALLE
+  LISTAR / DETALLE
 ========================== */
 exports.listarEquipos = async (req, res) => {
   try {
@@ -51,7 +51,7 @@ exports.listarEquipos = async (req, res) => {
 };
 
 /* ==========================
-   CREAR
+  CREAR
 ========================== */
 exports.crearEquipo = async (req, res) => {
     try {
@@ -106,7 +106,7 @@ exports.crearEquipo = async (req, res) => {
   };
   
 /* ==========================
-   EDITAR (solo ACTIVO)
+  EDITAR (solo ACTIVO)
 ========================== */
 exports.editarEquipo = async (req, res) => {
   try {
@@ -138,7 +138,7 @@ exports.editarEquipo = async (req, res) => {
 };
 
 /* ==========================
-   TRASPASO
+  TRASPASO
 ========================== */
 exports.traspasarEquipo = async (req, res) => {
   try {
@@ -196,7 +196,7 @@ exports.listarTraspasos = async (req, res) => {
   
 
 /* ==========================
-   BAJA
+  BAJA
 ========================== */
 exports.darDeBaja = async (req, res) => {
   try {
@@ -224,7 +224,7 @@ exports.darDeBaja = async (req, res) => {
 };
 
 /* ==========================
-   HISTORIAL
+  HISTORIAL
 ========================== */
 exports.historialEquipo = async (req, res) => {
   try {

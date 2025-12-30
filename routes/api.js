@@ -133,6 +133,15 @@ router.get(
 
 
 
+router.get('/equipos/filtros', async (req, res) => {
+  const areas = await Equipo.distinct('area', { estado: 'ACTIVO' });
+  const dependencias = await Equipo.distinct('dependencia', { estado: 'ACTIVO' });
+
+  res.json({ areas, dependencias });
+});
+
+
+
 
 router.get('/ping-sesion', (req, res) => {
   if (req.session) req.session.touch();

@@ -1,4 +1,5 @@
 let vistaActual = 'activos'; // activos | bajas | traspasos
+let equiposCache = [];
 
 
 //let estadoActual = 'alta';
@@ -46,6 +47,7 @@ formNuevoEquipo.onsubmit = async (e) => {
 
 
 
+
 /* ==========================
         CARGAR EQUIPOS
 ========================== */
@@ -62,10 +64,12 @@ async function cargarEquipos() {
     `/api/equipos?estado=${estado}&area=${area}&dependencia=${dependencia}&search=${search}`
   );
 
-  const equipos = await res.json();
+  equiposCache = await res.json();
+
   tbody.innerHTML = '';
 
-  if (equipos.length === 0) {
+  if (equiposCache.length === 0) {
+
     tbody.innerHTML = `
       <tr>
         <td colspan="6" class="text-center text-muted">
@@ -73,10 +77,11 @@ async function cargarEquipos() {
         </td>
       </tr>
     `;
+    refrescarFiltros(); 
     return;
   }
 
-  equipos.forEach(e => {
+  equiposCache.forEach(e => {
     tbody.innerHTML += `
       <tr class="${e.estado === 'BAJA' ? 'table-danger' : ''}">
         <td>${e.area}</td>
@@ -104,12 +109,42 @@ async function cargarEquipos() {
       </tr>
     `;
   });
+  refrescarFiltros(); 
 }
 
 
 /* ==========================
-   ACCIONES
+  ACCIONES
 ========================== */
+async function refrescarFiltros() {
+  const areaActual = selectArea.value;
+  const depActual = selectDependencia.value;
+
+  const areas = [...new Set(equiposCache.map(e => e.area).filter(Boolean))];
+  const deps = [...new Set(equiposCache.map(e => e.dependencia).filter(Boolean))];
+
+  selectArea.innerHTML = '<option value="">Todas</option>';
+  selectDependencia.innerHTML = '<option value="">Todas</option>';
+
+  areas.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a;
+    opt.textContent = a;
+    if (a === areaActual) opt.selected = true;
+    selectArea.appendChild(opt);
+  });
+
+  deps.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d;
+    if (d === depActual) opt.selected = true;
+    selectDependencia.appendChild(opt);
+  });
+}
+
+
+
 async function darBaja(id) {
   if (!confirm('¿Dar de baja el equipo?')) return;
   await fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' });
@@ -123,7 +158,7 @@ async function eliminarEquipo(id) {
 }
 
 /* ==========================
-   DETALLE
+  DETALLE
 ========================== */
 async function verDetalle(id) {
   const res = await fetch(`/api/equipos?detalle=${id}`);
@@ -148,7 +183,7 @@ async function verDetalle(id) {
 
 
 /* ==========================
-   EDITAR
+  EDITAR
 ========================== */
 async function abrirEditar(id) {
   const res = await fetch(`/api/equipos?detalle=${id}`);
@@ -197,7 +232,7 @@ async function guardarEdicion() {
   cargarEquipos();
 }
 /* ==========================
-   Traspaso de area
+  Traspaso de area
 ========================== */
 
 async function abrirTraspaso(id) {
@@ -263,9 +298,9 @@ async function cargarTraspasos() {
   traspasos.forEach(t => {
     tbody.innerHTML += `
       <tr>
+      <td>${t.areaAnterior} → ${t.areaNueva}</td>
+      <td>${t.dependenciaAnterior} → ${t.dependenciaNueva}</td>
         <td>${t.equipo?.maquina || '-'}</td>
-        <td>${t.areaAnterior} → ${t.areaNueva}</td>
-        <td>${t.dependenciaAnterior} → ${t.dependenciaNueva}</td>
         <td>${t.codigoAnterior} → ${t.codigoNuevo}</td>
         <td>${new Date(t.fecha).toLocaleString()}</td>
       </tr>
@@ -276,7 +311,7 @@ async function cargarTraspasos() {
 
 
 /* ==========================
-   EVENTOS
+  EVENTOS
 ========================== */
 function resetFiltros() {
   buscador.value = '';
