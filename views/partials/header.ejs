@@ -18,22 +18,24 @@
 <body>
 
         <script src="/resources/js/themeMode.js"></script>
-        <button
-        id="toggleSidebar"
-        class="btn btn-outline-secondary d-lg-none me-2"
-        type="button"
-      >
-        ☰
-      </button>
+        <div class="top-controls">
+          <button id="toggleSidebar" class="btn btn-outline-secondary">
+            ☰
+          </button>
+        
+          <div class="checkbox ms-2">
+            <input type="checkbox" id="theme-checkbox">
+            <label class="toggle" for="theme-checkbox">
+              <span></span>
+            </label>
+          </div>
+        </div>
+        
       
   <!-- Navbar -->
       <!-- SIDEBAR -->
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar bg-white">
-  <!-- Theme switch -->
-  <div class="theme-switch checkbox m-3">
-    <input id="theme-checkbox" type="checkbox" />
-    <label class="toggle" for="theme-checkbox"><span></span></label>
-  </div>    <div class="position-sticky">
+    <div class="position-sticky">
 
     <!-- Acciones -->
     <div class="list-group list-group-flush mx-3 mt-4">

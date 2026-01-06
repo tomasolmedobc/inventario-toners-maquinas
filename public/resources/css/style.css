@@ -130,49 +130,78 @@ footer{
     --bs-btn-padding-x: 0.25rem;
     --bs-btn-padding-y: 0.275rem;
 }
-
-
-/***** Estilos adicionales para mejorar la apariencia general //*****/
 /* ===== SIDEBAR ===== */
 .sidebar {
-  width: 280px;
+  width: 260px;
   height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 100;
-  padding-top: 1rem;
-  border-right: 1px solid rgba(0,0,0,.1);
-}
-.sidebar-toggle {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 1100; /* más alto que el sidebar */
+  transition: all 0.3s ease;
+  z-index: 1000;
 }
 
-
-main {
-  margin-left: 280px;
-  padding: 20px;
+/* Desktop collapsed */
+.sidebar.collapsed {
+  width: 80px;
 }
 
-/* Responsive */
-@media (max-width: 991px) {
-  main {
-    margin-left: 0;
-  }
-}
-
-
-/* ===== MAIN ===== */
+/* MAIN */
 main {
   margin-left: 260px;
-  padding: 20px;
-  width: 100%;
   transition: margin-left 0.3s ease;
 }
 
 .sidebar.collapsed ~ main {
   margin-left: 80px;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 991px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  main {
+    margin-left: 0;
+  }
+}
+.sidebar-toggle {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1200;
+}
+
+/* En desktop siempre visible */
+@media (min-width: 992px) {
+  .sidebar-toggle {
+    display: block;
+  }
+}
+.top-controls {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1200;
+}
+
+/* En mobile un poco más chico */
+@media (max-width: 576px) {
+  .top-controls {
+    top: 8px;
+    left: 8px;
+    gap: 8px;
+  }
+}
+.position-sticky{
+    margin: 15px;
+    padding-top: 12px;
 }
