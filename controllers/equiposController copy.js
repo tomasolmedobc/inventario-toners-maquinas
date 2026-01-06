@@ -2,6 +2,9 @@ const Equipo = require('../models/Equipo');
 const TraspasoEquipo = require('../models/TraspasoEquipo');
 const Auditoria = require('../models/Auditoria');
 const registrarAuditoria = require('../utils/registrarAuditoria');
+const Area = require('../models/Area');
+const Dependencia = require('../models/Dependencia');
+
 
 /* ==========================
   VISTA
@@ -98,16 +101,11 @@ exports.crearEquipo = async (req, res) => {
   
       res.json({ ok: true });
     } catch (error) {
-      if (error.code === 11000) {
-        return res.status(400).json({
-          error: 'El código de identificación ya existe'
-        });
-      }
-    
       console.error('❌ Error crearEquipo:', error);
-      res.status(500).json({ error: 'Error al crear equipo' });
+      res.status(400).json({
+        error: error.message
+      });
     }
-    
   };
   
 /* ==========================

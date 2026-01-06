@@ -250,13 +250,49 @@ window.verDetalle = async function (id) {
       <li class="list-group-item"><b>Área:</b> ${e.area}</li>
       <li class="list-group-item"><b>Dependencia:</b> ${e.dependencia}</li>
       <li class="list-group-item"><b>Usuario PC:</b> ${e.usernamePc}</li>
+      <li class="list-group-item"><b>Nombre Apellido:</b> ${e.nombreApellido}</li>
+      <li class="list-group-item"><b>Procesador:</b> ${e.procesador}</li>
+      <li class="list-group-item"><b>Ram:</b> ${e.ram}</li>
+      <li class="list-group-item"><b>Disco:</b> ${e.disco}</li>
+      <li class="list-group-item"><b>ip:</b> ${e.ip}</li>
       <li class="list-group-item"><b>Código:</b> ${e.codigoIdentificacion}</li>
-      <li class="list-group-item"><b>Estado:</b> ${e.estado}</li>
     </ul>
   `;
 
   new bootstrap.Modal('#modalDetalleEquipo').show();
 };
+
+
+// ==========================
+// CREAR EQUIPO
+// ==========================
+document.getElementById('formNuevoEquipo').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form));
+
+  const res = await fetch('/api/equipos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    alert(result.error || 'Error al crear equipo');
+    return;
+  }
+
+  bootstrap.Modal.getInstance(
+    document.getElementById('modalNuevoEquipo')
+  ).hide();
+
+  form.reset();
+  cargarEquipos(); // 🔥 SIN reload
+});
+
 
 window.darBaja = async function (id) {
   if (!confirm('¿Dar de baja este equipo?')) return;
@@ -264,13 +300,92 @@ window.darBaja = async function (id) {
   await fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' });
   location.reload();
 };
+window.modalEditarEquipo = async function (id) {
+  const res = await fetch(`/api/equipos?detalle=${id}`);
+  const e = await res.json();
 
-window.modalEditarEquipo = function (id) {
-  document.getElementById('editId').value = id;
+  document.getElementById('editId').value = e._id;
+  document.getElementById('editProcesador').value = e.procesador || '';
+  document.getElementById('editRam').value = e.ram || '';
+  document.getElementById('editDisco').value = e.disco || '';
+  document.getElementById('editIp').value = e.ip || '';
+  document.getElementById('editHostname').value = e.hostname || '';
+  document.getElementById('editUsernamePc').value = e.usernamePc || '';
+  document.getElementById('editNombreApellido').value = e.nombreApellido || '';
+
   new bootstrap.Modal('#modalEditarEquipo').show();
 };
+window.guardarEdicion = async function () {
+  const id = document.getElementById('editId').value;
 
-window.abrirTraspaso = function (id) {
-  document.getElementById('traspasoId').value = id;
+  const data = {
+    procesador: editProcesador.value,
+    ram: editRam.value,
+    disco: editDisco.value,
+    ip: editIp.value,
+    hostname: editHostname.value,
+    usernamePc: editUsernamePc.value,
+    nombreApellido: editNombreApellido.value
+  };
+
+  const res = await fetch(`/api/equipos/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    alert(result.error || 'Error al editar');
+    return;
+  }
+
+  bootstrap.Modal.getInstance(
+    document.getElementById('modalEditarEquipo')
+  ).hide();
+
+  cargarEquipos();
+};
+
+window.abrirTraspaso = async function (id) {
+  const res = await fetch(`/api/equipos?detalle=${id}`);
+  const e = await res.json();
+
+  traspasoId.value = e._id;
+  traspasoArea.value = e.area;
+  traspasoDependencia.value = e.dependencia;
+  traspasoUsernamePc.value = e.usernamePc;
+  traspasoNombreApellido.value = e.nombreApellido;
+
   new bootstrap.Modal('#modalTraspaso').show();
+};
+window.confirmarTraspaso = async function () {
+  const id = traspasoId.value;
+
+  const data = {
+    area: traspasoArea.value,
+    dependencia: traspasoDependencia.value,
+    usernamePc: traspasoUsernamePc.value,
+    nombreApellido: traspasoNombreApellido.value
+  };
+
+  const res = await fetch(`/api/equipos/${id}/traspaso`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    alert(result.error || 'Error en traspaso');
+    return;
+  }
+
+  bootstrap.Modal.getInstance(
+    document.getElementById('modalTraspaso')
+  ).hide();
+
+  cargarEquipos();
 };

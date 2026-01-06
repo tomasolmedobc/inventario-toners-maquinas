@@ -53,8 +53,9 @@ const EquipoSchema = new mongoose.Schema(
 
     codigoIdentificacion: {
       type: String,
+      required: true,
       unique: true,
-      required: true
+      index: true
     },
 
     estado: {
