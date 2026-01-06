@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
   
         const data = await res.json();
-        if (data.success) {
+        if (res.ok) {
           alert('Rol actualizado correctamente.');
           bootstrap.Modal.getInstance(document.getElementById('modalRol')).hide();
           location.reload();

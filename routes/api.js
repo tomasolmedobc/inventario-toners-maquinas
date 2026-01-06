@@ -102,7 +102,7 @@ router.patch(
 ====================================================== */
 
 router.get(
-  '/admin/usuarios',
+  '/usuarios',
   verificarSesion,
   isAdmin,
   adminController.listarUsuarios
