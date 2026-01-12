@@ -250,21 +250,37 @@ if (formSalida) {
     selectTipo.addEventListener('change', () => {
       const tipo = selectTipo.value;
       selectProducto.innerHTML = '';
+      if ($(selectProducto).hasClass("select2-hidden-accessible")) {
+        $(selectProducto).select2('destroy');
+      }
+      
+    
       const filtrados = todosLosProductos.filter(p => p.tipo === tipo);
-  
+    
       if (filtrados.length > 0) {
         selectProducto.disabled = false;
+    
         filtrados.forEach(p => {
           const opt = document.createElement('option');
           opt.value = p._id;
           opt.textContent = `${p.marca} ${p.modelo} (${p.cantidad})`;
           selectProducto.appendChild(opt);
         });
+    
+        // 👉 SOLO para toner
+        if (tipo.toLowerCase() === 'toner') {
+          $(selectProducto).select2({
+            dropdownParent: $('#modalSalida'),
+            width: '100%',
+            placeholder: 'Buscar toner...'
+          });
+        }
       } else {
         selectProducto.innerHTML = '<option disabled>No hay disponibles</option>';
         selectProducto.disabled = true;
       }
     });
+    
   
     btnQuitar.addEventListener('click', () => div.remove());
   }
@@ -306,15 +322,5 @@ if (formSalida) {
 document.querySelectorAll('#tablaEntregas tr.table-danger').forEach(fila => {
   fila.style.display = 'none';
 });
-
-
-  // // Cuando abren los modales
-  // const modales = ['modalReabastecimiento', 'modalSalida'];
-  // modales.forEach(id => {
-  //   const modal = document.getElementById(id);
-  //   if (modal) {
-  //     modal.addEventListener('show.bs.modal', cargarProductos);
-  //   }
-  // });
 
 });
