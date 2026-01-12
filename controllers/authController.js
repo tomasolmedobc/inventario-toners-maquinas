@@ -10,12 +10,24 @@ exports.mostrarRegistro = (req, res) => {
 };
 
 exports.registrarUsuario = async (req, res) => {
-  const { nombre, email, contraseña } = req.body;
-  try {
-    const usuarioExistente = await User.findOne({ email });
-    if (usuarioExistente) return res.render('register', { error: 'Ya existe un usuario con ese email' });
+  const { nombre, email, userName, contraseña } = req.body;
 
-    const nuevoUsuario = new User({ nombre, email, contraseña });
+  try {
+    const existe = await User.findOne({
+      $or: [{ email }, { userName }]
+    });
+
+    if (existe)
+      return res.render('register', { error: 'Email o usuario ya existente' });
+
+    const nuevoUsuario = new User({
+      nombre,
+      email: email.toLowerCase(),
+      userName: userName.toLowerCase(),
+      contraseña
+    });
+    
+
     await nuevoUsuario.save();
     res.redirect('/login');
   } catch (error) {
@@ -24,26 +36,33 @@ exports.registrarUsuario = async (req, res) => {
 };
 
 exports.loginUsuario = async (req, res) => {
-  const { email, contraseña } = req.body;
+  const { userName, contraseña } = req.body;
+  const identificador = userName.toLowerCase();
+
   try {
-    const usuario = await User.findOne({ email });
-    if (!usuario) return res.render('login', { error: 'Usuario no encontrado' });
+    const usuario = await User.findOne({
+      $or: [{ userName: identificador }, { email: identificador }]
+    });
+
+    if (!usuario)
+      return res.render('login', { error: 'Usuario no encontrado' });
 
     const coincide = await usuario.validarContraseña(contraseña);
-    if (!coincide) return res.render('login', { error: 'Contraseña incorrecta' });
+    if (!coincide)
+      return res.render('login', { error: 'Contraseña incorrecta' });
 
-    // Guardamos el usuario en la sesión
     req.session.usuario = {
-      _id: usuario._id,  // 👈 este es el nombre que después usás
+      _id: usuario._id,
       nombre: usuario.nombre,
       rol: usuario.rol
     };
 
     res.redirect('/');
-  } catch (error) {
+  } catch {
     res.render('login', { error: 'Error al iniciar sesión' });
   }
 };
+
 
 exports.logout = (req, res) => {
   req.session.destroy(() => {

@@ -3,19 +3,19 @@
   const bcrypt = require('bcryptjs');
   const User = require('../models/User');
 
-   const mostrarDashboard = async (req, res) => {
-    try {
-       const movimientos = await Movimiento.find()
-         .populate('producto')
-         .populate('usuario')
-         .sort({ fecha: -1 });
-  
-       res.render('dashboard', { movimientos });
-     } catch (error) {
-       console.error('Error al cargar dashboard:', error);
-       res.status(500).send('Error al cargar dashboard');
-     }
-   };
+    const mostrarDashboard = async (req, res) => {
+      try {
+        const movimientos = await Movimiento.find()
+          .populate('producto')
+          .populate('usuario')
+          .sort({ fecha: -1 });
+    
+        res.render('dashboard', { movimientos });
+      } catch (error) {
+        console.error('Error al cargar dashboard:', error);
+        res.status(500).send('Error al cargar dashboard');
+      }
+    };
   
   const getTopAreas = async (req, res) => {
   const { rango = '30' } = req.query;
