@@ -247,4 +247,62 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+/* ===============================
+📤 SUBMIT SALIDA DE STOCK
+=============================== */
+const formSalida = document.getElementById('formSalidaStock');
+
+formSalida?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const area = formSalida.querySelector('[name="area"]').value;
+  const observacion = formSalida.querySelector('[name="observacion"]').value;
+  
+  const productos = [];
+  
+  document.querySelectorAll('.producto-linea').forEach(linea => {
+    const producto = linea.querySelector('.producto')?.value;
+    const cantidad = linea.querySelector('.cantidad')?.value;
+    
+    if (producto && cantidad) {
+      productos.push({
+        producto,
+        cantidad: parseInt(cantidad)
+      });
+    }
+  });
+  
+  if (!productos.length) {
+    mostrarMensaje('Error', 'Debe agregar al menos un producto', 'error');
+    return;
+  }
+  
+  try {
+    mostrarCargando('Registrando salida...');
+    
+    const res = await fetch('/api/movimientos-multiples', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo: 'salida',
+        area,
+        observacion,
+        productos
+      })
+    });
+    
+    Swal.close();
+    if (!res.ok) throw await res.json();
+    
+    mostrarMensaje('Éxito', 'Salida registrada correctamente');
+    
+    formSalida.reset();
+    bootstrap.Modal.getInstance(document.getElementById('modalSalida')).hide();
+    
+  } catch (err) {
+    Swal.close();
+    mostrarMensaje('Error', err.error || 'Error al registrar salida', 'error');
+  }
+});
+
 });
