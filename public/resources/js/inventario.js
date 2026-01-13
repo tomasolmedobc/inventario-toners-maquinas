@@ -52,12 +52,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (p.cantidad <= 5) fila.classList.add('table-danger'); 
         
         fila.innerHTML = `
-          <td>${p.tipo}</td>
-          <td>${p.marca}</td>
-          <td>${p.modelo}</td>
-          <td>${Array.isArray(p.compatibilidad) ? p.compatibilidad.join(', ') : p.compatibilidad}</td>
+        <td>${p.tipo}</td>
+        <td>${p.marca}</td>
+        
+        <td>${p.modelo}</td>
+        <td>
+          ${p.tipo.toLowerCase() === 'toner'
+              ? `<button class="btn btn-sm btn-info btn-detalle"
+                  data-compat='${JSON.stringify(p.compatibilidad)}'>
+                  Ver
+                </button>`
+              : '-'}
+          </td>
           <td>${p.cantidad}</td>
-        `;
+      `;
+      
         tbody.appendChild(fila);
       });
       
@@ -120,5 +129,27 @@ document.addEventListener('DOMContentLoaded', () => {
         filtrarYMostrar();
       }
     });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('btn-detalle')) return;
+    
+      const compat = JSON.parse(e.target.dataset.compat || '[]');
+      const lista = document.getElementById('listaCompatibilidad');
+      lista.innerHTML = '';
+    
+      if (!compat.length) {
+        lista.innerHTML = '<li class="list-group-item">Sin compatibilidad registrada</li>';
+      } else {
+        compat.forEach(c => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item';
+          li.textContent = c;
+          lista.appendChild(li);
+        });
+      }
+    
+      new bootstrap.Modal(document.getElementById('modalDetalleToner')).show();
+    });
+    
   });
   
