@@ -205,3 +205,22 @@ main {
     margin: 15px;
     padding-top: 12px;
 }
+#modalDetalleToner .modal-body {
+  padding: 2px 8px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+#modalDetalleToner .modal-footer{
+  padding: 8px;
+}
+
+#listaCompatibilidad .list-group-item{
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+#listaCompatibilidad,
+#listaCompatibilidad li{
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
