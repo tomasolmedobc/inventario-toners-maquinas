@@ -62,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
                   data-compat='${JSON.stringify(p.compatibilidad)}'>
                   Ver
                 </button>`
-              : '-'}
+              : (p.compatibilidad?.join(', ') || '-')
+            }
           </td>
           <td>${p.cantidad}</td>
       `;
