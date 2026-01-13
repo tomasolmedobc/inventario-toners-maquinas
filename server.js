@@ -10,77 +10,74 @@ const authRoutes = require('./routes/auth');
 const apiRoutes = require('./routes/api');
 const devRoutes = require('./routes/devroutes');
 
-// Controladores y middleware
+// Controladores
 const { mostrarInicio } = require('./controllers/indexController');
-const { verificarSesion } = require('./middleware/auth');
+const { verificarSesion } = require('./middleware/auth'); // Middleware para proteger rutas
 
-// Cargar variables de entorno
-dotenv.config();
-
-// Inicializar app
+// Inicializar Express
 const app = express();
 
-// Conectar a MongoDB (local o prod según .env)
+// Configurar variables de entorno
+dotenv.config();
+
+// Conectar a MongoDB
 connectDB();
 
-// Vistas
+// Configurar EJS y vistas
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// Middlewares
+// Middleware para parseo de datos
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Archivos estáticos
 app.use(express.static('public'));
 
-// Sesiones
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'clave_local_dev',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI
-    }),
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 2 // 2 horas
-    }
-  })
-);
+// Configurar sesiones
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'clave_secreta_segura',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+  cookie: { maxAge: 1000 * 60 * 60 * 2 } // 2 horas
+}));
 
-// Usuario disponible en vistas
+// Middleware global para vistas (usuario logueado)
 app.use((req, res, next) => {
   res.locals.usuario = req.session.usuario || null;
   next();
 });
 
-// Rutas
+// Rutas principales
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 app.use('/dev', devRoutes);
 
-// Dashboard protegido
+// Ruta raíz protegida (dashboard principal)
 app.get('/', verificarSesion, mostrarInicio);
 
-// 404
-app.use((req, res) => {
+// --- 🔴 Manejo de errores 404 ---
+app.use((req, res, next) => {
   res.status(404).render('404', {
     titulo: 'Página no encontrada',
     mensaje: 'La página que buscas no existe.'
   });
 });
 
-// Error general
+//  Manejo de errores generales ---
 app.use((err, req, res, next) => {
-  console.error('🛑 Error:', err);
+  console.error('🛑 Error del servidor:', err);
   res.status(500).render('500', {
     titulo: 'Error del servidor',
-    mensaje: 'Ocurrió un error interno'
+    mensaje: 'Ocurrió un error interno. Intenta más tarde.'
   });
 });
 
-// Puerto
-const PORT = process.env.PORT || 5000;
+// Configurar puerto y host
+const HOST = '0.0.0.0'; // Esto escucha en todas las interfaces de red
+const PORT = 5000;
 
-app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+app.listen(PORT, HOST, () => {
+    console.log(`✅ Servidor corriendo en http://${require('os').networkInterfaces().eth0?.[0]?.address || '10.240.21.226'}:${PORT}`);
 });
