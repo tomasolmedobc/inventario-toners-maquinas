@@ -45,19 +45,19 @@ router.get('/grafico-toners', verificarSesion, apiController.getGraficoToners);
 router.get('/toners-bajo-stock', verificarSesion, apiController.getTonersBajoStock);
 router.get('/top-areas', verificarSesion, dashboardController.getTopAreas);
 
-/* ======================================================
-   NOTAS
-====================================================== */
+  /* ======================================================
+    NOTAS
+  ====================================================== */
 
-router.get('/nota-entrega/:id', verificarSesion, notaController.verNotaEntrega);
+  router.get('/nota-entrega/:id', verificarSesion, notaController.verNotaEntrega);
 
-/* ======================================================
-   EQUIPOS (API)
+  /* ======================================================
+    EQUIPOS (API)
 ====================================================== */
 
 // 📋 Listado
 router.get('/equipos', verificarSesion, equiposController.listarEquipos);
-
+  
 // ➕ Crear
 router.post(
   '/equipos',
@@ -137,14 +137,14 @@ router.get(
   equiposController.obtenerFiltros
 );
 
-
-
+  /* ======================================================
+  Mantener sesión activa
+  ======================================================= */
 
 router.get('/ping-sesion', (req, res) => {
   if (req.session) req.session.touch();
   res.sendStatus(200);
 });
-
 
 
 

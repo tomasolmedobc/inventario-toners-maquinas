@@ -1,0 +1,69 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+<h3>📊 Consumo de tóners</h3>
+
+    <!-- Filtro por período -->
+    <form method="GET" class="row g-2 align-items-end mb-3">
+        <div class="col-md-3">
+          <label class="form-label">Desde</label>
+          <input type="date" name="desde" class="form-control" value="<%= desde || '' %>">
+        </div>
+      
+        <div class="col-md-3">
+          <label class="form-label">Hasta</label>
+          <input type="date" name="hasta" class="form-control" value="<%= hasta || '' %>">
+        </div>
+        <div class="col-med-1 d-flex align-items-end">
+          <a
+          href="/dashboard/consumo/exportar-excel?desde=<%= desde %>&hasta=<%= hasta %>"
+          class="btn btn-success"
+          >
+          Exportar Excel
+        </a>
+      </div>
+      
+        <div class="col-md-2 d-flex align-items-end">
+          <button class="btn btn-primary w-100">Filtrar</button>
+        </div>
+      
+        <div class="col-md-2 d-flex align-items-end">
+            <a href="/dashboard/consumo" class="btn btn-secondary w-100">
+                Limpiar
+              </a>
+        </div>
+      </form>
+      
+    <!-- Total -->
+    <div class="alert alert-info">
+        <strong>Total consumido:</strong> <%= totalPeriodo %> tóners
+    </div>
+
+    <!-- Tabla -->
+    <table class="table table-bordered table-sm mt-3">
+        <thead class="table-dark">
+        <tr>
+            <th>Período</th>
+            <th>Tóner</th>
+            <th>Total consumido</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% if (!consumo.length) { %>
+            <tr>
+            <td colspan="2" class="text-center">Sin datos</td>
+            </tr>
+        <% } %>
+
+        <% consumo.forEach(c => { %>
+            <tr>
+            <td><%= c._id.periodo %></td>
+            <td><%= c._id.marca %> <%= c._id.modelo %></td>
+            <td><%= c.total %></td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<%- include('../partials/footer') %>

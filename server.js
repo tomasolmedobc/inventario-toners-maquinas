@@ -9,6 +9,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const apiRoutes = require('./routes/api');
 const devRoutes = require('./routes/devroutes');
+const dashboardRoutes = require('./routes/dashboard');
 
 // Controladores y middleware
 const { mostrarInicio } = require('./controllers/indexController');
@@ -22,6 +23,7 @@ const app = express();
 
 // Conectar a MongoDB (local o prod según .env)
 connectDB();
+
 
 // Vistas
 app.set('views', path.join(__dirname, 'views'));
@@ -57,6 +59,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 app.use('/dev', devRoutes);
+app.use('/dashboard', dashboardRoutes);
 
 // Dashboard protegido
 app.get('/', verificarSesion, mostrarInicio);

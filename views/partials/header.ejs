@@ -63,25 +63,48 @@
 
     <!-- Navegación -->
     <div class="list-group list-group-flush mx-3 mt-4">
+      <div class="list-group-item fw-bold text-muted">
+      Gestión Inventario
+      </div>
+    
+    <a class="list-group list-group-flush mx-3 mt-4">
       <a href="/dev/inventario" class="list-group-item list-group-item-action py-2">
         <i class="bx bx-package"></i> Inventario
+      </a>
+
+      <a href="/dev/entregas" class="list-group-item list-group-item-action py-2">
+        <i class="bx bx-bar-chart"></i> Informes
+      </a>
+      <a href="/dev/Historial" class="list-group-item list-group-item-action py-2">
+        <i class='bx bx-history'> Historial</i> 
       </a>
       
       <a href="/dev/bajo-stock" class="list-group-item list-group-item-action py-2">
         <i class="bx bx-error"></i> Bajo Stock
       </a>
-      
-      <a href="/dev/entregas" class="list-group-item list-group-item-action py-2">
-        <i class="bx bx-bar-chart"></i> Informes
+      <a href="/dev/equipos" class="list-group-item list-group-item-action py-2">
+        <i class="bx bx-laptop"></i> Equipos
       </a>
 
       <a href="/api/usuarios" class="list-group-item list-group-item-action py-2">
         <i class="bx bx-user"></i> Usuarios
       </a>
-
-      <a href="/dev/equipos" class="list-group-item list-group-item-action py-2">
-        <i class="bx bx-laptop"></i> Equipos
-      </a>
+      
+    </div>
+      <!-- Consumos-->
+      <div class="list-group list-group-flush mx-3 mt-4">
+        <div class="list-group-item fw-bold text-muted">
+          Consumo de toners
+        </div>
+  
+        <a href="/dashboard/consumo" class="list-group-item list-group-item-action py-2">
+          <li class="bx bx-detail"> Consumo total</li>
+        </a>
+  
+          <a href="/dashboard/consumoArea" class="list-group-item list-group-item-action py-2">
+          <li class="bx bx-detail"> Consumo por area</li>
+        </a>
+      </div>
 
       <% if (usuario) { %>
         <div class="list-group-item border-top mt-3">
