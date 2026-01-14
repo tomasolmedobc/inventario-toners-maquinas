@@ -9,6 +9,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const apiRoutes = require('./routes/api');
 const devRoutes = require('./routes/devroutes');
+const dashboardRoutes = require('./routes/dashboard');
 
 // Controladores
 const { mostrarInicio } = require('./controllers/indexController');
@@ -23,7 +24,8 @@ dotenv.config();
 // Conectar a MongoDB
 connectDB();
 
-// Configurar EJS y vistas
+
+// Vistas
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -53,6 +55,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 app.use('/dev', devRoutes);
+app.use('/dashboard', dashboardRoutes);
 
 // Ruta raíz protegida (dashboard principal)
 app.get('/', verificarSesion, mostrarInicio);

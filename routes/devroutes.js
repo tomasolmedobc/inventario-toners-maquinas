@@ -15,13 +15,13 @@ const apiController = require('../controllers/apiController');
 ====================================================== */
 
 router.get(
-  '/dashboard',
+  '/historial',
   verificarSesion,
   dashboardController.mostrarDashboard
 );
 
 /* ======================================================
-   ENTREGAS (VISTA)
+    ENTREGAS (VISTA)
 ====================================================== */
 
 router.get(

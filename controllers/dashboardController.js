@@ -10,10 +10,10 @@
           .populate('usuario')
           .sort({ fecha: -1 });
     
-        res.render('dashboard', { movimientos });
+        res.render('historial', { movimientos });
       } catch (error) {
-        console.error('Error al cargar dashboard:', error);
-        res.status(500).send('Error al cargar dashboard');
+        console.error('Error al cargar historial de movimiento:', error);
+        res.status(500).send('Error al cargar historial de movimiento');
       }
     };
   
@@ -108,9 +108,9 @@ exports.mostrarDashboard = async (req, res) => {
       .populate('producto')
       .populate('usuario');
 
-    res.render('dashboard', { entradas, salidas });
+    res.render('historial', { entradas, salidas });
   } catch (err) {
-    res.status(500).send('Error dashboard');
+    res.status(500).send('Error historial de movimientos');
   }
 };
 
