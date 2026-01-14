@@ -105,34 +105,24 @@ const exportarExcel = async (req, res) => {
     sheet.getCell('A3').value = `Período analizado: ${desde || 'Inicio'} hasta ${hasta || 'Hoy'}`;
     sheet.getCell('A3').alignment = { horizontal: 'center' };
 
-    sheet.getCell('A5').value = 'Marca';
-    sheet.getCell('B5').value = 'Modelo';
-    sheet.getCell('C5').value = 'Cantidad Consumida';
-    sheet.getCell('A5').alignment = { horizontal: 'center' };
-    sheet.getCell('B5').alignment = { horizontal: 'center' };
-    sheet.getCell('C5').alignment = { horizontal: 'center' };
+    sheet.getCell('A5').value = 'Período';
+    sheet.getCell('B5').value = 'Marca';
+    sheet.getCell('C5').value = 'Modelo';
+    sheet.getCell('D5').value = 'Cantidad Consumida';
+    sheet.getCell('A5','B5','C5','D5').alignment = { horizontal: 'center' };
+
 
 
     /* =========================
         ENCABEZADOS CLAROS
     ========================= */
     sheet.columns = [
-      {
-        header: 'Marca del tóner',
-        key: 'marca',
-        width: 25
-      },
-      {
-        header: 'Modelo del tóner',
-        key: 'modelo',
-        width: 30
-      },
-      {
-        header: 'Cantidad consumida',
-        key: 'total',
-        width: 20
-      }
+      { header: 'Período', key: 'periodo', width: 15 },
+      { header: 'Marca', key: 'marca', width: 25 },
+      { header: 'Modelo', key: 'modelo', width: 30 },
+      { header: 'Cantidad consumida', key: 'total', width: 20 }
     ];
+    
 
     const headerRow = sheet.getRow(5);
     headerRow.font = { bold: true };
@@ -143,11 +133,13 @@ const exportarExcel = async (req, res) => {
     ========================= */
     data.forEach(item => {
       sheet.addRow({
+        periodo: item._id.periodo,
         marca: item._id.marca,
         modelo: item._id.modelo,
         total: item.total
       });
     });
+    
 
     /* =========================
         TOTAL GENERAL
