@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
     todasLasAreas.forEach(a => {
       selectArea.innerHTML += `
-        <option value="${a.nombre}">
+        <option value="${a._id}">
           ${a.nombre}
         </option>
       `;
@@ -280,7 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
   formSalida?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const area = formSalida.querySelector('[name="area"]').value.trim();
+    const area = formSalida.querySelector('[name="area"]').value;
+
     const observacion = formSalida.querySelector('[name="observacion"]').value;
 
     if (!area) {

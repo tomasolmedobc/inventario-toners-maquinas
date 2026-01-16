@@ -91,11 +91,11 @@ const registrarMovimiento = async (req, res) => {
       producto,
       tipo,
       cantidad: cantidadNum,
-      area: area || '',
+      area: area || null, 
       observacion: observacion || '',
-      usuario: req.session.usuario?._id || null // o req.usuario._id si usás JWT
+      usuario: req.session.usuario?._id || null
     });
-
+    
     await movimiento.save();
     res.status(201).json(movimiento);
   } catch (err) {
@@ -108,11 +108,29 @@ const verEntregas = async (req, res) => {
     const entregas = await Movimiento.find({ tipo: 'salida' })
       .populate('producto')
       .populate('usuario')
-      .sort({ fecha: -1 });
+      .sort({ fecha: -1 })
+      .lean();
+
+    const areas = await Area.find().lean();
+
+    // mapa rápido id → nombre
+    const mapaAreas = {};
+    areas.forEach(a => {
+      mapaAreas[a._id.toString()] = a.nombre;
+    });
+
+    // resolver área
+    entregas.forEach(e => {
+      if (typeof e.area !== 'string' && e.area) {
+        e.areaNombre = mapaAreas[e.area.toString()] || 'Sin área';
+      } else {
+        e.areaNombre = e.area;
+      }
+    });
 
     res.render('entregas', { entregas });
   } catch (error) {
-    console.error('Error al obtener entregas:', error);
+    console.error(error);
     res.status(500).send('Error interno');
   }
 };
