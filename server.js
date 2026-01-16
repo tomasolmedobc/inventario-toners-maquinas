@@ -4,7 +4,7 @@ const path = require('path');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const connectDB = require('./config/db');
-
+const areasMiddleware = require('./middleware/areasMiddleware');
 // Rutas
 const authRoutes = require('./routes/auth');
 const apiRoutes = require('./routes/api');
@@ -49,11 +49,12 @@ app.use(
   })
 );
 
-// Usuario disponible en vistas
 app.use((req, res, next) => {
-  res.locals.usuario = req.session.usuario || null;
+  res.locals.usuario = req.session?.usuario || null;
   next();
 });
+
+
 
 // Rutas
 app.use('/auth', authRoutes);
@@ -87,3 +88,12 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
 });
+/*
+// Configurar puerto y host
+const HOST = '0.0.0.0'; // Esto escucha en todas las interfaces de red
+const PORT = 5000;
+
+app.listen(PORT, HOST, () => {
+    console.log(`✅ Servidor corriendo en http://${require('os').networkInterfaces().eth0?.[0]?.address || '10.240.21.226'}:${PORT}`);
+});
+*/

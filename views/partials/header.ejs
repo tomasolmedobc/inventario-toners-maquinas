@@ -67,7 +67,6 @@
       Gestión Inventario
       </div>
     
-    <a class="list-group list-group-flush mx-3 mt-4">
       <a href="/dev/inventario" class="list-group-item list-group-item-action py-2">
         <i class="bx bx-package"></i> Inventario
       </a>
@@ -89,7 +88,7 @@
       <a href="/api/usuarios" class="list-group-item list-group-item-action py-2">
         <i class="bx bx-user"></i> Usuarios
       </a>
-      
+
     </div>
       <!-- Consumos-->
       <div class="list-group list-group-flush mx-3 mt-4">
@@ -194,7 +193,10 @@
     
         <button type="button" class="btn btn-sm btn-secondary mb-3" id="agregarProductoBtn">+ Agregar otro producto</button>
     
-        <input class="form-control mb-2" name="area" placeholder="Área destino" required>
+        <select class="form-select mb-2" name="area" id="selectAreaSalida" required>
+          <option value="">Seleccionar área</option>
+        </select>
+        
         <input class="form-control mb-2" name="observacion" placeholder="Observación (opcional)">
       </div>
       <div class="modal-footer">

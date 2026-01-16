@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const Area = require('../models/Area');
 
 const { verificarSesion, isAdmin } = require('../middleware/auth');
 
@@ -21,6 +22,15 @@ router.post('/productos', verificarSesion, apiController.crearProducto);
 router.post('/movimientos', verificarSesion, apiController.registrarMovimiento);
 router.post('/movimientos-multiples', verificarSesion, apiController.registrarMultiplesMovimientos);
 
+router.get('/areas', verificarSesion, async (req, res) => {
+  try {
+    const areas = await Area.find().sort({ nombre: 1 });
+    res.json(areas);
+  } catch (err) {
+    res.status(500).json([]);
+  }
+});
+
 // ✏️ Editar entrega
 router.put(
   '/entregas/:id/editar',
@@ -38,7 +48,7 @@ router.patch(
 );
 
 /* ======================================================
-   DASHBOARD / REPORTES
+    DASHBOARD / REPORTES
 ====================================================== */
 
 router.get('/grafico-toners', verificarSesion, apiController.getGraficoToners);

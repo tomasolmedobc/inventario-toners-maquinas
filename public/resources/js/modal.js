@@ -25,6 +25,32 @@ document.addEventListener('DOMContentLoaded', () => {
      📦 DATOS
   =============================== */
   let todosLosProductos = [];
+  let todasLasAreas = []; 
+
+  async function cargarAreas() {
+    if (todasLasAreas.length) return;
+  
+    const res = await fetch('/api/areas');
+    todasLasAreas = await res.json();
+  
+    const selectArea = document.getElementById('selectAreaSalida');
+    selectArea.innerHTML = '<option value="">Seleccionar área</option>';
+  
+    todasLasAreas.forEach(a => {
+      selectArea.innerHTML += `
+        <option value="${a.nombre}">
+          ${a.nombre}
+        </option>
+      `;
+    });
+  
+    $(selectArea).select2({
+      dropdownParent: $('#modalSalida'),
+      width: '100%',
+      placeholder: 'Buscar área',
+      allowClear: true
+    });
+  }
 
   async function cargarProductos() {
     if (todosLosProductos.length) return;
@@ -48,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ===============================
-     🆕 NUEVO PRODUCTO
+      🆕 NUEVO PRODUCTO
   =============================== */
   const formCarga = document.getElementById('formCargaInicial');
   formCarga?.addEventListener('submit', async (e) => {
@@ -203,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       selectProducto.disabled = false;
-
       activarSelect2(selectProducto, '#modalSalida');
     });
 
@@ -216,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalSalida = document.getElementById('modalSalida');
   modalSalida?.addEventListener('show.bs.modal', async () => {
     await cargarProductos();
+    await cargarAreas();
     const cont = document.getElementById('contenedorProductos');
     cont.innerHTML = '';
     const linea = crearLineaProducto();
@@ -229,80 +255,83 @@ document.addEventListener('DOMContentLoaded', () => {
     cont.appendChild(linea);
     inicializarLinea(linea);
   });
+/* ===============================
+     🔧 FIX select2 / modales
+  =============================== */
+  ['modalReabastecimiento', 'modalSalida'].forEach(id => {
+    const modal = document.getElementById(id);
 
-  // 🔧 FIX aria-hidden + select2
-['modalReabastecimiento', 'modalSalida'].forEach(id => {
-  const modal = document.getElementById(id);
-
-  modal?.addEventListener('hidden.bs.modal', () => {
-    // sacar foco
-    document.activeElement?.blur();
-
-    // destruir select2 si existe
-    $(modal).find('select').each(function () {
-      if ($(this).hasClass('select2-hidden-accessible')) {
-        $(this).select2('destroy');
-      }
+    modal?.addEventListener('hidden.bs.modal', () => {
+      document.activeElement?.blur();
+      $(modal).find('select').each(function () {
+        if ($(this).hasClass('select2-hidden-accessible')) {
+          $(this).select2('destroy');
+        }
+      });
     });
   });
-});
+
 
 /* ===============================
-📤 SUBMIT SALIDA DE STOCK
-=============================== */
-const formSalida = document.getElementById('formSalidaStock');
+     📤 SUBMIT SALIDA DE STOCK
+  =============================== */
+  const formSalida = document.getElementById('formSalidaStock');
 
-formSalida?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const area = formSalida.querySelector('[name="area"]').value;
-  const observacion = formSalida.querySelector('[name="observacion"]').value;
-  
-  const productos = [];
-  
-  document.querySelectorAll('.producto-linea').forEach(linea => {
-    const producto = linea.querySelector('.producto')?.value;
-    const cantidad = linea.querySelector('.cantidad')?.value;
-    
-    if (producto && cantidad) {
-      productos.push({
-        producto,
-        cantidad: parseInt(cantidad)
+  formSalida?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const area = formSalida.querySelector('[name="area"]').value.trim();
+    const observacion = formSalida.querySelector('[name="observacion"]').value;
+
+    if (!area) {
+      mostrarMensaje('Error', 'Debe indicar un área', 'error');
+      return;
+    }
+
+    const productos = [];
+
+    document.querySelectorAll('.producto-linea').forEach(linea => {
+      const producto = linea.querySelector('.producto')?.value;
+      const cantidad = linea.querySelector('.cantidad')?.value;
+
+      if (producto && cantidad) {
+        productos.push({
+          producto,
+          cantidad: parseInt(cantidad)
+        });
+      }
+    });
+
+    if (!productos.length) {
+      mostrarMensaje('Error', 'Debe agregar al menos un producto', 'error');
+      return;
+    }
+
+    try {
+      mostrarCargando('Registrando salida...');
+
+      const res = await fetch('/api/movimientos-multiples', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo: 'salida',
+          area,
+          observacion,
+          productos
+        })
       });
+
+      Swal.close();
+      if (!res.ok) throw await res.json();
+
+      mostrarMensaje('Éxito', 'Salida registrada correctamente');
+      formSalida.reset();
+      bootstrap.Modal.getInstance(modalSalida).hide();
+
+    } catch (err) {
+      Swal.close();
+      mostrarMensaje('Error', err.error || 'Error al registrar salida', 'error');
     }
   });
-  
-  if (!productos.length) {
-    mostrarMensaje('Error', 'Debe agregar al menos un producto', 'error');
-    return;
-  }
-  
-  try {
-    mostrarCargando('Registrando salida...');
-    
-    const res = await fetch('/api/movimientos-multiples', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tipo: 'salida',
-        area,
-        observacion,
-        productos
-      })
-    });
-    
-    Swal.close();
-    if (!res.ok) throw await res.json();
-    
-    mostrarMensaje('Éxito', 'Salida registrada correctamente');
-    
-    formSalida.reset();
-    bootstrap.Modal.getInstance(document.getElementById('modalSalida')).hide();
-    
-  } catch (err) {
-    Swal.close();
-    mostrarMensaje('Error', err.error || 'Error al registrar salida', 'error');
-  }
-});
 
 });

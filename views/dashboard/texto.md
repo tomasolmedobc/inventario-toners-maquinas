@@ -1,0 +1,6 @@
+Problematicas y dudas que tengo.
+1. apiController ingresa las salidas de productos, los datos de area se ingresa a la tabla Movimiento(/models/Movimiento.js), pero aca estamos haciendo cambios para que area vaya a la tabla Areas (models/area.js), lo cual en produccion cuando se ingresa una salida de toner o producto, se ve reflejado en Historial (historial.ejs Registro de entrada y salida Movimientos), modulo informe(entregas.ejs refleja todas las salidas y permite imprmir una comprobante)
+Que posibilidades de que convivan las dos(models/Movimiento y models/Area) cuando se agregan un nuevo registro y se refleje en historial e informe? O es posible dejar de ingresar el dato area en Movimiento e ingresarlo a areas del models/Area? Como podria solucionarlo? ya que tengo 520 registros en la tabla movimientos en produccion.
+
+
+2. Tengo pensado que cuando se ingresa una nueva salida, se pueda buscar el area como se hace en select de toners y que el usuario no pueda ingresar una nueva area a traves del formulario de salida, ya que es el mayor problema que tengo hoy en dia por el tema que hay areas mal tipeadas o tipeadas de formas distintas. Es decir tomarme el trabajo de ingresar las areas desde dashboard/areas y que el formulario de salidas de producto me tome esas areas 

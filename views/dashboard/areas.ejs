@@ -1,0 +1,45 @@
+<%- include('../partials/header') %>
+    <form method="POST" action="/dashboard/areas">
+        <input type="text" name="nombre" placeholder="Nueva área" required>
+        <button>Agregar</button>
+    </form>
+    
+    <h3>Normalizar áreas</h3>
+
+        <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+            <th>Área cargada</th>
+            <th>Área correcta</th>
+            <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% areas.forEach((a, i) => { %>
+                <tr>
+                    <td><%= a.nombre %></td>
+                    <td>
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Ej: Sistemas"
+                        id="area-<%= i %>"
+                    >
+                    </td>
+                    <td>
+                    <button
+                        class="btn btn-success btn-sm"
+                        onclick="normalizar('<%= a %>', <%= i %>)">
+                        Normalizar
+                    </button>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+            
+    </table>
+    
+    
+
+
+    <%- include('../partials/footer') %>

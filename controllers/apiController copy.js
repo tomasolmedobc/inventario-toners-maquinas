@@ -1,6 +1,6 @@
 const Producto = require('../models/Producto');
 const Movimiento = require('../models/Movimiento');
-const Area = require('../models/Area');
+
 const User = require('../models/User');
 
 // Función auxiliar para actualizar stock

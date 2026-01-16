@@ -114,7 +114,7 @@ const exportarExcel = async (req, res) => {
 
 
     /* =========================
-        ENCABEZADOS CLAROS
+        ENCABEZADOS
     ========================= */
     sheet.columns = [
       { header: 'Período', key: 'periodo', width: 15 },
