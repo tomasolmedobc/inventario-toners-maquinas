@@ -224,3 +224,10 @@ main {
   overflow-wrap: anywhere;
   white-space: normal;
 }
+
+.smallName{
+  color: #4f2edc;;
+}
+.btn btn-sm btn-outline-secondary mt-2{
+  background-color: #4f2edc;
+}

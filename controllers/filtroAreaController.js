@@ -16,7 +16,7 @@ const crearArea = async (req, res) => {
 };
 
 /* ===============================
-   EDITAR ÁREA
+    EDITAR ÁREA
 ================================ */
 const editarArea = async (req, res) => {
     try {
@@ -51,6 +51,10 @@ const normalizarArea = async (req, res) => {
     try {
         const { areaViejaId, areaNuevaId } = req.body;
 
+        if (!areaViejaId || !areaNuevaId) {
+            return res.status(400).json({ ok: false });
+        }
+
         const result = await Movimiento.updateMany(
             { area: areaViejaId },
             { $set: { area: areaNuevaId } }
@@ -63,9 +67,11 @@ const normalizarArea = async (req, res) => {
             modificados: result.modifiedCount
         });
     } catch (error) {
-        res.status(500).json({ ok: false, error: error.message });
+        console.error(error);
+        res.status(500).json({ ok: false });
     }
 };
+
 
 module.exports = {
     listarAreas,

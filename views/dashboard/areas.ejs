@@ -15,16 +15,25 @@
             </tr>
         </thead>
         <tbody>
-            <% areas.forEach((a, i)=> { %>
+            <% areas.forEach(a=> { %>
                 <tr>
                     <td>
                         <%= a.nombre %>
                     </td>
                     <td>
-                        <input type="text" class="form-control" placeholder="Ej: Sistemas" id="area-<%= i %>">
+                        <select class="form-select" id="select-<%= a._id %>">
+                            <option value="">Seleccionar área correcta</option>
+                            <% areas.forEach(b=> { %>
+                                <% if (b._id.toString() !==a._id.toString()) { %>
+                                    <option value="<%= b._id %>">
+                                        <%= b.nombre %>
+                                    </option>
+                                    <% } %>
+                                        <% }) %>
+                        </select>
                     </td>
                     <td>
-                        <button class="btn btn-success btn-sm" onclick="normalizar('<%= a %>', <%= i %>)">
+                        <button type="button" class="btn btn-success btn-sm" onclick="normalizar('<%= a._id %>')">
                             Normalizar
                         </button>
                     </td>

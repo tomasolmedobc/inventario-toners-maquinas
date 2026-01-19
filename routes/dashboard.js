@@ -20,6 +20,6 @@ router.get('/areas', verificarSesion, listarAreas);
 
 // CRUD
 router.post('/areas', verificarSesion, crearArea);
-router.post('/areas/:id', verificarSesion, editarArea);
 router.post('/areas/normalizar', verificarSesion, normalizarArea);
+router.post('/areas/:id', verificarSesion, editarArea);
 module.exports = router;

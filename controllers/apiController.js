@@ -14,6 +14,7 @@ function actualizarStock(prod, tipo, cantidad) {
     throw new Error('Tipo de movimiento inválido');
   }
 }
+
 const crearProducto = async (req, res) => {
   try {
     let { tipo, marca, modelo, compatibilidad, cantidad } = req.body;
@@ -63,6 +64,7 @@ const crearProducto = async (req, res) => {
     res.status(500).json({ error: 'Error al crear producto' });
   }
 };
+
 const registrarMovimiento = async (req, res) => {
   try {
     const { producto, tipo, cantidad, area, observacion } = req.body;
@@ -103,6 +105,7 @@ const registrarMovimiento = async (req, res) => {
     res.status(500).json({ error: 'Error al registrar movimiento' });
   }
 };
+
 const verEntregas = async (req, res) => {
   try {
     const entregas = await Movimiento.find({ tipo: 'salida' })
@@ -144,6 +147,7 @@ const listarProductos = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener productos' });
   }
 };
+
 const mostrarDashboard = async (req, res) => {
   try {
     const entradas = await Movimiento.find({ tipo: 'entrada' })
@@ -162,6 +166,7 @@ const mostrarDashboard = async (req, res) => {
     res.status(500).send('Error al cargar dashboard');
   }
 };
+
 const getGraficoToners = async (req, res) => {
   const { rango = '30' } = req.query;
 
@@ -250,7 +255,8 @@ const getGraficoToners = async (req, res) => {
     res.status(500).json({ error: 'Error al generar gráfico por áreas' });
   }
 };
-  const editarMovimientoEntrega = async (req, res) => {
+
+const editarMovimientoEntrega = async (req, res) => {
   const { id } = req.params;
   const { nuevaCantidad, observacion } = req.body;
 
@@ -332,6 +338,7 @@ const registrarMultiplesMovimientos = async (req, res) => {
     res.status(500).json({ error: 'Error al registrar múltiples movimientos' });
   }
 };
+
 const anularMovimiento = async (req, res) => {
   try {
     const movimiento = await Movimiento.findById(req.params.id);

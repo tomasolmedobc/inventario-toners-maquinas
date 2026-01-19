@@ -74,9 +74,9 @@
       <a href="/dev/entregas" class="list-group-item list-group-item-action py-2">
         <i class="bx bx-bar-chart"></i> Informes
       </a>
-      <a href="/dev/Historial" class="list-group-item list-group-item-action py-2">
+      <!-- <a href="/dev/Historial" class="list-group-item list-group-item-action py-2">
         <i class='bx bx-history'> Historial</i> 
-      </a>
+      </a> -->
       
       <a href="/dev/bajo-stock" class="list-group-item list-group-item-action py-2">
         <i class="bx bx-error"></i> Bajo Stock
@@ -84,35 +84,45 @@
       <a href="/dev/equipos" class="list-group-item list-group-item-action py-2">
         <i class="bx bx-laptop"></i> Equipos
       </a>
-
-      <a href="/api/usuarios" class="list-group-item list-group-item-action py-2">
-        <i class="bx bx-user"></i> Usuarios
-      </a>
-
     </div>
-      <!-- Consumos-->
-      <div class="list-group list-group-flush mx-3 mt-4">
-        <div class="list-group-item fw-bold text-muted">
-          Consumo de toners
-        </div>
-  
-        <a href="/dashboard/consumo" class="list-group-item list-group-item-action py-2">
-          <li class="bx bx-detail"> Consumo total</li>
-        </a>
-  
-          <a href="/dashboard/consumoArea" class="list-group-item list-group-item-action py-2">
-          <li class="bx bx-detail"> Consumo por area</li>
-        </a>
+    
+    <div class="list-group list-group-flush mx-3 mt-4">
+      <div class="list-group-item fw-bold text-muted">
+        Consumo
       </div>
 
+      <a href="/dashboard/consumo" class="list-group-item list-group-item-action py-2">
+        <li class="bx bx-detail"> Consumo total</li>
+      </a>
+
+        <a href="/dashboard/consumoArea" class="list-group-item list-group-item-action py-2">
+        <li class="bx bx-detail"> Consumo por area</li>
+      </a>
+    
+
+
       <% if (usuario) { %>
+      <div class="list-group list-group-flush mx-3 mt-4">
+        <div class="smallName"><small>Hola, <strong><%= usuario.nombre %></strong></small></div>
+        <div class="list-group-item fw-bold text-muted">
+          Acceso Admin
+        </div>
+  
+        <a href="/api/usuarios" class="list-group-item list-group-item-action py-2">
+          <i class="bx bx-user"></i> Usuarios
+        </a>
+        <a href="/dashboard/areas" class="list-group-item list-group-item-action py-2">
+          <i class="bx bx-user"></i> Areas
+        </a>
+      </div>
         <div class="list-group-item border-top mt-3">
-          <small>Hola, <strong><%= usuario.nombre %></strong></small><br>
+          <div class="list-group list-group-flush mx-3 mt-4">
           <a href="/auth/logout" class="btn btn-sm btn-outline-secondary mt-2">
             Cerrar sesión
           </a>
         </div>
       <% } %>
+    </div> 
     </div>
   </div>
 </nav>
