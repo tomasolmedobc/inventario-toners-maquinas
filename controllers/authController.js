@@ -29,7 +29,7 @@ exports.registrarUsuario = async (req, res) => {
     
 
     await nuevoUsuario.save();
-    res.redirect('/login');
+    res.redirect('/auth/login');
   } catch (error) {
     res.render('register', { error: 'Error al registrar usuario' });
   }
@@ -45,11 +45,11 @@ exports.loginUsuario = async (req, res) => {
     });
 
     if (!usuario)
-      return res.render('login', { error: 'Usuario no encontrado' });
+      return res.render('/auth/login', { error: 'Usuario no encontrado' });
 
     const coincide = await usuario.validarContraseña(contraseña);
     if (!coincide)
-      return res.render('login', { error: 'Contraseña incorrecta' });
+      return res.render('/auth/login', { error: 'Contraseña incorrecta' });
 
     req.session.usuario = {
       _id: usuario._id,
@@ -59,7 +59,7 @@ exports.loginUsuario = async (req, res) => {
 
     res.redirect('/');
   } catch {
-    res.render('login', { error: 'Error al iniciar sesión' });
+    res.render('/auth/login', { error: 'Error al iniciar sesión' });
   }
 };
 

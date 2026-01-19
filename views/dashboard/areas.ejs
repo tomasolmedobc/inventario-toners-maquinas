@@ -1,0 +1,49 @@
+<%- include('../partials/header') %>
+    <form method="POST" action="/dashboard/areas">
+        <input type="text" name="nombre" placeholder="Nueva área" required>
+        <button>Agregar</button>
+    </form>
+
+    <h3>Normalizar áreas</h3>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Área cargada</th>
+                <th>Área correcta</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% areas.forEach(a=> { %>
+                <tr>
+                    <td>
+                        <%= a.nombre %>
+                    </td>
+                    <td>
+                        <select class="form-select" id="select-<%= a._id %>">
+                            <option value="">Seleccionar área correcta</option>
+                            <% areas.forEach(b=> { %>
+                                <% if (b._id.toString() !==a._id.toString()) { %>
+                                    <option value="<%= b._id %>">
+                                        <%= b.nombre %>
+                                    </option>
+                                    <% } %>
+                                        <% }) %>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm" onclick="normalizar('<%= a._id %>')">
+                            Normalizar
+                        </button>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+
+    </table>
+
+
+
+
+    <%- include('../partials/footer') %>

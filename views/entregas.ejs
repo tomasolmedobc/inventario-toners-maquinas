@@ -34,7 +34,7 @@
       <% entregas.forEach(e => { %>
         <tr class="<%= e.anulado ? 'table-danger text-decoration-line-through' : '' %>">
           <td><%= e.usuario?.nombre || 'N/A' %></td>
-          <td><%= e.area %></td>
+          <td><%= e.areaNombre || 'Sin área' %></td>
           <td><%= e.cantidad %></td>
           <td><%= e.producto?.tipo || '-' %></td>
           <td><%= e.producto?.marca || '-' %></td>
