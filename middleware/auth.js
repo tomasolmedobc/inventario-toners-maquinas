@@ -31,10 +31,23 @@ const isAdmin = (req, res, next) => {
   res.redirect('/');
 };
 
+const permitirRoles = (...rolesPermitidos) => {
+  return (req, res, next) => {
+    const rol = req.session.usuario?.rol;
 
-// Exportar middlewares
+    if (rolesPermitidos.includes(rol)) {
+      return next();
+    }
+
+    return res.status(403).render('403'); // o redirect('/')
+  };
+};
+
 module.exports = {
   verificarSesion,
   verificarToken,
-  isAdmin, // ✅ exportar también
+  permitirRoles,
+  isAdmin
 };
+
+

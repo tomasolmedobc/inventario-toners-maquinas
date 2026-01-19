@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Area = require('../models/Area');
 
-const { verificarSesion, isAdmin } = require('../middleware/auth');
+const { verificarSesion, permitirRoles, isAdmin } = require('../middleware/auth');
 
 const notaController = require('../controllers/notaController');
 const dashboardController = require('../controllers/dashboardController');
@@ -34,7 +34,7 @@ router.get('/areas', verificarSesion, async (req, res) => {
 // ✏️ Editar entrega
 router.put(
   '/entregas/:id/editar',
-  verificarSesion,
+  verificarSesion, permitirRoles('user,jefe,admin'),
   isAdmin,
   apiController.editarMovimientoEntrega
 );
@@ -42,7 +42,7 @@ router.put(
 // ⛔ Anular entrega
 router.patch(
   '/movimientos/:id/anular',
-  verificarSesion,
+  verificarSesion, permitirRoles('user,jefe,admin'),
   isAdmin,
   apiController.anularMovimiento
 );
@@ -102,7 +102,7 @@ router.get(
 // ⛔ Baja
 router.patch(
   '/equipos/:id/baja',
-  verificarSesion,
+  verificarSesion,permitirRoles('admin'),
   isAdmin,
   equiposController.darDeBaja
 );
@@ -113,21 +113,21 @@ router.patch(
 
 router.get(
   '/usuarios',
-  verificarSesion,
+  verificarSesion, permitirRoles('admin'),
   isAdmin,
   adminController.listarUsuarios
 );
 
 router.post(
   '/usuarios/:id/cambiar-password',
-  verificarSesion,
+  verificarSesion, permitirRoles('admin'),
   isAdmin,
   dashboardController.cambiarPasswordManual
 );
 
 router.post(
   '/usuarios/:id/cambiar-rol',
-  verificarSesion,
+  verificarSesion, permitirRoles('admin'),
   isAdmin,
   dashboardController.cambiarRolManual
 );

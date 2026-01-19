@@ -101,27 +101,28 @@
     
 
 
-      <% if (usuario) { %>
+      
+    </div>
+    <% if (usuario?.rol === 'admin') { %>
       <div class="list-group list-group-flush mx-3 mt-4">
-        <div class="smallName"><small>Hola, <strong><%= usuario.nombre %></strong></small></div>
+        <div class="smallName">
+          <small>Hola, <strong><%= usuario.nombre %></strong></small>
+        </div>
+    
         <div class="list-group-item fw-bold text-muted">
           Acceso Admin
         </div>
-  
+    
         <a href="/api/usuarios" class="list-group-item list-group-item-action py-2">
           <i class="bx bx-user"></i> Usuarios
         </a>
+    
         <a href="/dashboard/areas" class="list-group-item list-group-item-action py-2">
-          <i class="bx bx-user"></i> Areas
+          <i class="bx bx-map"></i> Áreas
         </a>
       </div>
-        <div class="list-group-item border-top mt-3">
-          <div class="list-group list-group-flush mx-3 mt-4">
-          <a href="/auth/logout" class="btn btn-sm btn-outline-secondary mt-2">
-            Cerrar sesión
-          </a>
-        </div>
-      <% } %>
+    <% } %>
+    
     </div> 
     </div>
   </div>
