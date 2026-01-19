@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <title>Nota de Entrega</title>
@@ -13,7 +14,8 @@
     }
 
     .fondo-transparente {
-      background-color: rgba(255, 255, 255, 0.85); /* blanco semitransparente */
+      background-color: rgba(255, 255, 255, 0.85);
+      /* blanco semitransparente */
       padding: 2rem;
       border-radius: 8px;
     }
@@ -44,6 +46,7 @@
     }
   </style>
 </head>
+
 <body class="p-4">
   <div class="container fondo-transparente">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -52,48 +55,65 @@
     </div>
 
     <!-- Datos generales -->
-    <p><strong>Fecha:</strong> <%= new Date(movimiento.fecha).toLocaleDateString() %></p>
-    <p><strong>Área de destino:</strong> <%= movimiento.area %></p>
-    <p><strong>Entregado por:</strong> <%= movimiento.usuario?.nombre || '---' %></p>
-    <p><strong>Observación:</strong> <%= movimiento.observacion || 'Sin observaciones' %></p>
+    <p><strong>Fecha:</strong>
+      <%= new Date(movimiento.fecha).toLocaleDateString() %>
+    </p>
+    <p><strong>Área de destino:</strong> <%= areaNombre %></p>
+        <p><strong>Entregado por:</strong>
+          <%= movimiento.usuario?.nombre || '---' %>
+        </p>
+        <p><strong>Observación:</strong>
+          <%= movimiento.observacion || 'Sin observaciones' %>
+        </p>
 
-    <!-- Tabla de productos -->
-    <hr>
-    <h5 class="mt-4 mb-2">Productos Entregados:</h5>
-    <table class="table table-bordered table-sm">
-      <thead class="table-light">
-        <tr>
-          <th>#</th>
-          <th>Tipo</th>
-          <th>Marca</th>
-          <th>Modelo</th>
-          <th>Cantidad</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% movimientos.forEach((mov, i) => { %>
-          <tr>
-            <td><%= i + 1 %></td>
-            <td><%= mov.producto.tipo %></td>
-            <td><%= mov.producto.marca %></td>
-            <td><%= mov.producto.modelo %></td>
-            <td><%= mov.cantidad %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+        <!-- Tabla de productos -->
+        <hr>
+        <h5 class="mt-4 mb-2">Productos Entregados:</h5>
+        <table class="table table-bordered table-sm">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tipo</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% movimientos.forEach((mov, i)=> { %>
+              <tr>
+                <td>
+                  <%= i + 1 %>
+                </td>
+                <td>
+                  <%= mov.producto.tipo %>
+                </td>
+                <td>
+                  <%= mov.producto.marca %>
+                </td>
+                <td>
+                  <%= mov.producto.modelo %>
+                </td>
+                <td>
+                  <%= mov.cantidad %>
+                </td>
+              </tr>
+              <% }) %>
+          </tbody>
+        </table>
 
-    <!-- Firmas -->
-    <div class="row mt-5">
-      <div class="col-6">
-        <p><strong>Firma Responsable:</strong></p>
-        <p>___________________________</p>
-      </div>
-      <div class="col-6">
-        <p><strong>Firma Receptor:</strong></p>
-        <p>___________________________</p>
-      </div>
-    </div>
+        <!-- Firmas -->
+        <div class="row mt-5">
+          <div class="col-6">
+            <p><strong>Firma Responsable:</strong></p>
+            <p>___________________________</p>
+          </div>
+          <div class="col-6">
+            <p><strong>Firma Receptor:</strong></p>
+            <p>___________________________</p>
+          </div>
+        </div>
   </div>
 </body>
+
 </html>
