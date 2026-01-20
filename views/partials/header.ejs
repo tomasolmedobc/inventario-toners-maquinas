@@ -1,218 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <!-- BoxIcons -->
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <!-- Tu archivo CSS personalizado -->
-    <link rel="stylesheet" href="/resources/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-    
-  
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <!-- BoxIcons -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <!-- Tu archivo CSS personalizado -->
+  <link rel="stylesheet" href="/resources/css/main.css">
+  <link rel="stylesheet" href="/resources/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 
 <body>
+  <script src="/resources/js/themeMode.js"></script>
+  <div class="top-controls">
+    <button id="toggleSidebar" class="btn btn-outline-secondary">
+      ☰
+    </button>
 
-        <script src="/resources/js/themeMode.js"></script>
-        <div class="top-controls">
-          <button id="toggleSidebar" class="btn btn-outline-secondary">
-            ☰
-          </button>
-        
-          <div class="checkbox ms-2">
-            <input type="checkbox" id="theme-checkbox">
-            <label class="toggle" for="theme-checkbox">
-              <span></span>
-            </label>
-          </div>
-        </div>
-        
-      
+    <div class="checkbox ms-2">
+      <input type="checkbox" id="theme-checkbox">
+      <label class="toggle" for="theme-checkbox">
+        <span></span>
+      </label>
+    </div>
+  </div>
+
+
   <!-- Navbar -->
-      <!-- SIDEBAR -->
-    <nav id="sidebarMenu" class="collapse d-lg-block sidebar bg-white">
+  <!-- SIDEBAR -->
+  <nav id="sidebarMenu" class="sidebar bg-white">
     <div class="position-sticky">
 
-    <!-- Acciones -->
-    <div class="list-group list-group-flush mx-3 mt-4">
-      <div class="list-group-item fw-bold text-muted">
-        Acciones
+      <!-- Acciones -->
+      <div class="list-group list-group-flush mx-3 mt-4">
+        <div class="list-group-item fw-bold text-muted sidebar-title">
+          Acciones
+        </div>
+
+        <button class="list-group-item list-group-item-action py-2" data-bs-toggle="modal"
+          data-bs-target="#modalCargaInicial">
+          <li class="bx bx-plus"></li>
+          <span>Nuevo Producto</span>
+        </button>
+
+        <button class="list-group-item list-group-item-action py-2" data-bs-toggle="modal"
+          data-bs-target="#modalReabastecimiento">
+          <li class="bx bx-repeat"></li>
+          <span>Ingreso Stock</span>
+        </button>
+
+        <button class="list-group-item list-group-item-action py-2" data-bs-toggle="modal"
+          data-bs-target="#modalSalida">
+          <li class="bx bx-run"></li>
+          <span>Registrar Salida</span>
+        </button>
       </div>
 
-      <button class="list-group-item list-group-item-action py-2"
-        data-bs-toggle="modal" data-bs-target="#modalCargaInicial">
-        <li class="bx bx-plus"> Nuevo Producto</li>
-      </button>
+      <!-- Navegación -->
+      <div class="list-group list-group-flush mx-3 mt-4">
+        <div class="list-group-item fw-bold text-muted sidebar-title">
+          Gestión Inventario
+        </div>
 
-      <button class="list-group-item list-group-item-action py-2"
-        data-bs-toggle="modal" data-bs-target="#modalReabastecimiento">
-        <li class="bx bx-repeat"> Ingreso Stock</li>
-      </button>
+        <a href="/dev/inventario" class="list-group-item list-group-item-action py-2">
+          <i class="bx bx-package"></i>
+          <span>Inventario</span>
+        </a>
 
-      <button class="list-group-item list-group-item-action py-2"
-        data-bs-toggle="modal" data-bs-target="#modalSalida">
-        <li class="bx bx-run"> Registrar Salida</li>
-      </button>
-    </div>
-
-    <!-- Navegación -->
-    <div class="list-group list-group-flush mx-3 mt-4">
-      <div class="list-group-item fw-bold text-muted">
-      Gestión Inventario
-      </div>
-    
-      <a href="/dev/inventario" class="list-group-item list-group-item-action py-2">
-        <i class="bx bx-package"></i> Inventario
-      </a>
-
-      <a href="/dev/entregas" class="list-group-item list-group-item-action py-2">
-        <i class="bx bx-bar-chart"></i> Informes
-      </a>
-      <!-- <a href="/dev/Historial" class="list-group-item list-group-item-action py-2">
-        <i class='bx bx-history'> Historial</i> 
+        <a href="/dev/entregas" class="list-group-item list-group-item-action py-2">
+          <i class="bx bx-bar-chart"></i>
+          <span>Informes</span>
+        </a>
+        <!-- <a href="/dev/Historial" class="list-group-item list-group-item-action py-2">
+        <i class='bx bx-history'></i> 
+        <span>Historial</span>
       </a> -->
-      
-      <a href="/dev/bajo-stock" class="list-group-item list-group-item-action py-2">
-        <i class="bx bx-error"></i> Bajo Stock
-      </a>
-      <a href="/dev/equipos" class="list-group-item list-group-item-action py-2">
-        <i class="bx bx-laptop"></i> Equipos
-      </a>
-    </div>
-    
-    <div class="list-group list-group-flush mx-3 mt-4">
-      <div class="list-group-item fw-bold text-muted">
-        Consumo
+
+        <a href="/dev/bajo-stock" class="list-group-item list-group-item-action py-2">
+          <i class="bx bx-error"></i>
+          <span>Bajo Stock</span>
+        </a>
+        <a href="/dev/equipos" class="list-group-item list-group-item-action py-2">
+          <i class="bx bx-laptop"></i>
+          <span>Equipos</span>
+        </a>
       </div>
 
-      <a href="/dashboard/consumo" class="list-group-item list-group-item-action py-2">
-        <li class="bx bx-detail"> Consumo total</li>
-      </a>
+      <div class="list-group list-group-flush mx-3 mt-4">
+        <div class="list-group-item fw-bold text-muted sidebar-title">
+          Consumo
+        </div>
+
+        <a href="/dashboard/consumo" class="list-group-item list-group-item-action py-2">
+          <li class="bx bx-detail"></li>
+          <span>Consumo total</span>
+        </a>
 
         <a href="/dashboard/consumoArea" class="list-group-item list-group-item-action py-2">
-        <li class="bx bx-detail"> Consumo por area</li>
-      </a>
-    
-
-
-      
-    </div>
-    <% if (usuario?.rol === 'admin') { %>
-      <div class="list-group list-group-flush mx-3 mt-4">
-        <div class="smallName">
-          <small>Hola, <strong><%= usuario.nombre %></strong></small>
-        </div>
-    
-        <div class="list-group-item fw-bold text-muted">
-          Acceso Admin
-        </div>
-    
-        <a href="/api/usuarios" class="list-group-item list-group-item-action py-2">
-          <i class="bx bx-user"></i> Usuarios
-        </a>
-    
-        <a href="/dashboard/areas" class="list-group-item list-group-item-action py-2">
-          <i class="bx bx-map"></i> Áreas
+          <li class="bx bx-detail"></li>
+          <span>Consumo por area</span>
         </a>
       </div>
-    <% } %>
-    
-    </div> 
-    </div>
-  </div>
-</nav>
 
-<main>
-  <!-- Modal: Carga Inicial -->
-<div class="modal fade" id="modalCargaInicial" tabindex="-1" aria-labelledby="modalCargaInicialLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form class="modal-content" id="formCargaInicial">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalCargaInicialLabel">Nuevo Producto</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <input class="form-control mb-2" name="tipo" placeholder="Tipo de producto" required>
-        <input class="form-control mb-2" name="marca" placeholder="Marca" required>
-        <input class="form-control mb-2" name="modelo" placeholder="Modelo" required>
-        <input class="form-control mb-2" name="compatibilidad" placeholder="Compatibilidad (opcional)">
-        <input type="number" class="form-control" name="cantidad" placeholder="Cantidad" required>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-success">Guardar</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal: Reabastecimiento (entrada de stock) -->
-<div class="modal fade" id="modalReabastecimiento" tabindex="-1" aria-labelledby="modalReabastecimientoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form class="modal-content" id="formEntradaStock">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalReabastecimientoLabel">Ingreso Stock</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-
-        <!-- Spinner -->
-        <div id="spinnerCargaEntrada" class="text-center my-2" style="display:none;">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
+      <% if (usuario?.rol==='admin' ) { %>
+        <div class="list-group list-group-flush mx-3 mt-4">
+          <div class="smallName">
+            <small>Hola, <strong>
+                <%= usuario.nombre %>
+              </strong></small>
           </div>
+
+          <div class="list-group-item fw-bold text-muted">
+            Acceso Admin
+          </div>
+
+          <a href="/api/usuarios" class="list-group-item list-group-item-action py-2" title="Usuarios">
+            <i class="bx bx-user"></i>
+            <span class="sidebar-text">Usuarios</span>
+          </a>
+
+          <a href="/dashboard/areas" class="list-group-item list-group-item-action py-2" title="Áreas">
+            <i class="bx bx-map"></i>
+            <span class="sidebar-text">Áreas</span>
+          </a>
+
+          </a>
         </div>
-
-        <!-- Select de Tipo -->
-        <select class="form-select mb-2" id="selectTipoProductoEntrada" required>
-          <option value="">Seleccionar tipo de producto</option>
-        </select>
-
-        <!-- Select de Producto -->
-        <select class="form-select mb-2" name="producto" id="selectProductoEntrada" required disabled>
-          <!-- Se llenará automáticamente -->
-        </select>
-
-        <input type="number" class="form-control mb-2" name="cantidad" placeholder="Cantidad" required>
-        <input type="hidden" name="tipo" value="entrada">
-
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Agregar</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal: Salida de Producto -->
-<div class="modal fade" id="modalSalida" tabindex="-1" aria-labelledby="modalSalidaLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form class="modal-content" id="formSalidaStock" data-multiple="true">
-      <div class="modal-header">
-        <h5 class="modal-title">Registrar Salida de Productos</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div id="contenedorProductos">
-          <!-- Bloques de producto se insertarán aquí -->
-        </div>
-    
-        <button type="button" class="btn btn-sm btn-secondary mb-3" id="agregarProductoBtn">+ Agregar otro producto</button>
-    
-        <select class="form-select mb-2" name="area" id="selectAreaSalida" required>
-          <option value="">Seleccionar área</option>
-        </select>
+        <% } %>
+        <div class="list-group list-group-flush mx-3 mt-auto mb-3">
+          <div class="list-group-item fw-bold text-muted sidebar-title">
+            Sesión
+          </div>
         
-        <input class="form-control mb-2" name="observacion" placeholder="Observación (opcional)">
+          <a href="/auth/logout"
+            class="list-group-item list-group-item-action py-2 text-danger">
+            <i class="bx bx-log-out"></i>
+            <span class="sidebar-text">Cerrar sesión</span>
+          </a>
+        </div>
+    </div>
+    </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Modal: Carga Inicial -->
+    <div class="modal fade" id="modalCargaInicial" tabindex="-1" aria-labelledby="modalCargaInicialLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <form class="modal-content" id="formCargaInicial">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalCargaInicialLabel">Nuevo Producto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input class="form-control mb-2" name="tipo" placeholder="Tipo de producto" required>
+            <input class="form-control mb-2" name="marca" placeholder="Marca" required>
+            <input class="form-control mb-2" name="modelo" placeholder="Modelo" required>
+            <input class="form-control mb-2" name="compatibilidad" placeholder="Compatibilidad (opcional)">
+            <input type="number" class="form-control" name="cantidad" placeholder="Cantidad" required>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Guardar</button>
+          </div>
+        </form>
       </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-warning">Registrar salida</button>
+    </div>
+
+    <!-- Modal: Reabastecimiento (entrada de stock) -->
+    <div class="modal fade" id="modalReabastecimiento" tabindex="-1" aria-labelledby="modalReabastecimientoLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <form class="modal-content" id="formEntradaStock">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalReabastecimientoLabel">Ingreso Stock</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+
+            <!-- Spinner -->
+            <div id="spinnerCargaEntrada" class="text-center my-2" style="display:none;">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+
+            <!-- Select de Tipo -->
+            <select class="form-select mb-2" id="selectTipoProductoEntrada" required>
+              <option value="">Seleccionar tipo de producto</option>
+            </select>
+
+            <!-- Select de Producto -->
+            <select class="form-select mb-2" name="producto" id="selectProductoEntrada" required disabled>
+              <!-- Se llenará automáticamente -->
+            </select>
+
+            <input type="number" class="form-control mb-2" name="cantidad" placeholder="Cantidad" required>
+            <input type="hidden" name="tipo" value="entrada">
+
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Agregar</button>
+          </div>
+        </form>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <!-- Modal: Salida de Producto -->
+    <div class="modal fade" id="modalSalida" tabindex="-1" aria-labelledby="modalSalidaLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form class="modal-content" id="formSalidaStock" data-multiple="true">
+          <div class="modal-header">
+            <h5 class="modal-title">Registrar Salida de Productos</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="contenedorProductos">
+              <!-- Bloques de producto se insertarán aquí -->
+            </div>
+
+            <button type="button" class="btn btn-sm btn-secondary mb-3" id="agregarProductoBtn">+ Agregar otro
+              producto</button>
+
+            <select class="form-select mb-2" name="area" id="selectAreaSalida" required>
+              <option value="">Seleccionar área</option>
+            </select>
+
+            <input class="form-control mb-2" name="observacion" placeholder="Observación (opcional)">
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-warning">Registrar salida</button>
+          </div>
+        </form>
+      </div>
+    </div>

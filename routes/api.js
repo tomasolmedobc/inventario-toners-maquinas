@@ -11,7 +11,7 @@ const apiController = require('../controllers/apiController');
 const equiposController = require('../controllers/equiposController');
 
 /* ======================================================
-   INVENTARIO / PRODUCTOS
+    INVENTARIO / PRODUCTOS
 ====================================================== */
 
 // 📦 Productos
