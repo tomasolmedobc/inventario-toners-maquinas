@@ -109,7 +109,7 @@ const exportarExcel = async (req, res) => {
     sheet.getCell('B5').value = 'Marca';
     sheet.getCell('C5').value = 'Modelo';
     sheet.getCell('D5').value = 'Cantidad Consumida';
-    sheet.getCell('A5','B5','C5','D5').alignment = { horizontal: 'center' };
+    sheet.getCell('A5', 'B5', 'C5', 'D5').alignment = { horizontal: 'center' };
 
 
 
@@ -122,7 +122,7 @@ const exportarExcel = async (req, res) => {
       { header: 'Modelo', key: 'modelo', width: 30 },
       { header: 'Cantidad consumida', key: 'total', width: 20 }
     ];
-    
+
 
     const headerRow = sheet.getRow(5);
     headerRow.font = { bold: true };
@@ -139,7 +139,7 @@ const exportarExcel = async (req, res) => {
         total: item.total
       });
     });
-    
+
 
     /* =========================
         TOTAL GENERAL

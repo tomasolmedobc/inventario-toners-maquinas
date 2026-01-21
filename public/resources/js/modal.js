@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ===============================
      🔔 UTILIDADES
   =============================== */
-  function mostrarMensaje(titulo, texto, icono = 'success') {
+  const mostrarMensaje = (titulo, texto, icono = 'success') => {
     Swal.fire({
       title: titulo,
       text: texto,
@@ -11,76 +11,81 @@ document.addEventListener('DOMContentLoaded', () => {
       timer: 2500,
       timerProgressBar: true
     });
-  }
+  };
 
-  function mostrarCargando(texto = 'Procesando...') {
+  const mostrarCargando = (texto = 'Procesando...') => {
     Swal.fire({
       title: texto,
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading()
     });
-  }
+  };
 
   /* ===============================
-     📦 DATOS
+     🔧 FIX GLOBAL MODALES
   =============================== */
-  let todosLosProductos = [];
-  let todasLasAreas = []; 
+  document.addEventListener('hidden.bs.modal', () => {
+    document.activeElement?.blur();
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+  });
 
-  async function cargarAreas() {
-    if (todasLasAreas.length) return;
-  
+  /* ===============================
+     📦 DATOS EN MEMORIA
+  =============================== */
+  let productos = [];
+  let areas = [];
+
+  const cargarProductos = async () => {
+    if (productos.length) return;
+    const res = await fetch('/api/productos');
+    productos = await res.json();
+  };
+
+  const cargarAreas = async () => {
+    if (areas.length) return;
     const res = await fetch('/api/areas');
-    todasLasAreas = await res.json();
-  
-    const selectArea = document.getElementById('selectAreaSalida');
-    selectArea.innerHTML = '<option value="">Seleccionar área</option>';
-  
-    todasLasAreas.forEach(a => {
-      selectArea.innerHTML += `
-        <option value="${a._id}">
-          ${a.nombre}
-        </option>
-      `;
+    areas = await res.json();
+
+    const select = document.getElementById('selectAreaSalida');
+    select.innerHTML = '<option value="">Seleccionar área</option>';
+
+    areas.forEach(a => {
+      select.innerHTML += `<option value="${a._id}">${a.nombre}</option>`;
     });
-  
-    $(selectArea).select2({
+
+    $(select).select2({
       dropdownParent: $('#modalSalida'),
       width: '100%',
       placeholder: 'Buscar área',
       allowClear: true
     });
-  }
+  };
 
-  async function cargarProductos() {
-    if (todosLosProductos.length) return;
-    const res = await fetch('/api/productos');
-    todosLosProductos = await res.json();
-  }
-
-  function destruirSelect2(selector) {
-    if ($(selector).hasClass('select2-hidden-accessible')) {
-      $(selector).select2('destroy');
+  const destruirSelect2 = (el) => {
+    if ($(el).hasClass('select2-hidden-accessible')) {
+      $(el).select2('destroy');
     }
-  }
+  };
 
-  function activarSelect2(selector, modalId) {
-    $(selector).select2({
+  const activarSelect2 = (el, modalId) => {
+    $(el).select2({
       dropdownParent: $(modalId),
       width: '100%',
-      placeholder: 'Buscar producto',
       allowClear: true
     });
-  }
+  };
 
   /* ===============================
-      🆕 NUEVO PRODUCTO
+     🆕 NUEVO PRODUCTO
   =============================== */
-  const formCarga = document.getElementById('formCargaInicial');
-  formCarga?.addEventListener('submit', async (e) => {
+  const formProducto = document.getElementById('formCargaInicial');
+
+  formProducto?.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const data = Object.fromEntries(new FormData(formCarga));
+    const data = Object.fromEntries(new FormData(formProducto));
     if (data.compatibilidad) {
       data.compatibilidad = data.compatibilidad.split(',').map(x => x.trim());
     }
@@ -96,11 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
       Swal.close();
       if (!res.ok) throw await res.json();
 
-      mostrarMensaje('Éxito', 'Producto agregado');
-      formCarga.reset();
+      formProducto.reset();
       bootstrap.Modal.getInstance(
         document.getElementById('modalCargaInicial')
       ).hide();
+
+      setTimeout(() => {
+        mostrarMensaje('Éxito', 'Producto agregado');
+      }, 200);
+
     } catch (err) {
       Swal.close();
       mostrarMensaje('Error', err.error || 'Error al guardar', 'error');
@@ -116,45 +125,42 @@ document.addEventListener('DOMContentLoaded', () => {
   modalEntrada?.addEventListener('show.bs.modal', async () => {
     await cargarProductos();
 
-    const selectTipo = document.getElementById('selectTipoProductoEntrada');
-    const selectProducto = document.getElementById('selectProductoEntrada');
+    const tipo = document.getElementById('selectTipoProductoEntrada');
+    const prod = document.getElementById('selectProductoEntrada');
 
-    selectTipo.innerHTML = '<option value="">Seleccionar tipo</option>';
-    selectProducto.innerHTML = '';
-    selectProducto.disabled = true;
+    tipo.innerHTML = '<option value="">Seleccionar tipo</option>';
+    prod.innerHTML = '';
+    prod.disabled = true;
 
-    destruirSelect2('#selectProductoEntrada');
+    destruirSelect2(prod);
 
-    [...new Set(todosLosProductos.map(p => p.tipo))].forEach(t => {
-      selectTipo.innerHTML += `<option value="${t}">${t}</option>`;
+    [...new Set(productos.map(p => p.tipo))].forEach(t => {
+      tipo.innerHTML += `<option value="${t}">${t}</option>`;
     });
   });
 
   document.addEventListener('change', e => {
     if (e.target.id !== 'selectTipoProductoEntrada') return;
 
-    const selectProducto = document.getElementById('selectProductoEntrada');
-    selectProducto.innerHTML = '';
-    selectProducto.disabled = true;
+    const prod = document.getElementById('selectProductoEntrada');
+    prod.innerHTML = '';
+    prod.disabled = true;
 
-    const filtrados = todosLosProductos.filter(
-      p => p.tipo === e.target.value
-    );
-
+    const filtrados = productos.filter(p => p.tipo === e.target.value);
     if (!filtrados.length) return;
 
     filtrados.forEach(p => {
-      selectProducto.innerHTML += `
+      prod.innerHTML += `
         <option value="${p._id}">
           ${p.marca} ${p.modelo} (${p.cantidad})
         </option>`;
     });
 
-    selectProducto.disabled = false;
-    activarSelect2('#selectProductoEntrada', '#modalReabastecimiento');
+    prod.disabled = false;
+    activarSelect2(prod, '#modalReabastecimiento');
   });
 
-  formEntrada?.addEventListener('submit', async (e) => {
+  formEntrada?.addEventListener('submit', async e => {
     e.preventDefault();
 
     const data = Object.fromEntries(new FormData(formEntrada));
@@ -171,9 +177,13 @@ document.addEventListener('DOMContentLoaded', () => {
       Swal.close();
       if (!res.ok) throw await res.json();
 
-      mostrarMensaje('Éxito', 'Stock actualizado');
       formEntrada.reset();
       bootstrap.Modal.getInstance(modalEntrada).hide();
+
+      setTimeout(() => {
+        mostrarMensaje('Éxito', 'Stock actualizado');
+      }, 200);
+
     } catch (err) {
       Swal.close();
       mostrarMensaje('Error', err.error || 'Error al actualizar', 'error');
@@ -183,151 +193,122 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ===============================
      📤 SALIDA DE STOCK
   =============================== */
-  function crearLineaProducto() {
+  const modalSalida = document.getElementById('modalSalida');
+  const formSalida = document.getElementById('formSalidaStock');
+
+  const crearLineaProducto = () => {
     const div = document.createElement('div');
     div.className = 'producto-linea mb-3';
     div.innerHTML = `
       <select class="form-select mb-2 tipo-producto">
         <option value="">Seleccionar tipo</option>
       </select>
-
       <select class="form-select mb-2 producto" disabled></select>
-
       <input type="number" class="form-control mb-2 cantidad" min="1" required>
-
       <button type="button" class="btn btn-sm btn-danger quitar-producto">Quitar</button>
       <hr>
     `;
     return div;
-  }
+  };
 
-  function inicializarLinea(div) {
-    const selectTipo = div.querySelector('.tipo-producto');
-    const selectProducto = div.querySelector('.producto');
+  const initLinea = (div) => {
+    const tipo = div.querySelector('.tipo-producto');
+    const prod = div.querySelector('.producto');
 
-    [...new Set(todosLosProductos.map(p => p.tipo))].forEach(t => {
-      selectTipo.innerHTML += `<option value="${t}">${t}</option>`;
+    [...new Set(productos.map(p => p.tipo))].forEach(t => {
+      tipo.innerHTML += `<option value="${t}">${t}</option>`;
     });
 
-    selectTipo.addEventListener('change', () => {
-      selectProducto.innerHTML = '';
-      selectProducto.disabled = true;
+    tipo.addEventListener('change', () => {
+      prod.innerHTML = '';
+      prod.disabled = true;
+      destruirSelect2(prod);
 
-      destruirSelect2(selectProducto);
-
-      const filtrados = todosLosProductos.filter(
-        p => p.tipo === selectTipo.value && p.cantidad > 0
+      const filtrados = productos.filter(
+        p => p.tipo === tipo.value && p.cantidad > 0
       );
 
       if (!filtrados.length) return;
 
       filtrados.forEach(p => {
-        selectProducto.innerHTML += `
+        prod.innerHTML += `
           <option value="${p._id}">
             ${p.marca} ${p.modelo} (${p.cantidad})
           </option>`;
       });
 
-      selectProducto.disabled = false;
-      activarSelect2(selectProducto, '#modalSalida');
+      prod.disabled = false;
+      activarSelect2(prod, '#modalSalida');
     });
 
     div.querySelector('.quitar-producto').onclick = () => {
-      destruirSelect2(selectProducto);
+      destruirSelect2(prod);
       div.remove();
     };
-  }
+  };
 
-  const modalSalida = document.getElementById('modalSalida');
   modalSalida?.addEventListener('show.bs.modal', async () => {
     await cargarProductos();
     await cargarAreas();
+
     const cont = document.getElementById('contenedorProductos');
     cont.innerHTML = '';
+
     const linea = crearLineaProducto();
     cont.appendChild(linea);
-    inicializarLinea(linea);
+    initLinea(linea);
   });
 
   document.getElementById('agregarProductoBtn')?.addEventListener('click', () => {
     const cont = document.getElementById('contenedorProductos');
     const linea = crearLineaProducto();
     cont.appendChild(linea);
-    inicializarLinea(linea);
-  });
-/* ===============================
-     🔧 FIX select2 / modales
-  =============================== */
-  ['modalReabastecimiento', 'modalSalida'].forEach(id => {
-    const modal = document.getElementById(id);
-
-    modal?.addEventListener('hidden.bs.modal', () => {
-      document.activeElement?.blur();
-      $(modal).find('select').each(function () {
-        if ($(this).hasClass('select2-hidden-accessible')) {
-          $(this).select2('destroy');
-        }
-      });
-    });
+    initLinea(linea);
   });
 
-
-/* ===============================
-     📤 SUBMIT SALIDA DE STOCK
-  =============================== */
-  const formSalida = document.getElementById('formSalidaStock');
-
-  formSalida?.addEventListener('submit', async (e) => {
+  formSalida?.addEventListener('submit', async e => {
     e.preventDefault();
 
     const area = formSalida.querySelector('[name="area"]').value;
-
-    const observacion = formSalida.querySelector('[name="observacion"]').value;
-
     if (!area) {
       mostrarMensaje('Error', 'Debe indicar un área', 'error');
       return;
     }
 
-    const productos = [];
-
-    document.querySelectorAll('.producto-linea').forEach(linea => {
-      const producto = linea.querySelector('.producto')?.value;
-      const cantidad = linea.querySelector('.cantidad')?.value;
-
-      if (producto && cantidad) {
-        productos.push({
-          producto,
-          cantidad: parseInt(cantidad)
-        });
-      }
+    const productosSalida = [];
+    document.querySelectorAll('.producto-linea').forEach(l => {
+      const p = l.querySelector('.producto')?.value;
+      const c = l.querySelector('.cantidad')?.value;
+      if (p && c) productosSalida.push({ producto: p, cantidad: parseInt(c) });
     });
 
-    if (!productos.length) {
+    if (!productosSalida.length) {
       mostrarMensaje('Error', 'Debe agregar al menos un producto', 'error');
       return;
     }
 
     try {
       mostrarCargando('Registrando salida...');
-
       const res = await fetch('/api/movimientos-multiples', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tipo: 'salida',
           area,
-          observacion,
-          productos
+          observacion: formSalida.querySelector('[name="observacion"]').value,
+          productos: productosSalida
         })
       });
 
       Swal.close();
       if (!res.ok) throw await res.json();
 
-      mostrarMensaje('Éxito', 'Salida registrada correctamente');
       formSalida.reset();
       bootstrap.Modal.getInstance(modalSalida).hide();
+
+      setTimeout(() => {
+        mostrarMensaje('Éxito', 'Salida registrada correctamente');
+      }, 200);
 
     } catch (err) {
       Swal.close();

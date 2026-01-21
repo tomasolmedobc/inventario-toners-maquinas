@@ -4,6 +4,7 @@ const path = require('path');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const connectDB = require('./config/db');
+const userLocals = require('./middleware/userLocals');
 const areasMiddleware = require('./middleware/areasMiddleware');
 // Rutas
 const authRoutes = require('./routes/auth');
@@ -23,7 +24,6 @@ const app = express();
 
 // Conectar a MongoDB (local o prod según .env)
 connectDB();
-
 
 // Vistas
 app.set('views', path.join(__dirname, 'views'));
@@ -63,7 +63,18 @@ app.use('/dev', devRoutes);
 app.use('/dashboard', dashboardRoutes);
 
 // Dashboard protegido
-app.get('/', verificarSesion, mostrarInicio);
+app.get(
+  '/',
+  verificarSesion,
+  (req, res, next) => {
+    if (!['user', 'jefe', 'admin'].includes(req.session.usuario.rol)) {
+      return res.status(403).render('403');
+    }
+    next();
+  },
+  mostrarInicio
+);
+
 
 // 404
 app.use((req, res) => {

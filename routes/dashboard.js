@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { verificarSesion } = require('../middleware/auth');
+const { verificarSesion, permitirRolesApi } = require('../middleware/auth');
 
 
 const { consumoPorMes, exportarExcel } = require('../controllers/consumoController');
@@ -12,14 +12,14 @@ const {
   } = require('../controllers/filtroAreaController');
   
 // Consumo
-router.get('/consumo', verificarSesion, consumoPorMes);
-router.get('/consumo/exportar-excel', verificarSesion, exportarExcel);
+router.get('/consumo', verificarSesion, permitirRolesApi('jefe', 'admin'), consumoPorMes);
+router.get('/consumo/exportar-excel', verificarSesion, permitirRolesApi('jefe', 'admin'), exportarExcel);
 
 // VISTA
-router.get('/areas', verificarSesion, listarAreas);
+router.get('/areas', verificarSesion, permitirRolesApi('admin'), listarAreas);
 
 // CRUD
-router.post('/areas', verificarSesion, crearArea);
-router.post('/areas/normalizar', verificarSesion, normalizarArea);
-router.post('/areas/:id', verificarSesion, editarArea);
+router.post('/areas', verificarSesion, permitirRolesApi('admin'), crearArea);
+router.post('/areas/normalizar', verificarSesion, permitirRolesApi('admin'), normalizarArea);
+router.post('/areas/:id', verificarSesion, permitirRolesApi('admin'), editarArea);
 module.exports = router;

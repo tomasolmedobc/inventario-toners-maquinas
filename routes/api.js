@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Area = require('../models/Area');
 
-const { verificarSesion, isAdmin } = require('../middleware/auth');
+const { verificarSesion, permitirRolesApi } = require('../middleware/auth');
 
 const notaController = require('../controllers/notaController');
 const dashboardController = require('../controllers/dashboardController');
@@ -11,18 +11,18 @@ const apiController = require('../controllers/apiController');
 const equiposController = require('../controllers/equiposController');
 
 /* ======================================================
-   INVENTARIO / PRODUCTOS
+    INVENTARIO / PRODUCTOS
 ====================================================== */
 
 // 📦 Productos
-router.get('/productos', verificarSesion, apiController.listarProductos);
-router.post('/productos', verificarSesion, apiController.crearProducto);
+router.get('/productos', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.listarProductos);
+router.post('/productos', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.crearProducto);
 
 // 🔄 Movimientos
-router.post('/movimientos', verificarSesion, apiController.registrarMovimiento);
-router.post('/movimientos-multiples', verificarSesion, apiController.registrarMultiplesMovimientos);
+router.post('/movimientos', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.registrarMovimiento);
+router.post('/movimientos-multiples', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.registrarMultiplesMovimientos);
 
-router.get('/areas', verificarSesion, async (req, res) => {
+router.get('/areas', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), async (req, res) => {
   try {
     const areas = await Area.find().sort({ nombre: 1 });
     res.json(areas);
@@ -34,16 +34,14 @@ router.get('/areas', verificarSesion, async (req, res) => {
 // ✏️ Editar entrega
 router.put(
   '/entregas/:id/editar',
-  verificarSesion,
-  isAdmin,
+  verificarSesion, permitirRolesApi('user', 'jefe', 'admin'),
   apiController.editarMovimientoEntrega
 );
 
 // ⛔ Anular entrega
 router.patch(
   '/movimientos/:id/anular',
-  verificarSesion,
-  isAdmin,
+  verificarSesion, permitirRolesApi('user', 'jefe', 'admin'),
   apiController.anularMovimiento
 );
 
@@ -51,28 +49,28 @@ router.patch(
     DASHBOARD / REPORTES
 ====================================================== */
 
-router.get('/grafico-toners', verificarSesion, apiController.getGraficoToners);
-router.get('/toners-bajo-stock', verificarSesion, apiController.getTonersBajoStock);
-router.get('/top-areas', verificarSesion, dashboardController.getTopAreas);
+router.get('/grafico-toners', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.getGraficoToners);
+router.get('/toners-bajo-stock', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.getTonersBajoStock);
+router.get('/top-areas', verificarSesion, permitirRolesApi('jefe', 'admin'), dashboardController.getTopAreas);
 
-  /* ======================================================
-    NOTAS
-  ====================================================== */
+/* ======================================================
+  NOTAS
+====================================================== */
 
-  router.get('/nota-entrega/:id', verificarSesion, notaController.verNotaEntrega);
+router.get('/nota-entrega/:id', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), notaController.verNotaEntrega);
 
-  /* ======================================================
-    EQUIPOS (API)
+/* ======================================================
+  EQUIPOS (API)
 ====================================================== */
 
 // 📋 Listado
-router.get('/equipos', verificarSesion, equiposController.listarEquipos);
-  
+router.get('/equipos', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), equiposController.listarEquipos);
+
 // ➕ Crear
 router.post(
   '/equipos',
   verificarSesion,
-  isAdmin,
+  permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.crearEquipo
 );
 
@@ -80,7 +78,7 @@ router.post(
 router.patch(
   '/equipos/:id',
   verificarSesion,
-  isAdmin,
+  permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.editarEquipo
 );
 
@@ -88,7 +86,7 @@ router.patch(
 router.patch(
   '/equipos/:id/traspaso',
   verificarSesion,
-  isAdmin,
+  permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.traspasarEquipo
 );
 
@@ -96,14 +94,14 @@ router.patch(
 router.get(
   '/equipos-traspasos',
   verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.listarTraspasos
 );
 
 // ⛔ Baja
 router.patch(
   '/equipos/:id/baja',
-  verificarSesion,
-  isAdmin,
+  verificarSesion, permitirRolesApi('admin'),
   equiposController.darDeBaja
 );
 
@@ -113,22 +111,19 @@ router.patch(
 
 router.get(
   '/usuarios',
-  verificarSesion,
-  isAdmin,
+  verificarSesion, permitirRolesApi('admin'),
   adminController.listarUsuarios
 );
 
 router.post(
   '/usuarios/:id/cambiar-password',
-  verificarSesion,
-  isAdmin,
+  verificarSesion, permitirRolesApi('admin'),
   dashboardController.cambiarPasswordManual
 );
 
 router.post(
   '/usuarios/:id/cambiar-rol',
-  verificarSesion,
-  isAdmin,
+  verificarSesion, permitirRolesApi('admin'),
   dashboardController.cambiarRolManual
 );
 
@@ -138,18 +133,20 @@ router.post(
 router.get(
   '/equipos/:id/historial',
   verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.historialEquipo
 );
 
 router.get(
   '/equipos/filtros',
   verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.obtenerFiltros
 );
 
-  /* ======================================================
-  Mantener sesión activa
-  ======================================================= */
+/* ======================================================
+Mantener sesión activa
+======================================================= */
 
 router.get('/ping-sesion', (req, res) => {
   if (req.session) req.session.touch();

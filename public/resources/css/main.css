@@ -1,68 +1,41 @@
-
-:root{
-    --background-body-zinc:#f1f4fd;
-    /**Colors**/
-    --blue-100:#dfe8fa;
-    --blue-200:#c7d6f6;
-    --blue-300:#a0bcf0;
-    --blue--400:#7298e8;
-    --blue-500:#5175e0;
-    --blue-600:#3754d2;
-    --blue-700:#3347c2;
-    --blue-800:#2f3b9e;
-    --blue-900:#2b367d;
-    --blue-950:#1e234d;
-
-    --text-secondary-color: #000000;
-    --primary-color: #35424a;
-    --secondary-color: #3f3f3f;
-    --dark-color: #333;
-    --background-primary-color: rgb(32, 33, 36);
-    --light-color: #f4f4f4;
-    --text-primary-color: #f3efef;
-    --background-secondary-color: #f4f4f4;
-    --border-color: #b1b0b0;
-    --progress-bar-color:#dcdcdc;
-    --danger-color: #dc3545;
-    --success-color: #28a745;
-    --warning-color: #ffc107;
-    --info-color: #17a2b8;
-    --button-next-color: rgba(11,78,179);
-    --text-size: clamp(0.875rem, 2vw, 1.25rem);
-
-    }
-
 body {
     font-family: Montserrat, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    display: grid;
-    place-items: center;
     min-height: 100vh;
 }
 
 .row {
     --bs-gutter-x: 0 !important;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    gap: 10px;
     padding: 10px;
-    width: 154vh;
+    width: 100%;
 }
 
-/* Ajustes para el contenido principal */
 main {
-    padding: min(5rem, 5%);
+    margin-left: 260px;
+    padding: 80px 20px 20px;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* Encabezado responsive */
-.header {
-    border-width: 1px;
-    border-radius: .75rem;
-    display: block;
-    text-align: center;
-    --bs-gutter-x: 0;
+.sidebar.collapsed~main {
+    margin-left: 80px;
 }
+
+@media (max-width: 991px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    main {
+        margin-left: 0;
+    }
+}
+
 
 /* Pie de página responsive */
 .footer {
@@ -77,5 +50,3 @@ main {
     margin-right: calc(-.5 * var(--bs-gutter-x));
     margin-left: calc(-.5 * var(--bs-gutter-x));
 }
-
-

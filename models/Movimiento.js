@@ -19,7 +19,9 @@ const movimientoSchema = new mongoose.Schema({
   area: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Area',
-    required: true
+    required: function () {
+      return this.tipo === 'salida'
+    }
   },
   observacion: {
     type: String,

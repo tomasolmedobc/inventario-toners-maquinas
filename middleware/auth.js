@@ -1,40 +1,49 @@
 const jwt = require('jsonwebtoken');
 
-// Middleware para verificar sesión
+// 🔐 Verificar sesión
 const verificarSesion = (req, res, next) => {
-  if (req.session && req.session.usuario) {
+  if (!req.session.usuario) {
+    return res.redirect('/auth/login');
+  }
+  next();
+};
+
+// 🧠 Roles para VISTAS
+const permitirRolesVista = (...roles) => {
+  return (req, res, next) => {
+    const usuario = req.session.usuario;
+
+    if (!usuario) {
+      return res.redirect('/auth/login');
+    }
+
+    if (!roles.includes(usuario.rol)) {
+      return res.status(403).render('403');
+    }
+
     next();
-  } else {
-    res.redirect('/auth/login');
-  }
+  };
 };
 
-// Middleware para verificar token JWT
-const verificarToken = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(401).json({ error: 'Token no proporcionado' });
+// 🧠 Roles para API
+const permitirRolesApi = (...roles) => {
+  return (req, res, next) => {
+    const usuario = req.session.usuario;
 
-  try {
-    const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
-    req.usuario = decoded;
+    if (!usuario) {
+      return res.status(401).json({ error: 'No autenticado' });
+    }
+
+    if (!roles.includes(usuario.rol)) {
+      return res.status(403).json({ error: 'No autorizado' });
+    }
+
     next();
-  } catch (error) {
-    res.status(403).json({ error: 'Token inválido' });
-  }
+  };
 };
 
-
-const isAdmin = (req, res, next) => {
-  if (req.session.usuario?.rol === 'admin') {
-    return next();
-  }
-  res.redirect('/');
-};
-
-
-// Exportar middlewares
 module.exports = {
   verificarSesion,
-  verificarToken,
-  isAdmin, // ✅ exportar también
+  permitirRolesVista,
+  permitirRolesApi
 };
