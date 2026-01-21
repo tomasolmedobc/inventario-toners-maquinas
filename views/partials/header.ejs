@@ -30,6 +30,11 @@
       </label>
     </div>
   </div>
+  <%
+  const rol = usuario?.rol || null;
+  const esAdmin = rol === 'admin';
+  const esJefe = rol === 'jefe';
+%>
 
 
   <!-- Navbar -->
@@ -92,7 +97,9 @@
         </a>
       </div>
 
+
       <div class="list-group list-group-flush mx-3 mt-4">
+        <% if (esAdmin || esJefe) { %>
         <div class="list-group-item fw-bold text-muted sidebar-title">
           Consumo
         </div>
@@ -106,16 +113,18 @@
           <li class="bx bx-detail"></li>
           <span>Consumo por area</span>
         </a>
+        <% } %>
       </div>
 
-      <% if (usuario?.rol==='admin' ) { %>
+ 
         <div class="list-group list-group-flush mx-3 mt-4">
+
           <div class="smallName">
             <small>Hola, <strong>
                 <%= usuario.nombre %>
               </strong></small>
           </div>
-
+          <% if (esAdmin) { %>
           <div class="list-group-item fw-bold text-muted">
             Acceso Admin
           </div>
@@ -129,10 +138,10 @@
             <i class="bx bx-map"></i>
             <span class="sidebar-text">Áreas</span>
           </a>
-
-          </a>
         </div>
         <% } %>
+
+
         <div class="list-group list-group-flush mx-3 mt-auto mb-3">
           <div class="list-group-item fw-bold text-muted sidebar-title">
             Sesión

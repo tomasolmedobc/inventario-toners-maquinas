@@ -45,11 +45,11 @@ exports.loginUsuario = async (req, res) => {
     });
 
     if (!usuario)
-      return res.render('/auth/login', { error: 'Usuario no encontrado' });
+      return res.render('login', { error: 'Usuario no encontrado' });
 
     const coincide = await usuario.validarContraseña(contraseña);
     if (!coincide)
-      return res.render('/auth/login', { error: 'Contraseña incorrecta' });
+      return res.render('login', { error: 'Contraseña incorrecta' });
 
     req.session.usuario = {
       _id: usuario._id,
@@ -58,10 +58,12 @@ exports.loginUsuario = async (req, res) => {
     };
 
     res.redirect('/');
-  } catch {
-    res.render('/auth/login', { error: 'Error al iniciar sesión' });
+  } catch (error) {
+    console.error(error);
+    res.render('login', { error: 'Error al iniciar sesión' });
   }
 };
+
 
 
 exports.logout = (req, res) => {

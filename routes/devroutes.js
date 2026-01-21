@@ -4,7 +4,7 @@ const router = express.Router();
 const Producto = require('../models/Producto');
 const Movimiento = require('../models/Movimiento');
 
-const { verificarSesion } = require('../middleware/auth');
+const { verificarSesion, permitirRolesApi } = require('../middleware/auth');
 
 const dashboardController = require('../controllers/dashboardController');
 const equiposController = require('../controllers/equiposController');
@@ -17,6 +17,7 @@ const apiController = require('../controllers/apiController');
 router.get(
   '/historial',
   verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
   dashboardController.mostrarDashboard
 );
 
@@ -27,6 +28,7 @@ router.get(
 router.get(
   '/entregas',
   verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
   apiController.verEntregas
 );
 
@@ -36,7 +38,7 @@ router.get(
 
 router.get(
   '/equipos',
-  verificarSesion,
+  verificarSesion,  permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.verEquipos
 );
 
@@ -44,7 +46,7 @@ router.get(
    INVENTARIO (VISTA)
 ====================================================== */
 
-router.get('/inventario', verificarSesion, async (req, res) => {
+router.get('/inventario', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), async (req, res) => {
   const productos = await Producto.find();
   res.render('inventario', { productos });
 });
@@ -53,7 +55,7 @@ router.get('/inventario', verificarSesion, async (req, res) => {
    MOVIMIENTOS (VISTA)
 ====================================================== */
 
-router.get('/movimientos', verificarSesion, async (req, res) => {
+router.get('/movimientos', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), async (req, res) => {
   const movimientos = await Movimiento.find()
     .populate('producto')
     .populate('usuario');
@@ -65,7 +67,7 @@ router.get('/movimientos', verificarSesion, async (req, res) => {
    BAJO STOCK (VISTA)
 ====================================================== */
 
-router.get('/bajo-stock', verificarSesion, (req, res) => {
+router.get('/bajo-stock', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), (req, res) => {
   res.render('bajo-stock');
 });
 

@@ -85,7 +85,7 @@ const cambiarRolManual = async (req, res) => {
   const { id } = req.params;
   const { rol } = req.body;
 
-  if (!['admin', 'user'].includes(rol)) {
+  if (!['admin', 'jefe' , 'user'].includes(rol)) {
 
     return res.status(400).json({ error: 'Rol no válido' });
   }

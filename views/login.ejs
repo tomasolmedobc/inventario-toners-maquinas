@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,30 +9,30 @@
   <link rel="stylesheet" href="/resources/css/login.css">
   <title>Login</title>
 </head>
+
 <body>
-<div class="row">
-  <div class="containerxz">
+  <div class="row">
+    <div class="containerxz">
       <form action="/auth/login" method="POST" class="form login-form">
         <p class="form-title">Iniciar Sesión</p>
         <div class="input-containerxz">
           <label>Usuario o Email</label>
           <input type="text" name="userName" id="userName" required>
-        </div>        
-      <div class="input-containerxz">
-        <label for="contraseña">Contraseña:</label>
-        <input type="password" name="contraseña" id="contraseña" required>
-      </div>
+        </div>
+        <div class="input-containerxz">
+          <label for="contraseña">Contraseña:</label>
+          <input type="password" name="contraseña" id="contraseña" required>
+        </div>
 
         <button type="submit" class="submit">Iniciar sesión</button>
-        </form>
-    <div><%= error ? error : '' %></div>
+      </form>
+      <div>
+        <%= error ? error : '' %>
+      </div>
+    </div>
   </div>
 
 
-</div>
-
-
 </body>
+
 </html>
-
-

@@ -1,31 +1,31 @@
 <%- include('partials/header') %>
 
-<div class="container mt-4">
-  <h2 class="mb-4">📉 Tóners con bajo stock</h2>
+  <div class="container mt-4">
+    <h2 class="mb-4">📉 Tóners con bajo stock</h2>
 
-  <!-- Tabla -->
-  <div class="table-responsive">
-    <table class="table table-bordered table-hover" id="tablaBajoStock">
-      <thead class="table-dark">
-        <tr>
-          <th>Marca</th>
-          <th>Modelo</th>
-          <th>Compatibilidad</th>
-          <th>Cantidad</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Se cargará dinámicamente -->
-      </tbody>
-    </table>
+    <!-- Tabla -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover" id="tablaBajoStock">
+        <thead class="table-dark">
+          <tr>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Compatibilidad</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Se cargará dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mensaje si no hay resultados -->
+    <div id="mensajeSinDatos" class="alert alert-success text-center" style="display:none;">
+      ✅ Todos los tóners tienen stock suficiente.
+    </div>
   </div>
 
-  <!-- Mensaje si no hay resultados -->
-  <div id="mensajeSinDatos" class="alert alert-success text-center" style="display:none;">
-    ✅ Todos los tóners tienen stock suficiente.
-  </div>
-</div>
 
-
-<script src="/resources/js/bajostock.js"></script>
-<%- include('partials/footer') %>
+  <script src="/resources/js/bajostock.js"></script>
+  <%- include('partials/footer') %>
