@@ -1,23 +1,23 @@
 
-  const Movimiento = require('../models/Movimiento');
-  const bcrypt = require('bcryptjs');
-  const User = require('../models/User');
+const Movimiento = require('../models/Movimiento');
+const bcrypt = require('bcryptjs');
+const User = require('../models/User');
 
-    const mostrarDashboard = async (req, res) => {
-      try {
-        const movimientos = await Movimiento.find()
-          .populate('producto')
-          .populate('usuario')
-          .sort({ fecha: -1 });
-    
-        res.render('historial', { movimientos });
-      } catch (error) {
-        console.error('Error al cargar historial de movimiento:', error);
-        res.status(500).send('Error al cargar historial de movimiento');
-      }
-    };
-  
-  const getTopAreas = async (req, res) => {
+const mostrarDashboard = async (req, res) => {
+  try {
+    const movimientos = await Movimiento.find()
+      .populate('producto')
+      .populate('usuario')
+      .sort({ fecha: -1 });
+
+    res.render('historial', { movimientos });
+  } catch (error) {
+    console.error('Error al cargar historial de movimiento:', error);
+    res.status(500).send('Error al cargar historial de movimiento');
+  }
+};
+
+const getTopAreas = async (req, res) => {
   const { rango = '30' } = req.query;
 
   let fechaInicio;
@@ -85,7 +85,7 @@ const cambiarRolManual = async (req, res) => {
   const { id } = req.params;
   const { rol } = req.body;
 
-  if (!['admin', 'jefe' , 'user'].includes(rol)) {
+  if (!['admin', 'jefe', 'user'].includes(rol)) {
 
     return res.status(400).json({ error: 'Rol no válido' });
   }

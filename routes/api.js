@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Area = require('../models/Area');
 
-const { verificarSesion, permitirRolesApi  } = require('../middleware/auth');
+const { verificarSesion, permitirRolesApi } = require('../middleware/auth');
 
 const notaController = require('../controllers/notaController');
 const dashboardController = require('../controllers/dashboardController');
@@ -15,12 +15,12 @@ const equiposController = require('../controllers/equiposController');
 ====================================================== */
 
 // 📦 Productos
-router.get('/productos', verificarSesion,  permitirRolesApi('user', 'jefe', 'admin'), apiController.listarProductos);
-router.post('/productos', verificarSesion,  permitirRolesApi('user', 'jefe', 'admin'), apiController.crearProducto);
+router.get('/productos', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.listarProductos);
+router.post('/productos', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.crearProducto);
 
 // 🔄 Movimientos
 router.post('/movimientos', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.registrarMovimiento);
-router.post('/movimientos-multiples', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'),  apiController.registrarMultiplesMovimientos);
+router.post('/movimientos-multiples', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.registrarMultiplesMovimientos);
 
 router.get('/areas', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), async (req, res) => {
   try {
@@ -50,22 +50,22 @@ router.patch(
 ====================================================== */
 
 router.get('/grafico-toners', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.getGraficoToners);
-router.get('/toners-bajo-stock', verificarSesion,  permitirRolesApi('user', 'jefe', 'admin'), apiController.getTonersBajoStock);
+router.get('/toners-bajo-stock', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), apiController.getTonersBajoStock);
 router.get('/top-areas', verificarSesion, permitirRolesApi('jefe', 'admin'), dashboardController.getTopAreas);
 
-  /* ======================================================
-    NOTAS
-  ====================================================== */
+/* ======================================================
+  NOTAS
+====================================================== */
 
-  router.get('/nota-entrega/:id', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), notaController.verNotaEntrega);
+router.get('/nota-entrega/:id', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), notaController.verNotaEntrega);
 
-  /* ======================================================
-    EQUIPOS (API)
+/* ======================================================
+  EQUIPOS (API)
 ====================================================== */
 
 // 📋 Listado
-router.get('/equipos', verificarSesion,  permitirRolesApi('user', 'jefe', 'admin'), equiposController.listarEquipos);
-  
+router.get('/equipos', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), equiposController.listarEquipos);
+
 // ➕ Crear
 router.post(
   '/equipos',
@@ -101,7 +101,7 @@ router.get(
 // ⛔ Baja
 router.patch(
   '/equipos/:id/baja',
-  verificarSesion,permitirRolesApi('admin'),
+  verificarSesion, permitirRolesApi('admin'),
   equiposController.darDeBaja
 );
 
@@ -144,9 +144,9 @@ router.get(
   equiposController.obtenerFiltros
 );
 
-  /* ======================================================
-  Mantener sesión activa
-  ======================================================= */
+/* ======================================================
+Mantener sesión activa
+======================================================= */
 
 router.get('/ping-sesion', (req, res) => {
   if (req.session) req.session.touch();

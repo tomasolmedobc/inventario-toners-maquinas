@@ -3,17 +3,7 @@ const Movimiento = require('../models/Movimiento');
 const Area = require('../models/Area');
 const User = require('../models/User');
 
-// Función auxiliar para actualizar stock
-function actualizarStock(prod, tipo, cantidad) {
-  if (tipo === 'entrada') {
-    prod.cantidad += cantidad;
-  } else if (tipo === 'salida') {
-    if (prod.cantidad < cantidad) throw new Error('Stock insuficiente');
-    prod.cantidad -= cantidad;
-  } else {
-    throw new Error('Tipo de movimiento inválido');
-  }
-}
+
 
 const crearProducto = async (req, res) => {
   try {
@@ -64,7 +54,17 @@ const crearProducto = async (req, res) => {
     res.status(500).json({ error: 'Error al crear producto' });
   }
 };
-
+// Función auxiliar para actualizar stock
+function actualizarStock(prod, tipo, cantidad) {
+  if (tipo === 'entrada') {
+    prod.cantidad += cantidad;
+  } else if (tipo === 'salida') {
+    if (prod.cantidad < cantidad) throw new Error('Stock insuficiente');
+    prod.cantidad -= cantidad;
+  } else {
+    throw new Error('Tipo de movimiento inválido');
+  }
+}
 const registrarMovimiento = async (req, res) => {
   try {
     const { producto, tipo, cantidad, area, observacion } = req.body;
