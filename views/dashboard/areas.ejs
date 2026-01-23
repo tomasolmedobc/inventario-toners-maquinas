@@ -1,49 +1,132 @@
 <%- include('../partials/header') %>
-    <form method="POST" action="/dashboard/areas">
-        <input type="text" name="nombre" placeholder="Nueva área" required>
-        <button>Agregar</button>
-    </form>
 
-    <h3>Normalizar áreas</h3>
+<form method="POST" action="/dashboard/areas" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="nombre" class="form-control" placeholder="Nueva área" required>
+        <button class="btn btn-primary">Agregar Área</button>
+    </div>
+</form>
 
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Área cargada</th>
-                <th>Área correcta</th>
-                <th>Acción</th>
+<h3>Normalizar áreas</h3>
+<h3>Áreas</h3>
+
+<div class="mb-3">
+    <input
+        type="text"
+        id="buscadorAreas"
+        class="form-control"
+        placeholder="Buscar área o dependencia..."
+    >
+</div>
+
+<table class="table table-bordered align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Área</th>
+            <th>Dependencias</th>
+            <th>Normalizar</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% areas.forEach(a => { %>
+            <tr class="area-row" data-area="<%= a.nombre.toLowerCase() %>">
+                <td><%= a.nombre %></td>
+
+                <td>
+                    <ul class="list-group mb-2">
+                        <% (dependenciasPorArea[a._id] || []).forEach(d => { %>
+                            <li
+                                class="list-group-item py-1 d-flex justify-content-between align-items-center dep-item"
+                                data-dep="<%= d.nombre.toLowerCase() %>"
+                            >
+                                <span class="dep-nombre" data-id="<%= d._id %>">
+                                    <%= d.nombre %>
+                                </span>
+
+                                <div>
+                                    <button
+                                        class="btn btn-sm btn-link text-warning"
+                                        onclick="editarDependencia(
+                                            '<%= d._id %>',
+                                            '<%= d.nombre %>',
+                                            '<%= a.nombre %>'
+                                        )"
+                                    >
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+
+                                    <button
+                                        class="btn btn-sm btn-link text-danger"
+                                        onclick="eliminarDependencia('<%= d._id %>')"
+                                    >
+                                    <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </li>
+                        <% }) %>
+                    </ul>
+
+                    <button
+                        class="btn btn-sm btn-outline-primary"
+                        onclick="abrirModalDependencia('<%= a._id %>', '<%= a.nombre %>')"
+                    >
+                        ➕ Agregar dependencia
+                    </button>
+                </td>
+
+                <td>
+                    <select class="form-select mb-1" id="select-<%= a._id %>">
+                        <option value="">Seleccionar área correcta</option>
+                        <% areas.forEach(b => { %>
+                            <% if (b._id.toString() !== a._id.toString()) { %>
+                                <option value="<%= b._id %>"><%= b.nombre %></option>
+                            <% } %>
+                        <% }) %>
+                    </select>
+
+                    <button
+                        type="button"
+                        class="btn btn-success btn-sm"
+                        onclick="normalizar('<%= a._id %>')"
+                    >
+                        Normalizar
+                    </button>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            <% areas.forEach(a=> { %>
-                <tr>
-                    <td>
-                        <%= a.nombre %>
-                    </td>
-                    <td>
-                        <select class="form-select" id="select-<%= a._id %>">
-                            <option value="">Seleccionar área correcta</option>
-                            <% areas.forEach(b=> { %>
-                                <% if (b._id.toString() !==a._id.toString()) { %>
-                                    <option value="<%= b._id %>">
-                                        <%= b.nombre %>
-                                    </option>
-                                    <% } %>
-                                        <% }) %>
-                        </select>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-success btn-sm" onclick="normalizar('<%= a._id %>')">
-                            Normalizar
-                        </button>
-                    </td>
-                </tr>
-                <% }) %>
-        </tbody>
+        <% }) %>
+    </tbody>
+</table>
 
-    </table>
+<!-- MODAL -->
+<div class="modal fade" id="modalDependencia" tabindex="-1">
+    <div class="modal-dialog">
+        <form id="formDependencia" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModalDependencia">Nueva Dependencia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
 
+            <div class="modal-body">
+                <input type="hidden" id="depId">
+                <input type="hidden" id="depAreaId">
 
+                <div class="mb-2">
+                    <label class="form-label">Área</label>
+                    <input type="text" id="depAreaNombre" class="form-control" disabled>
+                </div>
 
+                <div class="mb-2">
+                    <label class="form-label">Dependencia</label>
+                    <input type="text" id="depNombre" class="form-control" required>
+                </div>
+            </div>
 
-    <%- include('../partials/footer') %>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

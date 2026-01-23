@@ -1,81 +1,39 @@
 const mongoose = require('mongoose');
 
-const EquipoSchema = new mongoose.Schema(
-  {
-    area: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    
-    dependencia:{
-        type: String,
-        required:true,
-        trim: true
-    
-    },
-
-    usernamePc: {
-      type: String, // Ej: PC-ADMIN-01
-      required: true,
-      trim: true
-    },
-
-    procesador: {
-      type: String,
-      default: ''
-    },
-
-    ram: {
-      type: String, // Ej: 16 GB
-      default: ''
-    },
-
-    disco: {
-      type: String, // Ej: SSD 480 GB
-      default: ''
-    },
-
-    ip: {
-      type: String,
-      default: ''
-    },
-
-    hostname: {
-      type: String,
-      default: ''
-    },
-
-    nombreApellido: {
-      type: String, // Usuario asignado al equipo
-      default: ''
-    },
-
-    codigoIdentificacion: {
-      type: String,
-      required: true,
-      unique: true,
-      index: true
-    },
-
-    estado: {
-      type: String,
-      enum: ['ACTIVO', 'BAJA'],
-      default: 'ACTIVO'
-    },
-
-    observacionBaja: {
-      type: String,
-      default: ''
-    },
-
-    fechaBaja: {
-      type: Date
-    }
+const EquipoSchema = new mongoose.Schema({
+  area: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Area',
+    required: true
   },
-  {
-    timestamps: true
-  }
-);
+  dependencia: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Dependencia',
+    required: true
+  },
+
+  usernamePc: { type: String, required: true },
+  procesador: String,
+  ram: String,
+  disco: String,
+  ip: String,
+  hostname: String,
+  nombreApellido: String,
+
+  codigoIdentificacion: {
+    type: String,
+    required: true,
+    unique: true
+  },
+
+  estado: {
+    type: String,
+    enum: ['ACTIVO', 'BAJA'],
+    default: 'ACTIVO'
+  },
+
+  observacionBaja: String,
+  fechaBaja: Date
+}, { timestamps: true });
 
 module.exports = mongoose.model('Equipo', EquipoSchema);

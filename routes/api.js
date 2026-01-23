@@ -9,6 +9,7 @@ const dashboardController = require('../controllers/dashboardController');
 const adminController = require('../controllers/adminController');
 const apiController = require('../controllers/apiController');
 const equiposController = require('../controllers/equiposController');
+const Dependencia = require('../models/Dependencia')
 
 /* ======================================================
     INVENTARIO / PRODUCTOS
@@ -88,6 +89,7 @@ router.patch(
   verificarSesion,
   permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.traspasarEquipo
+  
 );
 
 // 🧾 Historial de traspasos
@@ -143,6 +145,85 @@ router.get(
   permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.obtenerFiltros
 );
+/* ======================================================
+  DEPENDENCIAS
+====================================================== */
+
+// ➕ Crear dependencia
+router.post(
+  '/dependencias',
+  verificarSesion,
+  permitirRolesApi('admin'),
+  async (req, res) => {
+    try {
+      const { nombre, area } = req.body
+      if (!nombre || !area) {
+        return res.status(400).json({ error: 'Datos incompletos' })
+      }
+
+      const dep = await Dependencia.create({
+        nombre: nombre.trim(),
+        area
+      })
+
+      res.json(dep)
+    } catch (e) {
+      if (e.code === 11000) {
+        return res.status(400).json({ error: 'La dependencia ya existe en el área' })
+      }
+      res.status(500).json({ error: 'Error al crear dependencia' })
+    }
+  }
+)
+
+// 📋 Listar dependencias por área
+router.get(
+  '/dependencias/:areaId',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  async (req, res) => {
+    const deps = await Dependencia.find({ area: req.params.areaId })
+      .sort({ nombre: 1 })
+    res.json(deps)
+  }
+)
+// ✏️ Editar dependencia
+router.patch(
+  '/dependencias/:id',
+  verificarSesion,
+  permitirRolesApi('admin'),
+  async (req, res) => {
+    try {
+      const { nombre } = req.body
+      if (!nombre) return res.status(400).json({ error: 'Nombre requerido' })
+
+      const dep = await Dependencia.findByIdAndUpdate(
+        req.params.id,
+        { nombre: nombre.trim() },
+        { new: true }
+      )
+
+      res.json(dep)
+    } catch (e) {
+      res.status(500).json({ error: 'Error al editar dependencia' })
+    }
+  }
+)
+
+// 🗑️ Eliminar dependencia
+router.delete(
+  '/dependencias/:id',
+  verificarSesion,
+  permitirRolesApi('admin'),
+  async (req, res) => {
+    try {
+      await Dependencia.findByIdAndDelete(req.params.id)
+      res.sendStatus(200)
+    } catch (e) {
+      res.status(500).json({ error: 'Error al eliminar dependencia' })
+    }
+  }
+)
 
 /* ======================================================
 Mantener sesión activa

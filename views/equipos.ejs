@@ -2,35 +2,36 @@
 
 <div class="container mt-4">
 
-
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="mb-0">Gestión de Equipos</h3>
-  
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoEquipo">
       ➕ Nuevo Equipo
     </button>
   </div>
-  
 
   <!-- FILTROS -->
   <div class="row mb-3">
     <div class="col-md-4">
       <input type="text" id="buscador" class="form-control" placeholder="Buscar equipo...">
     </div>
-  
-    <option value="">Todas las áreas</option>
 
-  
     <div class="col-md-4">
-      <select id="selectDependencia" class="form-select">
-        <option value="">Todas las dependencias</option>
-        <% dependencias.forEach(dep => { %>
-          <option value="<%= dep %>"><%= dep %></option>
+      <select id="selectArea" class="form-select">
+        <option value="">Todas las áreas</option>
+        <% areas.forEach(a => { %>
+          <option value="<%= a._id %>"><%= a.nombre %></option>
         <% }) %>
       </select>
     </div>
-  </div>
-  
+
+    <div class="col-md-4">
+      <select id="selectDependencia" class="form-select">
+        <option value="">Todas las dependencias</option>
+        <% dependencias.forEach(d => { %>
+          <option value="<%= d._id %>"><%= d.nombre %></option>
+        <% }) %>
+      </select>
+    </div>
   </div>
 
   <!-- TABS -->
@@ -46,30 +47,17 @@
     </li>
   </ul>
 
-
   <!-- TABLA -->
   <table class="table table-bordered table-hover" id="tablaEquipos">
-    <thead class="table-dark">
-      <tr>
-        <th>Área</th>
-        <th>Dependencia</th>
-        <th>Máquina</th>
-        <th>Código</th>
-        <th>Estado</th>
-        <th style="width:160px">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- JS -->
-    </tbody>
+    <thead class="table-dark"></thead>
+    <tbody></tbody>
   </table>
-  <nav>
-    <ul class="pagination justify-content-center" id="paginacion"></ul>
-  </nav>
-  
+
 </div>
 
-<!-- MODAL DETALLE -->
+<!-- ================= MODALES ================= -->
+
+<!-- DETALLE -->
 <div class="modal fade" id="modalDetalleEquipo" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -77,13 +65,12 @@
         <h5 class="modal-title">Detalle del Equipo</h5>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body" id="detalleEquipo">
-        <!-- JS -->
-      </div>
+      <div class="modal-body" id="detalleEquipo"></div>
     </div>
   </div>
 </div>
 
+<!-- NUEVO EQUIPO -->
 <div class="modal fade" id="modalNuevoEquipo" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <form class="modal-content" id="formNuevoEquipo">
@@ -97,19 +84,28 @@
 
           <div class="col-md-6">
             <label class="form-label">Área</label>
-            <input class="form-control" name="area" placeholder="Dirección de Sistemas" required>
+            <select class="form-select" name="area" required>
+              <option value="">Seleccionar</option>
+              <% areas.forEach(a => { %>
+                <option value="<%= a._id %>"><%= a.nombre %></option>
+              <% }) %>
+            </select>
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Dependencia</label>
-            <input class="form-control" name="dependencia" placeholder="Municipalidad" required>
+            <select class="form-select" name="dependencia" required>
+              <option value="">Seleccionar</option>
+              <% dependencias.forEach(d => { %>
+                <option value="<%= d._id %>"><%= d.nombre %></option>
+              <% }) %>
+            </select>
           </div>
-          
+
           <div class="col-md-6">
             <label class="form-label">Usuario PC</label>
-            <input class="form-control" name="usernamePc" placeholder="jperez" required>
+            <input class="form-control" name="usernamePc" required>
           </div>
-          
 
           <div class="col-md-6">
             <label class="form-label">Código Identificación</label>
@@ -118,32 +114,32 @@
 
           <div class="col-md-6">
             <label class="form-label">Procesador</label>
-            <input class="form-control" name="procesador" placeholder="Ej: Intel Core i5-8400">
+            <input class="form-control" name="procesador">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">RAM</label>
-            <input class="form-control" name="ram" placeholder="Ej: 8GB">
+            <input class="form-control" name="ram">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Disco</label>
-            <input class="form-control" name="disco" placeholder="Ej: 256GB SSD o 1TB HDD">
+            <input class="form-control" name="disco">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">IP</label>
-            <input class="form-control" name="ip" placeholder="10.240.21.xx">
+            <input class="form-control" name="ip">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Hostname</label>
-            <input class="form-control" name="hostname" placeholder="Ej: PC-OFICINA-01">
+            <input class="form-control" name="hostname">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Nombre Apellido</label>
-            <input class="form-control" name="nombreApellido" placeholder="Ej: Juan Pérez">
+            <input class="form-control" name="nombreApellido">
           </div>
 
         </div>
@@ -157,7 +153,7 @@
   </div>
 </div>
 
-
+<!-- EDITAR -->
 <div class="modal fade" id="modalEditarEquipo" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -171,34 +167,26 @@
 
         <div class="row g-2">
           <div class="col-md-6">
-            <span>Procesador:</span>
-            <input class="form-control" id="editProcesador" placeholder="Procesador">
-          </div>
+            <label class="form-label">Área</label>
+            <input id="editProcesador" class="form-control" placeholder="Procesador"></div>
           <div class="col-md-6">
-            <span>Memoria:</span>
-            <input class="form-control" id="editRam" placeholder="RAM">
-          </div>
+            <label class="form-label">Dependencia</label>
+            <input id="editRam" class="form-control" placeholder="RAM"></div>
           <div class="col-md-6">
-            <span>Disco:</span>
-            <input class="form-control" id="editDisco" placeholder="Disco">
-          </div>
+            <label class="form-label">Código Identificación</label>
+            <input id="editDisco" class="form-control" placeholder="Disco"></div>
           <div class="col-md-6">
-            <span>IP:</span>
-            <input class="form-control" id="editIp" placeholder="IP">
-          </div>
+            <label class="form-label">IP</label>
+            <input id="editIp" class="form-control" placeholder="IP"></div>
           <div class="col-md-6">
-            <span>Hostname:</span>
-            <input class="form-control" id="editHostname" placeholder="Hostname">
-          </div>
+            <label class="form-label">Hostname</label>
+            <input id="editHostname" class="form-control" placeholder="Hostname"></div>
           <div class="col-md-6">
-            <span>Username:</span>
-            <input class="form-control" id="editUsernamePc" placeholder="Username">
-
-          </div>
+            <label class="form-label">Usuario PC</label>
+            <input id="editUsernamePc" class="form-control" placeholder="Usuario PC"></div>
           <div class="col-md-6">
-            <span>Nombre y Apellido:</span>
-            <input class="form-control" id="editNombreApellido" placeholder="NombreApellido">
-          </div>
+            <label class="form-label">Nombre y Apellido</label>
+            <input id="editNombreApellido" class="form-control" placeholder="Nombre y Apellido"></div>
         </div>
       </div>
 
@@ -208,6 +196,8 @@
     </div>
   </div>
 </div>
+
+<!-- TRASPASO -->
 <div class="modal fade" id="modalTraspaso" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -219,41 +209,41 @@
 
       <div class="modal-body">
         <input type="hidden" id="traspasoId">
-
-        <div class="mb-2">
-          <label>Área</label>
-          <input class="form-control" id="traspasoArea">
-        </div>
-
-        <div class="mb-2">
-          <label>Dependencia</label>
-          <input class="form-control" id="traspasoDependencia">
-        </div>
-        <div class="mb-2">
-          <label>Username</label>
-          <input class="form-control" id="traspasoUsernamePc">
-        </div>
-        <div class="mb-2">
-          <label>Nombre y Apellido</label>
-          <input class="form-control" id="traspasoNombreApellido">
-        </div>
-
-        <div class="alert alert-warning small mt-2">
-          Este cambio quedará registrado como traspaso
-        </div>
+        <label class="form-label">Nueva Área</label>
+        <select id="traspasoArea" class="form-select">
+          <% areas.forEach(a => { %>
+            <option value="<%= a._id %>"><%= a.nombre %></option>
+          <% }) %>
+        </select>
+        <label class="form-label mt-2">Nueva Dependencia</label>
+        <select id="traspasoDependencia" class="form-select">
+          <% dependencias.forEach(d => { %>
+            <option value="<%= d._id %>"><%= d.nombre %></option>
+          <% }) %>
+        </select>
+        <label class="form-label mt-2">Nuevos Datos del Usuario</label>
+        <input id="traspasoUsernamePc" class="form-control mb-2" placeholder="Usuario PC">
+        <label class="form-label">Nombre y Apellido</label>
+        <input id="traspasoNombreApellido" class="form-control mb-2" placeholder="Nombre Apellido">
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-info" onclick="confirmarTraspaso()">
-          Confirmar traspaso
-        </button>
+        <button class="btn btn-info" onclick="confirmarTraspaso()">Confirmar</button>
       </div>
 
     </div>
   </div>
 </div>
 
-
+<!-- TOAST -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toastOk" class="toast text-bg-success border-0">
+    <div class="d-flex">
+      <div class="toast-body" id="toastMsg"></div>
+      <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
 
 <script src="/resources/js/equipos.js"></script>
 

@@ -266,3 +266,19 @@ main {
 .modal-backdrop {
   z-index: 1090;
 }
+.list-group-item {
+  transition: all 0.25s ease;
+}
+
+.list-group-item:hover {
+  transform: scale(1.01);
+  background-color: #f8f9fa;
+}
+.btn-link i {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-link:hover i {
+  transform: scale(1.15);
+  opacity: 0.8;
+}
