@@ -15,14 +15,15 @@
   const tabActivos = document.getElementById('tabActivos')
   const tabBajas = document.getElementById('tabBajas')
   const tabTraspasos = document.getElementById('tabTraspasos')
+  const tabService = document.getElementById('tabService')
 
   const formNuevoEquipo = document.getElementById('formNuevoEquipo')
 
   const modalNuevoEquipo = new bootstrap.Modal(document.getElementById('modalNuevoEquipo'))
-  const modalDetalle     = new bootstrap.Modal(document.getElementById('modalDetalleEquipo'))
-  const modalEditar      = new bootstrap.Modal(document.getElementById('modalEditarEquipo'))
-  const modalTraspaso    = new bootstrap.Modal(document.getElementById('modalTraspaso'))
-  
+  const modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalleEquipo'))
+  const modalEditar = new bootstrap.Modal(document.getElementById('modalEditarEquipo'))
+  const modalTraspaso = new bootstrap.Modal(document.getElementById('modalTraspaso'))
+
 
   if (!tbody || !thead) return
 
@@ -39,7 +40,51 @@
     document.getElementById('toastMsg').textContent = msg
     toast.show()
   }
+  function initTooltips() {
+    document
+      .querySelectorAll('[data-bs-toggle="tooltip"]')
+      .forEach(el => {
+        bootstrap.Tooltip.getInstance(el)?.dispose()
+        new bootstrap.Tooltip(el)
+      })
+  }
 
+  const modalConfirm = new bootstrap.Modal(
+    document.getElementById('modalConfirm')
+  )
+  
+  let onConfirmAction = null
+  
+  function confirmar({ titulo, mensaje, onConfirm }) {
+    document.getElementById('confirmTitle').textContent = titulo
+    document.getElementById('confirmMessage').textContent = mensaje
+    onConfirmAction = onConfirm
+    modalConfirm.show()
+  }
+  
+  document.getElementById('btnConfirmar').onclick = async () => {
+    if (onConfirmAction) await onConfirmAction()
+    modalConfirm.hide()
+    onConfirmAction = null
+  }
+  
+  function cargarDependencias(select, areaId = null) {
+    select.innerHTML = '<option value="">Seleccionar</option>'
+  
+    const deps = new Map()
+  
+    equiposCache.forEach(e => {
+      if (!e.dependencia) return
+      if (areaId && e.area?._id !== areaId) return
+  
+      deps.set(e.dependencia._id, e.dependencia.nombre)
+    })
+  
+    deps.forEach((nombre, id) => {
+      select.append(new Option(nombre, id))
+    })
+  }
+  
   /* ==========================
     HEADERS
   ========================== */
@@ -53,7 +98,6 @@
       <th>Acciones</th>
     </tr>
   `
-
   const theadTraspasos = `
     <tr>
       <th>Área</th>
@@ -63,6 +107,14 @@
       <th>Fecha</th>
     </tr>
   `
+  const theadHistorial = `
+  <tr>
+    <th>Último servicio</th>
+    <th>Código</th>
+    <th>Detalle PC</th>
+    <th>Fecha</th>
+  </tr>
+`
 
   /* ==========================
     RENDER
@@ -83,37 +135,47 @@
     lista.forEach(e => {
       const acciones = e.estado === 'ACTIVO'
         ? `
-          <div class="d-flex gap-1">
-              <button
-                  class="btn btn-sm btn-link text-primary action-btn"
-                  data-edit="${e._id}"
-                  title="Editar"
-              >
-                  <i class="fa-solid fa-pen-to-square"></i>
-              </button>
+        <div class="btn-group btn-group-sm">
+          <button
+            class="btn btn-outline-primary"
+            data-edit="${e._id}"
+             data-bs-toggle="tooltip"
+            data-bs-title="Editar">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+    
+          <button
+            class="btn btn-outline-info"
+            data-traspaso="${e._id}"
+             data-bs-toggle="tooltip"
+            data-bs-title="Traspasar">
+            <i class="fa-solid fa-right-left"></i>
+          </button>
+    
+          <button
+            class="btn btn-outline-warning"
+            data-baja="${e._id}"
+            data-bs-toggle="tooltip"
+            data-bs-title="Dar de baja">
+            <i class="fa-solid fa-arrow-down-wide-short"></i>
+          </button>
+    
+          <button
+            class="btn btn-outline-secondary"
+            data-service="${e.codigoIdentificacion}"
+            data-id="${e._id}"
+            data-bs-toggle="tooltip"
+            data-bs-title="Registrar service">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+      </button>
 
-              <button
-                  class="btn btn-sm btn-link text-info action-btn"
-                  data-traspaso="${e._id}"
-                  title="Traspasar"
-              >
-                  <i class="fa-solid fa-right-left"></i>
-              </button>
-
-              <button
-                  class="btn btn-sm btn-link text-warning action-btn"
-                  data-baja="${e._id}"
-                  title="Dar de baja"
-              >
-                  <i class="fa-solid fa-arrow-down-wide-short"></i>
-              </button>
-          </div>
-
-        `
+        </div>
+      `
         : '<span class="text-muted">No editable</span>'
 
+
       tbody.insertAdjacentHTML('beforeend', `
-        <tr class="${e.estado === 'BAJA' ? 'table-danger' : ''}">
+        <tr class="${e.estado === 'BAJA' ? 'table-secondary text-muted' : ''}">
           <td>${areaNombre(e)}</td>
           <td>${depNombre(e)}</td>
           <td>
@@ -124,7 +186,8 @@
           </td>
           <td>${e.codigoIdentificacion}</td>
           <td>
-            <span class="badge ${e.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}">
+            <span class="badge rounded-pill ${e.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}">
+          
               ${e.estado}
             </span>
           </td>
@@ -132,6 +195,7 @@
         </tr>
       `)
     })
+    initTooltips()
   }
 
   /* ==========================
@@ -160,7 +224,33 @@
     )
   }
 
-  function filtrar() {
+  async function filtrar() {
+    if (vistaActual === 'service') {
+      const codigo = buscador.value.trim()
+      if (!codigo) return
+
+      const res = await fetch(`/api/service-equipo/${codigo}`)
+      const lista = await res.json()
+
+      tbody.innerHTML = lista.length
+        ? lista.map(s => `
+          <tr>
+            <td>${s.tipo} - ${s.descripcion}</td>
+            <td>${s.codigoIdentificacion}</td>
+            <td>
+              ${s.equipo?.procesador || '-'} /
+              ${s.equipo?.ram || '-'} /
+              ${s.equipo?.disco || '-'}
+            </td>
+            <td>${new Date(s.fecha).toLocaleString()}</td>
+          </tr>
+        `).join('')
+        : `<tr><td colspan="4" class="text-center text-muted">Sin registros</td></tr>`
+
+      return
+    }
+
+    // 🔽 lo que ya tenías para equipos normales
     const t = buscador.value.toLowerCase()
     const a = selectArea.value
     const d = selectDependencia.value
@@ -182,7 +272,7 @@
   }
 
   /* ==========================
-    API
+    API Tablas carga
   ========================== */
   async function cargarEquipos() {
     if (vistaActual === 'traspasos') return
@@ -210,6 +300,16 @@
         </tr>`).join('')
       : `<tr><td colspan="5" class="text-center text-muted">Sin traspasos</td></tr>`
   }
+  async function cargarServiceEquipo() {
+    thead.innerHTML = theadHistorial
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center text-muted">
+          Ingrese o busque un código para ver el historial
+        </td>
+      </tr>
+    `
+  }
 
   /* ==========================
     EVENTOS
@@ -220,11 +320,19 @@
   tabActivos.onclick = () => cambiarVista('activos', theadEquipos, cargarEquipos)
   tabBajas.onclick = () => cambiarVista('bajas', theadEquipos, cargarEquipos)
   tabTraspasos.onclick = () => cambiarVista('traspasos', theadTraspasos, cargarTraspasos)
+  tabService.onclick = () => cambiarVista('service', theadHistorial, cargarServiceEquipo)
 
   function cambiarVista(vista, header, fn) {
     vistaActual = vista
     document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'))
-    document.getElementById(`tab${vista.charAt(0).toUpperCase() + vista.slice(1)}`).classList.add('active')
+
+    const tab = document.getElementById(
+      vista === 'service'
+        ? 'tabService'
+        : `tab${vista.charAt(0).toUpperCase() + vista.slice(1)}`
+    )
+
+    tab?.classList.add('active')
     thead.innerHTML = header
     fn()
   }
@@ -232,29 +340,30 @@
   tbody.onclick = async e => {
     const btn = e.target.closest('button');
     if (!btn) return;
-  
+
     if (btn.dataset.detalle) verDetalle(btn.dataset.detalle);
     if (btn.dataset.edit) abrirEditar(btn.dataset.edit);
     if (btn.dataset.traspaso) abrirTraspaso(btn.dataset.traspaso);
     if (btn.dataset.baja) darBaja(btn.dataset.baja);
+
   };
-  
+
   selectArea.onchange = () => {
     const area = selectArea.value;
     const deps = new Map();
     selectDependencia.innerHTML = '<option value="">Todas</option>';
     equiposCache
-    .filter(e => !area || e.area?._id === area)
-    .forEach(e => {
-      if (e.dependencia) {
-        deps.set(e.dependencia._id, e.dependencia.nombre);
-      }
+      .filter(e => !area || e.area?._id === area)
+      .forEach(e => {
+        if (e.dependencia) {
+          deps.set(e.dependencia._id, e.dependencia.nombre);
+        }
+      });
+
+    deps.forEach((nombre, id) => {
+      selectDependencia.append(new Option(nombre, id));
     });
-  
-  deps.forEach((nombre, id) => {
-    selectDependencia.append(new Option(nombre, id));
-  });
-  
+
     filtrar();
   };
   /* ==========================
@@ -286,6 +395,7 @@
 
   async function abrirTraspaso(id) {
     const e = await fetch(`/api/equipos?detalle=${id}`).then(r => r.json())
+    
     traspasoId.value = id
     traspasoArea.value = e.area?._id
     traspasoDependencia.value = e.dependencia?._id
@@ -294,12 +404,18 @@
     modalTraspaso.show()
   }
 
-  async function darBaja(id) {
-    if (!confirm('¿Dar de baja este equipo?')) return
-    await fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' })
-    showToast('Equipo dado de baja')
-    cargarEquipos()
+  function darBaja(id) {
+    confirmar({
+      titulo: 'Dar de baja equipo',
+      mensaje: '¿Seguro que querés dar de baja este equipo?',
+      onConfirm: async () => {
+        await fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' })
+        showToast('Equipo dado de baja')
+        cargarEquipos()
+      }
+    })
   }
+
 
   /* ==========================
     FORM NUEVO
@@ -321,32 +437,33 @@
   window.confirmarTraspaso = async function () {
     try {
       const id = document.getElementById('traspasoId').value;
-  
+
       const payload = {
         area: document.getElementById('traspasoArea').value,
         dependencia: document.getElementById('traspasoDependencia').value,
         usernamePc: document.getElementById('traspasoUsernamePc').value,
         nombreApellido: document.getElementById('traspasoNombreApellido').value
       };
-  
+
       const res = await fetch(`/api/equipos/${id}/traspaso`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
-  
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error');
-  
+
       modalTraspaso.hide();
       showToast('Traspaso realizado');
       cargarEquipos();
-  
+
     } catch (err) {
       showToast(err.message);
     }
   };
- 
+
+
   /* ==========================
     INIT
   ========================== */

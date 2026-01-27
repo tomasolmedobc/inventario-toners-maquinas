@@ -6,13 +6,13 @@
     <h3 class="mb-0">Gestión de Equipos</h3>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoEquipo">
       ➕ Nuevo Equipo
-    </button>
+    </button>   
   </div>
 
   <!-- FILTROS -->
   <div class="row mb-3">
     <div class="col-md-4">
-      <input type="text" id="buscador" class="form-control" placeholder="Buscar equipo...">
+      <input type="text" id="buscador" class="form-control" placeholder="🔍 Buscar por código, usuario, IP, hostname...">
     </div>
 
     <div class="col-md-4">
@@ -34,41 +34,40 @@
     </div>
   </div>
 
-  <!-- TABS -->
+  <!-- TABS --> 
   <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
-      <button class="nav-link active" id="tabActivos">Activos</button>
+
+      <button class="nav-link active" id="tabActivos" >
+        <i class="fa-solid fa-desktop me-1"></i> Activos
+      </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link" id="tabBajas">Bajas</button>
+      <button class="nav-link" id="tabBajas">
+        <i class="fa-solid fa-arrow-down-wide-short me-1"></i> Bajas
+      </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link" id="tabTraspasos">Traspasos</button>
+      <button class="nav-link" id="tabTraspasos">
+        <i class="fa-solid fa-right-left me-1"></i> Traspasos
+      </button>
+    </li>
+    <li>
+      <button class="nav-link" id="tabService"> 
+        <i class="fa-solid fa-screwdriver-wrench me-1"></i> Service Equipo</button>
     </li>
   </ul>
 
   <!-- TABLA -->
-  <table class="table table-bordered table-hover" id="tablaEquipos">
+  <table class="table table-hover align-middle" id="tablaEquipos">
     <thead class="table-dark"></thead>
     <tbody></tbody>
   </table>
-
 </div>
 
 <!-- ================= MODALES ================= -->
 
-<!-- DETALLE -->
-<div class="modal fade" id="modalDetalleEquipo" tabindex="-1">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Detalle del Equipo</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="detalleEquipo"></div>
-    </div>
-  </div>
-</div>
+
 
 <!-- NUEVO EQUIPO -->
 <div class="modal fade" id="modalNuevoEquipo" tabindex="-1">
@@ -103,43 +102,43 @@
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">Usuario PC</label>
-            <input class="form-control" name="usernamePc" required>
+            <la class="form-label">Usuario PC</label>
+            <input class="form-control" name="usernamePc" placeholder="mborges" required>
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Código Identificación</label>
-            <input class="form-control" name="codigoIdentificacion" required>
+            <input class="form-control" name="codigoIdentificacion" placeholder="PC-000" required>
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Procesador</label>
-            <input class="form-control" name="procesador">
+            <input class="form-control" name="procesador" placeholder="Intel Core i5 6500 @ 3.20GHz">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">RAM</label>
-            <input class="form-control" name="ram">
+            <input class="form-control" name="ram" placeholder="8 GB">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Disco</label>
-            <input class="form-control" name="disco">
+            <input class="form-control" name="disco" placeholder="500 GB SSD/1TB Rigido">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">IP</label>
-            <input class="form-control" name="ip">
+            <input class="form-control" name="ip" placeholder="10.240.21.xx">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Hostname</label>
-            <input class="form-control" name="hostname">
+            <input class="form-control" name="hostname" placeholder="recaudacion-01">
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Nombre Apellido</label>
-            <input class="form-control" name="nombreApellido">
+            <input class="form-control" name="nombreApellido" placeholder="María Borges">
           </div>
 
         </div>
@@ -152,7 +151,18 @@
     </form>
   </div>
 </div>
-
+<!-- DETALLE -->
+<div class="modal fade" id="modalDetalleEquipo" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalle del Equipo</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="detalleEquipo"></div>
+    </div>
+  </div>
+</div>
 <!-- EDITAR -->
 <div class="modal fade" id="modalEditarEquipo" tabindex="-1">
   <div class="modal-dialog modal-lg">
@@ -235,6 +245,83 @@
   </div>
 </div>
 
+<!-- SERVICE EQUIPO -->
+<div class="modal fade" id="modalService" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="formService" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Registrar service</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="codigoEquipo">
+        <input type="hidden" id="equipoId">
+      
+        <div class="mb-3">
+          <label class="form-label">Tipo</label>
+          <select id="tipoService" class="form-select" required>
+            <option value="">Seleccionar</option>
+            <option value="ENTRADA">Entrada</option>
+            <option value="SALIDA">Salida</option>
+          </select>
+        </div>
+      
+        <div class="mb-3">
+          <label class="form-label">Descripción</label>
+          <textarea id="descripcionService" class="form-control" rows="3" required></textarea>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Motivo de la baja</label>
+        <textarea
+          id="motivoBaja"
+          class="form-control"
+          rows="2"
+          placeholder="Ej: equipo sin reparación"
+        ></textarea>
+      </div>      
+
+      <div class="modal-footer justify-content-between">
+        <button
+          type="button"
+          id="btnBajaEquipo"
+          class="btn btn-outline-danger">
+          Dar de baja
+        </button>
+
+        <button type="submit" class="btn btn-primary">
+          Guardar service
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirmacion -->
+<div class="modal fade" id="modalConfirm" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmTitle">Confirmar acción</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body" id="confirmMessage">
+        ¿Estás seguro?
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-danger" id="btnConfirmar">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- TOAST -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
   <div id="toastOk" class="toast text-bg-success border-0">
@@ -245,6 +332,7 @@
   </div>
 </div>
 
-<script src="/resources/js/equipos.js"></script>
 
+<script src="/resources/js/equipos.js"></script>
+<script src="/resources/js/equipoServicio.js"></script>
 <%- include('partials/footer') %>

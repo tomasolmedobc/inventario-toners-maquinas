@@ -5,6 +5,7 @@ const Equipo = require('../models/Equipo');
 const TraspasoEquipo = require('../models/TraspasoEquipo');
 const Auditoria = require('../models/Auditoria');
 const registrarAuditoria = require('../utils/registrarAuditoria');
+const HistorialEquipo = require('../models/HistorialEquipo');
 
 /* ==========================
   VISTA
@@ -163,23 +164,30 @@ exports.editarEquipo = async (req, res) => {
 ========================== */
 exports.traspasarEquipo = async (req, res) => {
   try {
-    const { area, dependencia, usernamePc, nombreApellido } = req.body
+    const { area, dependencia, usernamePc, nombreApellido } = req.body;
 
     if (
       !mongoose.Types.ObjectId.isValid(area) ||
       !mongoose.Types.ObjectId.isValid(dependencia)
     ) {
-      return res.status(400).json({ error: 'Área o dependencia inválida' })
+      return res.status(400).json({ error: 'Área o dependencia inválida' });
     }
 
-    const equipo = await Equipo.findById(req.params.id)
-    if (!equipo) return res.status(404).json({ error: 'No encontrado' })
+    const equipo = await Equipo.findById(req.params.id);
+    if (!equipo) return res.status(404).json({ error: 'No encontrado' });
     if (equipo.estado !== 'ACTIVO') {
-      return res.status(403).json({ error: 'Equipo dado de baja' })
+      return res.status(403).json({ error: 'Equipo dado de baja' });
     }
 
-    const mismoArea = equipo.area?.toString() === area
-    const mismaDep = equipo.dependencia?.toString() === dependencia
+    const datosAnteriores = {
+      area: equipo.area,
+      dependencia: equipo.dependencia,
+      usernamePc: equipo.usernamePc,
+      nombreApellido: equipo.nombreApellido
+    };
+
+    const mismoArea = equipo.area?.toString() === area;
+    const mismaDep = equipo.dependencia?.toString() === dependencia;
 
     if (
       mismoArea &&
@@ -187,34 +195,39 @@ exports.traspasarEquipo = async (req, res) => {
       equipo.usernamePc === usernamePc &&
       equipo.nombreApellido === nombreApellido
     ) {
-      return res.status(400).json({ error: 'No hay cambios para registrar' })
+      return res.status(400).json({ error: 'No hay cambios para registrar' });
     }
 
-    await TraspasoEquipo.create({
+    // 🔁 Actualizar equipo
+    equipo.area = area;
+    equipo.dependencia = dependencia;
+    equipo.usernamePc = usernamePc;
+    equipo.nombreApellido = nombreApellido;
+    await equipo.save();
+
+    // 📜 Historial
+    await HistorialEquipo.create({
       equipo: equipo._id,
-      areaAnterior: equipo.area,
-      dependenciaAnterior: equipo.dependencia,
-      usernamePcAnterior: equipo.usernamePc,
-      nombreApellidoAnterior: equipo.nombreApellido,
-      areaNueva: area,
-      dependenciaNueva: dependencia,
-      usernamePcNueva: usernamePc,
-      nombreApellidoNuevo: nombreApellido,
+      tipo: 'TRASPASO',
+      descripcion: 'Traspaso de equipo',
+      datosAnteriores,
+      datosNuevos: {
+        area,
+        dependencia,
+        usernamePc,
+        nombreApellido
+      },
       usuario: req.session.usuario.nombre
-    })
+    });
 
-    equipo.area = area
-    equipo.dependencia = dependencia
-    equipo.usernamePc = usernamePc
-    equipo.nombreApellido = nombreApellido
-    await equipo.save()
+    res.json({ ok: true });
 
-    res.json({ ok: true })
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Error traspasando equipo' })
+    console.error(err);
+    res.status(500).json({ error: 'Error traspasando equipo' });
   }
-}
+};
+
 
 exports.listarTraspasos = async (req, res) => {
   try {
@@ -279,6 +292,34 @@ exports.historialEquipo = async (req, res) => {
     res.status(500).json({ error: 'Error obteniendo historial' });
   }
 };
+exports.buscarHistorialPorCodigo = async (req, res) => {
+  try {
+    const { codigo } = req.params;
+
+    const equipo = await Equipo.findOne({ codigoIdentificacion: codigo })
+      .populate('area', 'nombre')
+      .populate('dependencia', 'nombre');
+
+    if (!equipo) {
+      return res.status(404).json({ error: 'Equipo no encontrado' });
+    }
+
+    const ultimoService = await HistorialEquipo.findOne({ equipo: equipo._id })
+      .sort({ fecha: -1 });
+
+    res.json({
+      codigo: equipo.codigoIdentificacion,
+      ultimoService: ultimoService?.descripcion || 'Sin service',
+      fecha: ultimoService?.fecha || null,
+      equipoId: equipo._id
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error buscando historial' });
+  }
+};
+
 
 exports.obtenerFiltros = async (req, res) => {
   try {

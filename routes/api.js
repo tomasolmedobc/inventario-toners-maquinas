@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Area = require('../models/Area');
+const Dependencia = require('../models/Dependencia')
 
 const { verificarSesion, permitirRolesApi } = require('../middleware/auth');
 
@@ -9,7 +10,7 @@ const dashboardController = require('../controllers/dashboardController');
 const adminController = require('../controllers/adminController');
 const apiController = require('../controllers/apiController');
 const equiposController = require('../controllers/equiposController');
-const Dependencia = require('../models/Dependencia')
+const serviceEquipoController = require('../controllers/serviceEquipoController');
 
 /* ======================================================
     INVENTARIO / PRODUCTOS
@@ -106,7 +107,43 @@ router.patch(
   verificarSesion, permitirRolesApi('admin'),
   equiposController.darDeBaja
 );
+// routes/api.js
+router.get(
+  '/historial/equipo/:codigo',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  equiposController.buscarHistorialPorCodigo
+);
 
+/* ======================================================
+  SERVICE EQUIPOS
+====================================================== */
+
+// ➕ Registrar entrada / salida
+router.post(
+  '/service-equipo',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  serviceEquipoController.registrarService
+)
+
+// 📋 Historial por código
+router.get(
+  '/service-equipo/:codigo',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  serviceEquipoController.listarPorCodigo
+)
+
+// 🕒 Último service
+router.get(
+  '/service-equipo/:codigo/ultimo',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  serviceEquipoController.ultimoService
+)
+router.post('/baja',   verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),serviceEquipoController.darDeBajaEquipo);
 /* ======================================================
   USUARIOS (ADMIN)
 ====================================================== */
