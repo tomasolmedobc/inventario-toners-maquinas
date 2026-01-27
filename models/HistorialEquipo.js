@@ -1,30 +1,25 @@
 const mongoose = require('mongoose');
 
 const HistorialEquipoSchema = new mongoose.Schema({
-    equipo: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Equipo',
-        required: true
-    },
+  equipo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Equipo',
+    required: true
+  },
 
-    codigoIdentificacion: {
-        type: String,
-        required: true
-    },
+  tipo: {
+    type: String,
+    enum: ['ALTA', 'TRASPASO', 'REPARACION', 'CAMBIO', 'BAJA'],
+    required: true
+  },
 
-    tipo: {
-        type: String,
-        enum: ['ALTA', 'REPARACION', 'TRASPASO', 'OBSERVACION', 'BAJA'],
-        required: true
-    },
+  descripcion: String,
 
-    detalle: {
-        type: String,
-        required: true
-    },
+  datosAnteriores: Object,
+  datosNuevos: Object,
 
-    usuario: String,
-}, { timestamps: true });
+  usuario: String,
+  fecha: { type: Date, default: Date.now }
+});
 
 module.exports = mongoose.model('HistorialEquipo', HistorialEquipoSchema);
-

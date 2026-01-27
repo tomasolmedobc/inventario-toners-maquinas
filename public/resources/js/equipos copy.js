@@ -20,10 +20,10 @@
   const formNuevoEquipo = document.getElementById('formNuevoEquipo')
 
   const modalNuevoEquipo = new bootstrap.Modal(document.getElementById('modalNuevoEquipo'))
-  const modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalleEquipo'))
-  const modalEditar = new bootstrap.Modal(document.getElementById('modalEditarEquipo'))
-  const modalTraspaso = new bootstrap.Modal(document.getElementById('modalTraspaso'))
-
+  const modalDetalle     = new bootstrap.Modal(document.getElementById('modalDetalleEquipo'))
+  const modalEditar      = new bootstrap.Modal(document.getElementById('modalEditarEquipo'))
+  const modalTraspaso    = new bootstrap.Modal(document.getElementById('modalTraspaso'))
+  
 
   if (!tbody || !thead) return
 
@@ -91,7 +91,7 @@
 
     lista.forEach(e => {
       const acciones = e.estado === 'ACTIVO'
-        ? `
+      ? `
         <div class="d-flex gap-1">
           <button
             class="btn btn-sm btn-link text-primary action-btn"
@@ -117,15 +117,13 @@
           <button
             class="btn btn-sm btn-link text-warning action-btn"
             data-service="${e.codigoIdentificacion}"
-            data-id="${e._id}"
             title="Registrar service">
             <i class="fa-solid fa-screwdriver-wrench"></i>
-      </button>
-
+          </button>
         </div>
       `
-        : '<span class="text-muted">No editable</span>'
-
+      : '<span class="text-muted">No editable</span>'
+    
 
       tbody.insertAdjacentHTML('beforeend', `
         <tr class="${e.estado === 'BAJA' ? 'table-danger' : ''}">
@@ -179,10 +177,10 @@
     if (vistaActual === 'service') {
       const codigo = buscador.value.trim()
       if (!codigo) return
-
+  
       const res = await fetch(`/api/service-equipo/${codigo}`)
       const lista = await res.json()
-
+  
       tbody.innerHTML = lista.length
         ? lista.map(s => `
           <tr>
@@ -197,15 +195,15 @@
           </tr>
         `).join('')
         : `<tr><td colspan="4" class="text-center text-muted">Sin registros</td></tr>`
-
+  
       return
     }
-
+  
     // 🔽 lo que ya tenías para equipos normales
     const t = buscador.value.toLowerCase()
     const a = selectArea.value
     const d = selectDependencia.value
-
+  
     renderTabla(
       equiposCache.filter(e =>
         (!a || areaId(e) === a) &&
@@ -221,9 +219,9 @@
       )
     )
   }
-
+  
   /* ==========================
-    API Tablas
+    API
   ========================== */
   async function cargarEquipos() {
     if (vistaActual === 'traspasos') return
@@ -261,7 +259,7 @@
       </tr>
     `
   }
-
+  
   /* ==========================
     EVENTOS
   ========================== */
@@ -276,45 +274,45 @@
   function cambiarVista(vista, header, fn) {
     vistaActual = vista
     document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'))
-
+  
     const tab = document.getElementById(
       vista === 'service'
         ? 'tabService'
         : `tab${vista.charAt(0).toUpperCase() + vista.slice(1)}`
     )
-
+  
     tab?.classList.add('active')
     thead.innerHTML = header
     fn()
   }
-
+  
   tbody.onclick = async e => {
     const btn = e.target.closest('button');
     if (!btn) return;
-
+  
     if (btn.dataset.detalle) verDetalle(btn.dataset.detalle);
     if (btn.dataset.edit) abrirEditar(btn.dataset.edit);
     if (btn.dataset.traspaso) abrirTraspaso(btn.dataset.traspaso);
     if (btn.dataset.baja) darBaja(btn.dataset.baja);
-
+    if (btn.dataset.service) abrirService(btn.dataset.service)
   };
-
+  
   selectArea.onchange = () => {
     const area = selectArea.value;
     const deps = new Map();
     selectDependencia.innerHTML = '<option value="">Todas</option>';
     equiposCache
-      .filter(e => !area || e.area?._id === area)
-      .forEach(e => {
-        if (e.dependencia) {
-          deps.set(e.dependencia._id, e.dependencia.nombre);
-        }
-      });
-
-    deps.forEach((nombre, id) => {
-      selectDependencia.append(new Option(nombre, id));
+    .filter(e => !area || e.area?._id === area)
+    .forEach(e => {
+      if (e.dependencia) {
+        deps.set(e.dependencia._id, e.dependencia.nombre);
+      }
     });
-
+  
+  deps.forEach((nombre, id) => {
+    selectDependencia.append(new Option(nombre, id));
+  });
+  
     filtrar();
   };
   /* ==========================
@@ -361,8 +359,31 @@
     cargarEquipos()
   }
 
-
-
+  async function abrirService(codigo) {
+    const tipo = prompt('Tipo de service (ENTRADA / SALIDA)')
+    if (!tipo) return
+  
+    const descripcion = prompt('Descripción del service')
+    if (!descripcion) return
+  
+    const res = await fetch('/api/service-equipo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        codigoIdentificacion: codigo,
+        tipo,
+        descripcion
+      })
+    })
+  
+    if (!res.ok) {
+      alert('Error al registrar service')
+      return
+    }
+  
+    showToast('Service registrado')
+  }
+  
   /* ==========================
     FORM NUEVO
   ========================== */
@@ -383,38 +404,34 @@
   window.confirmarTraspaso = async function () {
     try {
       const id = document.getElementById('traspasoId').value;
-
+  
       const payload = {
         area: document.getElementById('traspasoArea').value,
         dependencia: document.getElementById('traspasoDependencia').value,
         usernamePc: document.getElementById('traspasoUsernamePc').value,
         nombreApellido: document.getElementById('traspasoNombreApellido').value
       };
-
+  
       const res = await fetch(`/api/equipos/${id}/traspaso`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
-
+  
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error');
-
+  
       modalTraspaso.hide();
       showToast('Traspaso realizado');
       cargarEquipos();
-
+  
     } catch (err) {
       showToast(err.message);
     }
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
-    new bootstrap.Tooltip(document.body, {
-      selector: '[title]'
-    })
-  })
-
+  
+  
   /* ==========================
     INIT
   ========================== */
