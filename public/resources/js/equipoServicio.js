@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let modalService = null
 
     /* ===============================
-       ABRIR MODAL SERVICE
+    ABRIR MODAL SERVICE
     ================================ */
     document.addEventListener('click', e => {
         const btn = e.target.closest('[data-service]')
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     /* ===============================
-       REGISTRAR SERVICE
+    REGISTRAR SERVICE
     ================================ */
     document.getElementById('formService')?.addEventListener('submit', async e => {
         e.preventDefault()

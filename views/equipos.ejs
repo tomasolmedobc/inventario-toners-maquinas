@@ -34,24 +34,32 @@
     </div>
   </div>
 
-  <!-- TABS -->
+  <!-- TABS --> 
   <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
-      <button class="nav-link active" id="tabActivos">Activos</button>
+
+      <button class="nav-link active" id="tabActivos" >
+        <i class="fa-solid fa-desktop me-1"></i> Activos
+      </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link" id="tabBajas">Bajas</button>
+      <button class="nav-link" id="tabBajas">
+        <i class="fa-solid fa-arrow-down-wide-short me-1"></i> Bajas
+      </button>
     </li>
     <li class="nav-item">
-      <button class="nav-link" id="tabTraspasos">Traspasos</button>
+      <button class="nav-link" id="tabTraspasos">
+        <i class="fa-solid fa-right-left me-1"></i> Traspasos
+      </button>
     </li>
     <li>
-      <button class="nav-link" id="tabService">Service Equipo</button>
+      <button class="nav-link" id="tabService"> 
+        <i class="fa-solid fa-screwdriver-wrench me-1"></i> Service Equipo</button>
     </li>
   </ul>
 
   <!-- TABLA -->
-<table class="table table-bordered table-hover" id="tablaEquipos">
+  <table class="table table-hover align-middle" id="tablaEquipos">
     <thead class="table-dark"></thead>
     <tbody></tbody>
   </table>
@@ -237,7 +245,7 @@
   </div>
 </div>
 
-
+<!-- SERVICE EQUIPO -->
 <div class="modal fade" id="modalService" tabindex="-1">
   <div class="modal-dialog">
     <form id="formService" class="modal-content">
@@ -289,6 +297,30 @@
     </form>
   </div>
 </div>
+
+<!-- Confirmacion -->
+<div class="modal fade" id="modalConfirm" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmTitle">Confirmar acción</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body" id="confirmMessage">
+        ¿Estás seguro?
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-danger" id="btnConfirmar">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- TOAST -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">

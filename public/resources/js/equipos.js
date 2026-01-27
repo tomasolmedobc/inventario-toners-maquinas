@@ -40,7 +40,51 @@
     document.getElementById('toastMsg').textContent = msg
     toast.show()
   }
+  function initTooltips() {
+    document
+      .querySelectorAll('[data-bs-toggle="tooltip"]')
+      .forEach(el => {
+        bootstrap.Tooltip.getInstance(el)?.dispose()
+        new bootstrap.Tooltip(el)
+      })
+  }
 
+  const modalConfirm = new bootstrap.Modal(
+    document.getElementById('modalConfirm')
+  )
+  
+  let onConfirmAction = null
+  
+  function confirmar({ titulo, mensaje, onConfirm }) {
+    document.getElementById('confirmTitle').textContent = titulo
+    document.getElementById('confirmMessage').textContent = mensaje
+    onConfirmAction = onConfirm
+    modalConfirm.show()
+  }
+  
+  document.getElementById('btnConfirmar').onclick = async () => {
+    if (onConfirmAction) await onConfirmAction()
+    modalConfirm.hide()
+    onConfirmAction = null
+  }
+  
+  function cargarDependencias(select, areaId = null) {
+    select.innerHTML = '<option value="">Seleccionar</option>'
+  
+    const deps = new Map()
+  
+    equiposCache.forEach(e => {
+      if (!e.dependencia) return
+      if (areaId && e.area?._id !== areaId) return
+  
+      deps.set(e.dependencia._id, e.dependencia.nombre)
+    })
+  
+    deps.forEach((nombre, id) => {
+      select.append(new Option(nombre, id))
+    })
+  }
+  
   /* ==========================
     HEADERS
   ========================== */
@@ -54,7 +98,6 @@
       <th>Acciones</th>
     </tr>
   `
-
   const theadTraspasos = `
     <tr>
       <th>Área</th>
@@ -92,33 +135,37 @@
     lista.forEach(e => {
       const acciones = e.estado === 'ACTIVO'
         ? `
-        <div class="d-flex gap-1">
+        <div class="btn-group btn-group-sm">
           <button
-            class="btn btn-sm btn-link text-primary action-btn"
+            class="btn btn-outline-primary"
             data-edit="${e._id}"
-            title="Editar">
+             data-bs-toggle="tooltip"
+            data-bs-title="Editar">
             <i class="fa-solid fa-pen-to-square"></i>
           </button>
     
           <button
-            class="btn btn-sm btn-link text-info action-btn"
+            class="btn btn-outline-info"
             data-traspaso="${e._id}"
-            title="Traspasar">
+             data-bs-toggle="tooltip"
+            data-bs-title="Traspasar">
             <i class="fa-solid fa-right-left"></i>
           </button>
     
           <button
-            class="btn btn-sm btn-link text-warning action-btn"
+            class="btn btn-outline-warning"
             data-baja="${e._id}"
-            title="Dar de baja">
+            data-bs-toggle="tooltip"
+            data-bs-title="Dar de baja">
             <i class="fa-solid fa-arrow-down-wide-short"></i>
           </button>
     
           <button
-            class="btn btn-sm btn-link text-warning action-btn"
+            class="btn btn-outline-secondary"
             data-service="${e.codigoIdentificacion}"
             data-id="${e._id}"
-            title="Registrar service">
+            data-bs-toggle="tooltip"
+            data-bs-title="Registrar service">
             <i class="fa-solid fa-screwdriver-wrench"></i>
       </button>
 
@@ -128,7 +175,7 @@
 
 
       tbody.insertAdjacentHTML('beforeend', `
-        <tr class="${e.estado === 'BAJA' ? 'table-danger' : ''}">
+        <tr class="${e.estado === 'BAJA' ? 'table-secondary text-muted' : ''}">
           <td>${areaNombre(e)}</td>
           <td>${depNombre(e)}</td>
           <td>
@@ -139,7 +186,8 @@
           </td>
           <td>${e.codigoIdentificacion}</td>
           <td>
-            <span class="badge ${e.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}">
+            <span class="badge rounded-pill ${e.estado === 'ACTIVO' ? 'bg-success' : 'bg-danger'}">
+          
               ${e.estado}
             </span>
           </td>
@@ -147,6 +195,7 @@
         </tr>
       `)
     })
+    initTooltips()
   }
 
   /* ==========================
@@ -223,7 +272,7 @@
   }
 
   /* ==========================
-    API Tablas
+    API Tablas carga
   ========================== */
   async function cargarEquipos() {
     if (vistaActual === 'traspasos') return
@@ -346,6 +395,7 @@
 
   async function abrirTraspaso(id) {
     const e = await fetch(`/api/equipos?detalle=${id}`).then(r => r.json())
+    
     traspasoId.value = id
     traspasoArea.value = e.area?._id
     traspasoDependencia.value = e.dependencia?._id
@@ -354,13 +404,17 @@
     modalTraspaso.show()
   }
 
-  async function darBaja(id) {
-    if (!confirm('¿Dar de baja este equipo?')) return
-    await fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' })
-    showToast('Equipo dado de baja')
-    cargarEquipos()
+  function darBaja(id) {
+    confirmar({
+      titulo: 'Dar de baja equipo',
+      mensaje: '¿Seguro que querés dar de baja este equipo?',
+      onConfirm: async () => {
+        await fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' })
+        showToast('Equipo dado de baja')
+        cargarEquipos()
+      }
+    })
   }
-
 
 
   /* ==========================
@@ -409,11 +463,6 @@
     }
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
-    new bootstrap.Tooltip(document.body, {
-      selector: '[title]'
-    })
-  })
 
   /* ==========================
     INIT
