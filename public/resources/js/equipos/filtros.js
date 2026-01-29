@@ -38,9 +38,10 @@ export const FiltroManager = {
         
         this.poblarSelect(selectDep, filtradas, placeholder);
         
-        // Habilitar si hay área elegida, deshabilitar si no
         if (selectDep) {
             selectDep.disabled = !areaId;
+            // DISPARAR EVENTO PARA SELECT2
+            $(selectDep).trigger('change'); 
         }
     },
 
