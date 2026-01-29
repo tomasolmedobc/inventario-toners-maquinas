@@ -83,26 +83,23 @@
 
           <div class="col-md-6">
             <label class="form-label">Área</label>
-            <select class="form-select" name="area" required>
-              <option value="">Seleccionar</option>
+            <select class="form-select" id="modalNuevoArea" name="area" required>
+              <option value="">Seleccionar Área</option>
               <% areas.forEach(a => { %>
                 <option value="<%= a._id %>"><%= a.nombre %></option>
               <% }) %>
             </select>
           </div>
-
+          
           <div class="col-md-6">
             <label class="form-label">Dependencia</label>
-            <select class="form-select" name="dependencia" required>
-              <option value="">Seleccionar</option>
-              <% dependencias.forEach(d => { %>
-                <option value="<%= d._id %>"><%= d.nombre %></option>
-              <% }) %>
+            <select class="form-select" id="modalNuevoDep" name="dependencia" required disabled>
+              <option value="">Seleccione un área primero</option>
             </select>
           </div>
-
+          
           <div class="col-md-6">
-            <la class="form-label">Usuario PC</label>
+            <label class="form-label">Usuario PC</label>
             <input class="form-control" name="usernamePc" placeholder="mborges" required>
           </div>
 
@@ -126,6 +123,11 @@
             <input class="form-control" name="disco" placeholder="500 GB SSD/1TB Rigido">
           </div>
 
+          <div class="col-md-6">
+            <label class="form-label">Sistema Operativo</label>
+            <input id="editSistemaOp" name="sistemaOp" class="form-control" placeholder="Windows 10">
+          </div>
+          
           <div class="col-md-6">
             <label class="form-label">IP</label>
             <input class="form-control" name="ip" placeholder="10.240.21.xx">
@@ -166,85 +168,88 @@
 <!-- EDITAR -->
 <div class="modal fade" id="modalEditarEquipo" tabindex="-1">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
+    <form id="formEditarEquipo" class="modal-content"> <div class="modal-header">
         <h5 class="modal-title">Editar Equipo</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
-        <input type="hidden" id="editId">
-
-        <div class="row g-2">
+        <input type="hidden" id="editId" name="id"> <div class="row g-2">
           <div class="col-md-6">
-            <label class="form-label">Área</label>
-            <input id="editProcesador" class="form-control" placeholder="Procesador"></div>
+            <label class="form-label">Procesador</label>
+            <input id="editProcesador" name="procesador" class="form-control" placeholder="Procesador">
+          </div>
           <div class="col-md-6">
-            <label class="form-label">Dependencia</label>
-            <input id="editRam" class="form-control" placeholder="RAM"></div>
+            <label class="form-label">RAM</label>
+            <input id="editRam" name="ram" class="form-control" placeholder="RAM">
+          </div>
           <div class="col-md-6">
-            <label class="form-label">Código Identificación</label>
-            <input id="editDisco" class="form-control" placeholder="Disco"></div>
+            <label class="form-label">Disco</label>
+            <input id="editDisco" name="disco" class="form-control" placeholder="Disco">
+          </div>
+          
           <div class="col-md-6">
             <label class="form-label">IP</label>
-            <input id="editIp" class="form-control" placeholder="IP"></div>
+            <input id="editIp" name="ip" class="form-control" placeholder="IP">
+          </div>
           <div class="col-md-6">
             <label class="form-label">Hostname</label>
-            <input id="editHostname" class="form-control" placeholder="Hostname"></div>
+            <input id="editHostname" name="hostname" class="form-control" placeholder="Hostname">
+          </div>
+
           <div class="col-md-6">
             <label class="form-label">Usuario PC</label>
-            <input id="editUsernamePc" class="form-control" placeholder="Usuario PC"></div>
+            <input id="editUsernamePc" name="usernamePc" class="form-control" placeholder="Usuario PC">
+          </div>
           <div class="col-md-6">
             <label class="form-label">Nombre y Apellido</label>
-            <input id="editNombreApellido" class="form-control" placeholder="Nombre y Apellido"></div>
+            <input id="editNombreApellido" name="nombreApellido" class="form-control" placeholder="Nombre y Apellido">
+          </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-primary" onclick="guardarEdicion()">Guardar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="guardarEdicion()">Guardar</button>
       </div>
-    </div>
+    </form>
   </div>
 </div>
 
 <!-- TRASPASO -->
 <div class="modal fade" id="modalTraspaso" tabindex="-1">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <form class="modal-content" id="formTraspaso"> 
 
       <div class="modal-header">
         <h5 class="modal-title">Traspaso de Equipo</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
-        <input type="hidden" id="traspasoId">
-        <label class="form-label">Nueva Área</label>
-        <select id="traspasoArea" class="form-select">
-          <% areas.forEach(a => { %>
+        <input type="hidden" id="traspasoId" name="id"> <label class="form-label">Nueva Área</label>
+        <select id="traspasoArea" name="area" class="form-select"> <% areas.forEach(a => { %>
             <option value="<%= a._id %>"><%= a.nombre %></option>
           <% }) %>
         </select>
+
         <label class="form-label mt-2">Nueva Dependencia</label>
-        <select id="traspasoDependencia" class="form-select">
-          <% dependencias.forEach(d => { %>
+        <select id="traspasoDependencia" name="dependencia" class="form-select"> <% dependencias.forEach(d => { %>
             <option value="<%= d._id %>"><%= d.nombre %></option>
           <% }) %>
         </select>
+
         <label class="form-label mt-2">Nuevos Datos del Usuario</label>
-        <input id="traspasoUsernamePc" class="form-control mb-2" placeholder="Usuario PC">
-        <label class="form-label">Nombre y Apellido</label>
-        <input id="traspasoNombreApellido" class="form-control mb-2" placeholder="Nombre Apellido">
-      </div>
+        <input id="traspasoUsernamePc" name="usernamePc" class="form-control mb-2" placeholder="Usuario PC"> <label class="form-label">Nombre y Apellido</label>
+        <input id="traspasoNombreApellido" name="nombreApellido" class="form-control mb-2" placeholder="Nombre Apellido"> </div>
 
       <div class="modal-footer">
-        <button class="btn btn-info" onclick="confirmarTraspaso()">Confirmar</button>
+        <button type="button" class="btn btn-info" onclick="confirmarTraspaso()">Confirmar</button>
       </div>
 
-    </div>
+    </form>
   </div>
 </div>
-
 <!-- SERVICE EQUIPO -->
 <div class="modal fade" id="modalService" tabindex="-1">
   <div class="modal-dialog">
@@ -333,6 +338,6 @@
 </div>
 
 
-<script src="/resources/js/equipos.js"></script>
+<script type="module" src="/resources/js/equipos/main.js"></script>
 <script src="/resources/js/equipoServicio.js"></script>
 <%- include('partials/footer') %>

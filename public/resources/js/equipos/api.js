@@ -1,31 +1,61 @@
 export const API = {
-  async getEquipos(estado) {
-    return fetch(`/api/equipos?estado=${estado}`).then(r => r.json());
-  },
-  async getTraspasos() {
-    return fetch('/api/equipos-traspasos').then(r => r.json());
-  },
-  async getDetalle(id) {
-    return fetch(`/api/equipos?detalle=${id}`).then(r => r.json());
-  },
-  async getService(codigo) {
-    return fetch(`/api/service-equipo/${codigo}`).then(r => r.json());
-  },
-  async darBaja(id) {
-    return fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' });
-  },
-  async ejecutarTraspaso(id, payload) {
-    return fetch(`/api/equipos/${id}/traspaso`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-  },
-  async crearEquipo(data) {
-    return fetch('/api/equipos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  }
+    async getFiltros() {
+        const res = await fetch('/api/equipos/filtros');
+        return await res.json();
+    },
+
+    async getEquipos(estado) {
+        const res = await fetch(`/api/equipos?estado=${estado}`);
+        return await res.json();
+    },
+
+    async getTraspasos() {
+        const res = await fetch('/api/equipos-traspasos');
+        return await res.json();
+    },
+
+    async getService(codigo) {
+        const res = await fetch(`/api/service-equipo/${codigo}`);
+        return await res.json();
+    },
+
+    /**
+     * Devuelve los datos de un equipo por su ID
+     */
+    async getDetalle(id) {
+        const res = await fetch(`/api/equipos?detalle=${id}`);
+        if (!res.ok) throw new Error('No se pudo obtener el detalle');
+        return await res.json();
+    },
+
+    async crearEquipo(data) {
+        return await fetch('/api/equipos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    },
+
+    /**
+     * Actualiza los datos de un equipo (Editar)
+     */
+    async actualizarEquipo(id, data) {
+        return await fetch(`/api/equipos/${id}`, { // ID en la URL, sin el "?"
+            method: 'PATCH',                      // Cambiado de PUT a PATCH
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    },
+
+    async darBaja(id) {
+        return await fetch(`/api/equipos/${id}/baja`, { method: 'PATCH' });
+    },
+
+    async realizarTraspaso(id, payload) {
+        return await fetch(`/api/equipos/${id}/traspaso`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    }
 };
