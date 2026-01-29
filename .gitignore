@@ -1,5 +1,23 @@
+# Env
 .env
-node_modules
+
+# Dependencias
+node_modules/
+
+# OS / logs
 .DS_Store
-npm-debug.log
+npm-debug.log*
+*.log
+
+# Scripts locales
 limpiarMovimientos.js
+
+# Backups / copias JS
+/public/resources/js/**/*copy*.js
+/public/resources/js/**/*back*.js
+/public/resources/js/**/*old*.js
+/public/resources/js/**/*backup*.js
+
+# Temporales
+/tmp
+.cache

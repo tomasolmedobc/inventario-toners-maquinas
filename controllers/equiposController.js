@@ -41,7 +41,7 @@ exports.listarEquipos = async (req, res) => {
     if (estado) {
       filtro.estado = estado.toUpperCase();
     }
-    
+
 
     if (area) filtro.area = area;
     if (dependencia) filtro.dependencia = dependencia;
@@ -74,6 +74,7 @@ exports.crearEquipo = async (req, res) => {
       procesador,
       ram,
       disco,
+      sistemaOp,
       ip,
       hostname,
       nombreApellido
@@ -93,6 +94,7 @@ exports.crearEquipo = async (req, res) => {
       procesador,
       ram,
       disco,
+      sistemaOp,
       ip,
       hostname,
       nombreApellido
@@ -134,7 +136,7 @@ exports.editarEquipo = async (req, res) => {
     }
 
     const camposPermitidos = [
-      'procesador', 'ram', 'disco', 'ip', 'hostname', 'usernamePc', 'nombreApellido'
+      'procesador', 'ram', 'disco', 'ip', 'hostname', 'usernamePc', 'nombreApellido', 'sistemaOp'
     ];
     camposPermitidos.forEach(c => {
       if (req.body[c] !== undefined) equipo[c] = req.body[c];
@@ -162,81 +164,135 @@ exports.editarEquipo = async (req, res) => {
 /* ==========================
   TRASPASO
 ========================== */
+// exports.traspasarEquipo = async (req, res) => {
+//   try {
+//     const { area, dependencia, usernamePc, nombreApellido } = req.body;
+
+//     if (
+//       !mongoose.Types.ObjectId.isValid(area) ||
+//       !mongoose.Types.ObjectId.isValid(dependencia)
+//     ) {
+//       return res.status(400).json({ error: 'Área o dependencia inválida' });
+//     }
+
+//     const equipo = await Equipo.findById(req.params.id);
+//     if (!equipo) return res.status(404).json({ error: 'No encontrado' });
+//     if (equipo.estado !== 'ACTIVO') {
+//       return res.status(403).json({ error: 'Equipo dado de baja' });
+//     }
+
+//     const datosAnteriores = {
+//       area: equipo.area,
+//       dependencia: equipo.dependencia,
+//       usernamePc: equipo.usernamePc,
+//       nombreApellido: equipo.nombreApellido
+//     };
+
+//     const mismoArea = equipo.area?.toString() === area;
+//     const mismaDep = equipo.dependencia?.toString() === dependencia;
+
+//     if (
+//       mismoArea &&
+//       mismaDep &&
+//       equipo.usernamePc === usernamePc &&
+//       equipo.nombreApellido === nombreApellido
+//     ) {
+//       return res.status(400).json({ error: 'No hay cambios para registrar' });
+//     }
+
+//     // 🔁 Actualizar equipo
+//     equipo.area = area;
+//     equipo.dependencia = dependencia;
+//     equipo.usernamePc = usernamePc;
+//     equipo.nombreApellido = nombreApellido;
+//     await equipo.save();
+
+//     // 📜 Historial
+//     await HistorialEquipo.create({
+//       equipo: equipo._id,
+//       tipo: 'TRASPASO',
+//       descripcion: 'Traspaso de equipo',
+//       datosAnteriores,
+//       datosNuevos: {
+//         area,
+//         dependencia,
+//         usernamePc,
+//         nombreApellido
+//       },
+//       usuario: req.session.usuario.nombre
+//     });
+
+//     res.json({ ok: true });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Error traspasando equipo' });
+//   }
+// };
+
+/* ==========================
+  TRASPASO (Corregido)
+========================== */
 exports.traspasarEquipo = async (req, res) => {
   try {
     const { area, dependencia, usernamePc, nombreApellido } = req.body;
+    const equipoId = req.params.id;
 
-    if (
-      !mongoose.Types.ObjectId.isValid(area) ||
-      !mongoose.Types.ObjectId.isValid(dependencia)
-    ) {
-      return res.status(400).json({ error: 'Área o dependencia inválida' });
-    }
-
-    const equipo = await Equipo.findById(req.params.id);
+    const equipo = await Equipo.findById(equipoId);
     if (!equipo) return res.status(404).json({ error: 'No encontrado' });
-    if (equipo.estado !== 'ACTIVO') {
-      return res.status(403).json({ error: 'Equipo dado de baja' });
-    }
 
+    // 1. Guardar TODOS los datos viejos
     const datosAnteriores = {
       area: equipo.area,
       dependencia: equipo.dependencia,
       usernamePc: equipo.usernamePc,
-      nombreApellido: equipo.nombreApellido
+      nombreApellido: equipo.nombreApellido // <-- Te faltaba este para el registro
     };
 
-    const mismoArea = equipo.area?.toString() === area;
-    const mismaDep = equipo.dependencia?.toString() === dependencia;
-
-    if (
-      mismoArea &&
-      mismaDep &&
-      equipo.usernamePc === usernamePc &&
-      equipo.nombreApellido === nombreApellido
-    ) {
-      return res.status(400).json({ error: 'No hay cambios para registrar' });
-    }
-
-    // 🔁 Actualizar equipo
+    // 2. Actualizar equipo
     equipo.area = area;
     equipo.dependencia = dependencia;
     equipo.usernamePc = usernamePc;
     equipo.nombreApellido = nombreApellido;
     await equipo.save();
 
-    // 📜 Historial
+    // 3. Crear registro con los nombres EXACTOS del modelo
+    await TraspasoEquipo.create({
+      equipo: equipo._id,
+      areaAnterior: datosAnteriores.area,
+      dependenciaAnterior: datosAnteriores.dependencia,
+      areaNueva: area,
+      dependenciaNueva: dependencia,
+      usernamePcAnterior: datosAnteriores.usernamePc,
+      usernamePcNueva: usernamePc, // <-- Asegúrate de que termine en 'a' como en tu modelo
+      nombreApellidoAnterior: datosAnteriores.nombreApellido, // <-- Agregado
+      nombreApellidoNuevo: nombreApellido,
+      usuario: req.session.usuario?.nombre || 'Sistema'
+    });
+
+    // 4. (Opcional) También puedes mantener el registro en HistorialEquipo si quieres
     await HistorialEquipo.create({
       equipo: equipo._id,
       tipo: 'TRASPASO',
-      descripcion: 'Traspaso de equipo',
-      datosAnteriores,
-      datosNuevos: {
-        area,
-        dependencia,
-        usernamePc,
-        nombreApellido
-      },
-      usuario: req.session.usuario.nombre
+      descripcion: `Traspaso a ${nombreApellido}`,
+      usuario: req.session.usuario?.nombre || 'Sistema'
     });
 
     res.json({ ok: true });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error traspasando equipo' });
   }
 };
 
-
 exports.listarTraspasos = async (req, res) => {
   try {
     const traspasos = await TraspasoEquipo.find()
-    .populate('areaAnterior', 'nombre')
-    .populate('dependenciaAnterior', 'nombre')
-    .populate('areaNueva', 'nombre')
-    .populate('dependenciaNueva', 'nombre')
-    .populate('equipo', 'codigoIdentificacion usernamePc')
+      .populate('areaAnterior', 'nombre')
+      .populate('dependenciaAnterior', 'nombre')
+      .populate('areaNueva', 'nombre')
+      .populate('dependenciaNueva', 'nombre')
+      .populate('equipo', 'codigoIdentificacion usernamePc')
       .sort({ fecha: -1 });
 
     res.json(traspasos);

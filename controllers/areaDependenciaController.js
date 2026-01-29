@@ -1,4 +1,3 @@
-// controllers/areaDependenciaController.js
 const Area = require('../models/Area')
 const Dependencia = require('../models/Dependencia')
 

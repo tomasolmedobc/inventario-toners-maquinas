@@ -19,6 +19,7 @@ const EquipoSchema = new mongoose.Schema({
   ip: String,
   hostname: String,
   nombreApellido: String,
+  sistemaOp: String,
 
   codigoIdentificacion: {
     type: String,
