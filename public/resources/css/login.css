@@ -73,8 +73,10 @@ body{
     text-decoration: underline;
   }
   
+  .row{
+    margin: 5%;
+  }
   .containerxz{
-    height: 100vh;
     border-radius: .75rem;
     padding: 10px;
     display: block;
