@@ -10,7 +10,7 @@
   </div>
 
   <!-- FILTROS -->
-  <div class="row mb-3">
+  <div class="row mb-3 equipos-search-box">
     <div class="col-md-4">
       <input type="text" id="buscador" class="form-control" placeholder="🔍 Buscar por código, usuario, IP, hostname...">
     </div>
@@ -79,12 +79,12 @@
       </div>
 
       <div class="modal-body">
-        <div class="row g-2">
+        <div class="row g-2 nuevo-equipo-form">
 
           <div class="col-md-6">
             <label class="form-label">Área</label>
-            <select class="form-select" id="modalNuevoArea" name="area" required>
-              <option value="">Seleccionar Área</option>
+            <select class="form-select select2-buscable" id="modalNuevoArea" name="area" required>
+              <option value="">Buscar área...</option>
               <% areas.forEach(a => { %>
                 <option value="<%= a._id %>"><%= a.nombre %></option>
               <% }) %>
@@ -93,8 +93,8 @@
           
           <div class="col-md-6">
             <label class="form-label">Dependencia</label>
-            <select class="form-select" id="modalNuevoDep" name="dependencia" required disabled>
-              <option value="">Seleccione un área primero</option>
+            <select class="form-select select2-buscable" id="modalNuevoDep" name="dependencia" required disabled>
+              <option value="">Seleccione área primero</option>
             </select>
           </div>
           
@@ -220,33 +220,37 @@
 <div class="modal fade" id="modalTraspaso" tabindex="-1">
   <div class="modal-dialog">
     <form class="modal-content" id="formTraspaso"> 
-
       <div class="modal-header">
         <h5 class="modal-title">Traspaso de Equipo</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-      <div class="modal-body">
-        <input type="hidden" id="traspasoId" name="id"> <label class="form-label">Nueva Área</label>
-        <select id="traspasoArea" name="area" class="form-select"> <% areas.forEach(a => { %>
+      <div class="modal-body nuevo-equipo-form">
+        <input type="hidden" id="traspasoId" name="id"> 
+        
+        <label class="form-label">Nueva Área</label>
+        <select id="traspasoArea" name="area" class="form-select select2-traspaso"> 
+          <option value="">Buscar área...</option>
+          <% areas.forEach(a => { %>
             <option value="<%= a._id %>"><%= a.nombre %></option>
           <% }) %>
         </select>
 
         <label class="form-label mt-2">Nueva Dependencia</label>
-        <select id="traspasoDependencia" name="dependencia" class="form-select"> <% dependencias.forEach(d => { %>
-            <option value="<%= d._id %>"><%= d.nombre %></option>
-          <% }) %>
+        <select id="traspasoDependencia" name="dependencia" class="form-select select2-traspaso" disabled> 
+          <option value="">Seleccione área primero</option>
         </select>
 
         <label class="form-label mt-2">Nuevos Datos del Usuario</label>
-        <input id="traspasoUsernamePc" name="usernamePc" class="form-control mb-2" placeholder="Usuario PC"> <label class="form-label">Nombre y Apellido</label>
-        <input id="traspasoNombreApellido" name="nombreApellido" class="form-control mb-2" placeholder="Nombre Apellido"> </div>
+        <input id="traspasoUsernamePc" name="usernamePc" class="form-control mb-2" placeholder="Usuario PC"> 
+        
+        <label class="form-label">Nuevo Nombre y Apellido</label>
+        <input id="traspasoNombreApellido" name="nombreApellido" class="form-control mb-2" placeholder="Nombre Apellido"> 
+      </div>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-info" onclick="confirmarTraspaso()">Confirmar</button>
       </div>
-
     </form>
   </div>
 </div>

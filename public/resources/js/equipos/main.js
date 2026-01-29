@@ -329,4 +329,73 @@ window.guardarEdicion = async function() {
         showToast('Error de conexión', 'danger');
     }
 };
+$(document).ready(function() {
+    // 1. Inicializar Select2 en los filtros de la página principal
+    $('.select2-filtros').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: "Seleccionar"
+    });
+
+    // 2. Evento para cuando cambia el Área en los filtros
+    $('#selectArea').on('select2:select', function (e) {
+        const areaId = e.target.value;
+        
+        // Ejecutamos la cascada
+        FiltroManager.configurarCascada(areaId, selectDependencia, "Todas las dependencias");
+        
+        // Forzamos el filtrado de la tabla
+        ejecutarFiltrado();
+    });
+
+    // 3. Evento para cuando cambia la Dependencia en los filtros
+    $('#selectDependencia').on('select2:select', function () {
+        ejecutarFiltrado();
+    });
+
+    // 4. Manejar el botón de "limpiar" (si el usuario borra la selección)
+    $('.select2-filtros').on('select2:unselect', function() {
+        setTimeout(ejecutarFiltrado, 10); // Un pequeño delay para que tome el valor vacío
+    });
+});
+
+$(document).ready(function() {
+    // 1. Inicializar Select2 en los elementos con la clase
+    $('.select2-buscable').select2({
+        theme: 'bootstrap-5',
+        dropdownParent: $('#modalNuevoEquipo'), // Importante para que funcione dentro de un modal
+        width: '100%'
+    });
+
+    // 2. Escuchar el cambio de Área con Select2
+    $('#modalNuevoArea').on('select2:select', function (e) {
+        const areaId = e.params.data.id;
+        
+        // Llamamos a tu lógica de FiltroManager
+        FiltroManager.configurarCascada(areaId, document.getElementById('modalNuevoDep'), "Seleccionar Dependencia");
+        
+        // Refrescar Select2 de dependencia para que muestre los nuevos datos
+        $('#modalNuevoDep').val(null).trigger('change'); 
+    });
+});
+$(document).ready(function() {
+    // Inicializar Select2 para Traspaso
+    $('.select2-traspaso').select2({
+        theme: 'bootstrap-5',
+        dropdownParent: $('#modalTraspaso'), // Crucial para que funcione el buscador en el modal
+        width: '100%'
+    });
+
+    // Evento cuando cambia el área en el modal de Traspaso
+    $('#traspasoArea').on('select2:select', function (e) {
+        const areaId = e.params.data.id;
+        const selectDep = document.getElementById('traspasoDependencia');
+        
+        // Usamos tu FiltroManager para cargar las dependencias filtradas
+        FiltroManager.configurarCascada(areaId, selectDep, "Seleccionar Dependencia");
+        
+        // Forzamos a Select2 a refrescarse y limpiarse
+        $(selectDep).val(null).trigger('change');
+    });
+});
 inicializar();

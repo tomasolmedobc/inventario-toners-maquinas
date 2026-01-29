@@ -18,6 +18,7 @@
     --info-color: #17a2b8;
     --button-next-color: rgba(11,78,179);
     --text-size: clamp(0.875rem, 2vw, 1.25rem);
+    --dex-text-color: #333;
     }
 /* Estilos para el modo claro */
 [data-theme='light'] {
@@ -55,8 +56,32 @@ header{
     background-color: var(--primary-bg-color);
 }
 .row{
-    background-color: var(--primary-bg-color);
+    background-color: var(--background-secondary-color);
+    color:var(--dex-text-color);
+    
 }
+.equipos-search-box{
+  border-radius: 5px;
+}
+
+.nuevo-equipo-form .select2-container .select2-selection--single .select2-selection__rendered{
+  display: block;
+  width: 100%;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--bs-body-color);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: var(--bs-body-bg);
+  background-clip: padding-box;
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
 
 footer{
     background-color: var(--primary-bg-color);
