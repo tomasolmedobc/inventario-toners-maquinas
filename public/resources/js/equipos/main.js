@@ -98,10 +98,6 @@ async function buscarService(codigo) {
 ========================== */
 buscador.oninput = ejecutarFiltrado;
 
-selectArea.onchange = () => {
-    FiltroManager.configurarCascada(selectArea.value, selectDependencia, "Todas las dependencias");
-    ejecutarFiltrado();
-};
 
 selectDependencia.onchange = ejecutarFiltrado;
 modalNuevoArea.onchange = () => {
@@ -146,16 +142,14 @@ function renderTabla(lista) {
 
 function renderTablaTraspasos(lista) {
     tbody.innerHTML = lista.length ? lista.map(t => `
-        <tr>
+<tr>
             <td>${t.areaAnterior?.nombre || '-'} → ${t.areaNueva?.nombre || '-'}</td>
             <td>${t.dependenciaAnterior?.nombre || '-'} → ${t.dependenciaNueva?.nombre || '-'}</td>
-            
             <td>${t.usernamePcAnterior || '-'} → ${t.usernamePcNueva || '-'}</td>
-            
             <td>${t.nombreApellidoAnterior || '-'} → ${t.nombreApellidoNuevo || '-'}</td>
-            
-            <td>${new Date(t.fecha).toLocaleDateString()}</td>
-        </tr>`).join('') : `<tr><td colspan="5" class="text-center text-muted">Sin movimientos registrados</td></tr>`;
+            <td><span class="badge bg-light text-dark border">${t.equipo?.codigoIdentificacion || '-'}</span></td>
+            <td>${t.fecha ? new Date(t.fecha).toLocaleDateString() : '-'}</td>
+        </tr>`).join('') : `<tr><td colspan="6" class="text-center text-muted">Sin movimientos registrados</td></tr>`;
 }
 /* ==========================
    EVENTOS DE TABLA 
@@ -358,44 +352,85 @@ $(document).ready(function() {
         setTimeout(ejecutarFiltrado, 10); // Un pequeño delay para que tome el valor vacío
     });
 });
-
+/* ==========================
+    EXPORTAR A EXCEL
+========================== */
+async function exportarAExcel() {
+    try {
+        showToast("Generando reporte Excel...", "info");
+        // Redirección directa para que el navegador maneje la descarga del stream
+        window.location.href = '/api/equipos/exportar-excel'; 
+    } catch (error) {
+        console.error(error);
+        showToast("Error al solicitar el reporte", "danger");
+    }
+}
+/* ==========================
+   CONFIGURACIÓN SELECT2 (Página y Modales)
+========================== */
 $(document).ready(function() {
-    // 1. Inicializar Select2 en los elementos con la clase
+    $('#btnExportarExcel').on('click', exportarAExcel);
+    // --- 1. FILTROS PRINCIPALES (Página) ---
+    $('.select2-filtros').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: "Seleccionar"
+    });
+
+    $('#selectArea').on('select2:select', function (e) {
+        FiltroManager.configurarCascada(e.target.value, selectDependencia, "Todas las dependencias");
+        ejecutarFiltrado();
+    });
+
+    $('#selectDependencia').on('select2:select', ejecutarFiltrado);
+
+    $('.select2-filtros').on('select2:unselect', () => setTimeout(ejecutarFiltrado, 10));
+
+    $('#btnLimpiarFiltros').on('click', function() {
+        buscador.value = '';
+        $('.select2-filtros').val(null).trigger('change');
+        selectDependencia.disabled = true;
+        ejecutarFiltrado();
+        showToast('Filtros restablecidos');
+    });
+
+    // --- 2. MODAL NUEVO EQUIPO ---
     $('.select2-buscable').select2({
         theme: 'bootstrap-5',
-        dropdownParent: $('#modalNuevoEquipo'), // Importante para que funcione dentro de un modal
+        dropdownParent: $('#modalNuevoEquipo'),
         width: '100%'
     });
 
-    // 2. Escuchar el cambio de Área con Select2
     $('#modalNuevoArea').on('select2:select', function (e) {
-        const areaId = e.params.data.id;
-        
-        // Llamamos a tu lógica de FiltroManager
-        FiltroManager.configurarCascada(areaId, document.getElementById('modalNuevoDep'), "Seleccionar Dependencia");
-        
-        // Refrescar Select2 de dependencia para que muestre los nuevos datos
-        $('#modalNuevoDep').val(null).trigger('change'); 
+        FiltroManager.configurarCascada(e.params.data.id, modalNuevoDep, "Seleccionar Dependencia");
+        $(modalNuevoDep).val(null).trigger('change'); 
     });
-});
-$(document).ready(function() {
-    // Inicializar Select2 para Traspaso
+
+    // --- 3. MODAL TRASPASO ---
     $('.select2-traspaso').select2({
         theme: 'bootstrap-5',
-        dropdownParent: $('#modalTraspaso'), // Crucial para que funcione el buscador en el modal
+        dropdownParent: $('#modalTraspaso'),
         width: '100%'
     });
 
-    // Evento cuando cambia el área en el modal de Traspaso
     $('#traspasoArea').on('select2:select', function (e) {
-        const areaId = e.params.data.id;
-        const selectDep = document.getElementById('traspasoDependencia');
-        
-        // Usamos tu FiltroManager para cargar las dependencias filtradas
-        FiltroManager.configurarCascada(areaId, selectDep, "Seleccionar Dependencia");
-        
-        // Forzamos a Select2 a refrescarse y limpiarse
-        $(selectDep).val(null).trigger('change');
+        FiltroManager.configurarCascada(e.params.data.id, modalTraspasoDep, "Seleccionar Dependencia");
+        $(modalTraspasoDep).val(null).trigger('change');
     });
+
+    // --- 4. MODAL EDICIÓN (Importante añadir esto) ---
+    if ($('#modalEditar').length) {
+        $('#editArea, #editDependencia').select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#modalEditar'),
+            width: '100%'
+        });
+
+        $('#editArea').on('select2:select', function (e) {
+            FiltroManager.configurarCascada(e.params.data.id, modalEditDep, "Seleccionar Dependencia");
+            $(modalEditDep).val(null).trigger('change');
+        });
+    }
 });
+
 inicializar();

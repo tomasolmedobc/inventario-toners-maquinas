@@ -32,6 +32,7 @@ export const FiltroManager = {
      * @param {string} placeholder 
      */
     configurarCascada(areaId, selectDep, placeholder = "Todas las dependencias") {
+        // Si no hay areaId, la lista filtrada es vacía
         const filtradas = areaId 
             ? this.dataMaestra.dependencias.filter(d => (d.area._id || d.area) === areaId)
             : [];
@@ -39,8 +40,9 @@ export const FiltroManager = {
         this.poblarSelect(selectDep, filtradas, placeholder);
         
         if (selectDep) {
+            // Si no hay área, deshabilitamos el select de dependencia
             selectDep.disabled = !areaId;
-            // DISPARAR EVENTO PARA SELECT2
+            // Importante: Refrescar Select2
             $(selectDep).trigger('change'); 
         }
     },

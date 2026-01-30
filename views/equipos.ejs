@@ -8,31 +8,45 @@
       ➕ Nuevo Equipo
     </button>   
   </div>
-
   <!-- FILTROS -->
-  <div class="row mb-3 equipos-search-box">
-    <div class="col-md-4">
-      <input type="text" id="buscador" class="form-control" placeholder="🔍 Buscar por código, usuario, IP, hostname...">
-    </div>
-
-    <div class="col-md-4">
-      <select id="selectArea" class="form-select">
-        <option value="">Todas las áreas</option>
-        <% areas.forEach(a => { %>
-          <option value="<%= a._id %>"><%= a.nombre %></option>
-        <% }) %>
-      </select>
-    </div>
-
-    <div class="col-md-4">
-      <select id="selectDependencia" class="form-select">
-        <option value="">Todas las dependencias</option>
-        <% dependencias.forEach(d => { %>
-          <option value="<%= d._id %>"><%= d.nombre %></option>
-        <% }) %>
-      </select>
-    </div>
+  <div class="row mb-3   align-items-end">
+    <div class="row mb-4 equipos-search-box">
+      <div class="col-md-4">
+        <input type="text" id="buscador" class="form-control search-equipos" placeholder="🔍 Buscar por código, usuario, IP, hostname...">
+      </div>
+  
+      <div class="col-md-2 selec-header">
+        <select id="selectArea" class="form-select select2-filtros">
+          <option value="">Todas las áreas</option>
+          <% areas.forEach(a => { %>
+            <option value="<%= a._id %>"><%= a.nombre %></option>
+          <% }) %>
+        </select>
+      </div>
+      
+      <div class="col-md-2 selec-header">
+        <select id="selectDependencia" class="form-select select2-filtros">
+          <option value="">Todas las dependencias</option>
+          <% dependencias.forEach(d => { %>
+            <option value="<%= d._id %>"><%= d.nombre %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-2 text-end mt-2">
+        <button type="button" id="btnLimpiarFiltros" class="btn btn-outline-secondary btn-sm">
+          <i class="fa-solid fa-eraser"></i> Limpiar Filtros
+        </button>
+      </div>
+      <div class="col-md-1 text-end mt-2">
+        <button type="button" id="btnExportarExcel" class="btn btn-outline-secondary btn-sm">
+          <i class="fa-solid fa-file-excel"></i> Exportar
+        </button>
+      </div>
   </div>
+
+
+
+
 
   <!-- TABS --> 
   <ul class="nav nav-tabs mb-3">
@@ -215,7 +229,6 @@
     </form>
   </div>
 </div>
-
 <!-- TRASPASO -->
 <div class="modal fade" id="modalTraspaso" tabindex="-1">
   <div class="modal-dialog">
@@ -306,7 +319,6 @@
     </form>
   </div>
 </div>
-
 <!-- Confirmacion -->
 <div class="modal fade" id="modalConfirm" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">

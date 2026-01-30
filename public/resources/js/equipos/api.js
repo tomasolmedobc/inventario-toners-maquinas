@@ -41,7 +41,7 @@ export const API = {
      */
     async actualizarEquipo(id, data) {
         return await fetch(`/api/equipos/${id}`, { // ID en la URL, sin el "?"
-            method: 'PATCH',                      // Cambiado de PUT a PATCH
+            method: 'PATCH',                      
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
