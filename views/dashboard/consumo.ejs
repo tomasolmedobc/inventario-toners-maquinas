@@ -4,37 +4,44 @@
 <h3>📊 Consumo de tóners</h3>
 
     <!-- Filtro por período -->
-    <form method="GET" class="row g-2 align-items-end mb-3">
-        <div class="col-md-3">
-          <label class="form-label">Desde</label>
-          <input type="date" name="desde" class="form-control" value="<%= desde || '' %>">
+    
+    <div class="row mb-4 equipos-search-box">
+      <form method="GET" class="row mb-3   align-items-end">
+        <div class="col-md-2">
+            <label class="form-label">Desde</label>
+            <input type="date" name="desde" class="form-control" value="<%= desde || '' %>">
         </div>
-      
-        <div class="col-md-3">
-          <label class="form-label">Hasta</label>
-          <input type="date" name="hasta" class="form-control" value="<%= hasta || '' %>">
+          
+          <div class="col-md-2">
+            <label class="form-label">Hasta</label>
+            <input type="date" name="hasta" class="form-control" value="<%= hasta || '' %>">
+          </div>
+
+
+
+        
+        <div class="col-md-1 text-center mt-2">
+          <button class="btn btn-primary btn-sm">
+            <i class="fa-solid fas fa-search"></i>   Filtrar
+          </button>
         </div>
-        <div class="col-med-1 d-flex align-items-end">
+        
+        <div class="col-md-1 text-center mt-2">
+          <a href="/dashboard/consumo" class="btn btn-outline-secondary btn-sm">
+            <i class="fa-solid fas fa-trash"></i> Limpiar
+          </a>
+        </div>
+        <div class="col-md-1 text-center mt-2">
           <a
           href="/dashboard/consumo/exportar-excel?desde=<%= desde %>&hasta=<%= hasta %>"
-          class="btn btn-success"
+          class="btn btn-outline-success btn-sm"
           >
-          Exportar Excel
+          <i class="fa-solid fa-file-excel"></i> Exportar
         </a>
       </div>
-      
-        <div class="col-md-2 d-flex align-items-end">
-          <button class="btn btn-primary w-100">Filtrar</button>
-        </div>
-      
-        <div class="col-md-2 d-flex align-items-end">
-            <a href="/dashboard/consumo" class="btn btn-secondary w-100">
-                Limpiar
-              </a>
-        </div>
-      </form>
-      
-    <!-- Total -->
+    </form>
+    </div>
+      <!-- Total -->
     <div class="alert alert-info">
         <strong>Total consumido:</strong> <%= totalPeriodo %> tóners
     </div>
