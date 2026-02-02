@@ -3,11 +3,12 @@
 ========================== */
 export const areaNombre = e => e.area?.nombre || '-';
 export const depNombre = e => e.dependencia?.nombre || '-';
+export const codId = e => e.codigoIdentificacion || '-';
 export const areaId = e => e.area?._id;
 export const depId = e => e.dependencia?._id;
 
 /* ==========================
-   HEADERS DE TABLAS
+    HEADERS DE TABLAS
 ========================== */
 export const theadEquipos = `
     <tr>
@@ -25,6 +26,7 @@ export const theadTraspasos = `
       <th>Dependencia</th>
       <th>Usuario PC</th>
       <th>Responsable</th>
+      <th>Código</th>
       <th>Fecha</th>
     </tr>`;
 

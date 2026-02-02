@@ -11,6 +11,7 @@ const adminController = require('../controllers/adminController');
 const apiController = require('../controllers/apiController');
 const equiposController = require('../controllers/equiposController');
 const serviceEquipoController = require('../controllers/serviceEquipoController');
+const reporteController = require('../controllers/reporteController'); 
 
 /* ======================================================
     INVENTARIO / PRODUCTOS
@@ -114,7 +115,10 @@ router.get(
   permitirRolesApi('user', 'jefe', 'admin'),
   equiposController.buscarHistorialPorCodigo
 );
-
+router.get('/equipos/exportar-excel',
+  verificarSesion,
+  permitirRolesApi('jefe', 'admin'),
+  reporteController.exportarInventarioCompleto);
 /* ======================================================
   SERVICE EQUIPOS
 ====================================================== */
