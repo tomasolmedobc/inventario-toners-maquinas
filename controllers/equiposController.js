@@ -161,77 +161,9 @@ exports.editarEquipo = async (req, res) => {
   }
 };
 
-/* ==========================
-  TRASPASO
-========================== */
-// exports.traspasarEquipo = async (req, res) => {
-//   try {
-//     const { area, dependencia, usernamePc, nombreApellido } = req.body;
-
-//     if (
-//       !mongoose.Types.ObjectId.isValid(area) ||
-//       !mongoose.Types.ObjectId.isValid(dependencia)
-//     ) {
-//       return res.status(400).json({ error: 'Área o dependencia inválida' });
-//     }
-
-//     const equipo = await Equipo.findById(req.params.id);
-//     if (!equipo) return res.status(404).json({ error: 'No encontrado' });
-//     if (equipo.estado !== 'ACTIVO') {
-//       return res.status(403).json({ error: 'Equipo dado de baja' });
-//     }
-
-//     const datosAnteriores = {
-//       area: equipo.area,
-//       dependencia: equipo.dependencia,
-//       usernamePc: equipo.usernamePc,
-//       nombreApellido: equipo.nombreApellido
-//     };
-
-//     const mismoArea = equipo.area?.toString() === area;
-//     const mismaDep = equipo.dependencia?.toString() === dependencia;
-
-//     if (
-//       mismoArea &&
-//       mismaDep &&
-//       equipo.usernamePc === usernamePc &&
-//       equipo.nombreApellido === nombreApellido
-//     ) {
-//       return res.status(400).json({ error: 'No hay cambios para registrar' });
-//     }
-
-//     // 🔁 Actualizar equipo
-//     equipo.area = area;
-//     equipo.dependencia = dependencia;
-//     equipo.usernamePc = usernamePc;
-//     equipo.nombreApellido = nombreApellido;
-//     await equipo.save();
-
-//     // 📜 Historial
-//     await HistorialEquipo.create({
-//       equipo: equipo._id,
-//       tipo: 'TRASPASO',
-//       descripcion: 'Traspaso de equipo',
-//       datosAnteriores,
-//       datosNuevos: {
-//         area,
-//         dependencia,
-//         usernamePc,
-//         nombreApellido
-//       },
-//       usuario: req.session.usuario.nombre
-//     });
-
-//     res.json({ ok: true });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: 'Error traspasando equipo' });
-//   }
-// };
 
 /* ==========================
-  TRASPASO (Corregido)
+  TRASPASO 
 ========================== */
 exports.traspasarEquipo = async (req, res) => {
   try {

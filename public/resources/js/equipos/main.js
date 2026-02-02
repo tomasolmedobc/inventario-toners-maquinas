@@ -166,7 +166,6 @@ tbody.onclick = async e => {
             <div class="list-group list-group-flush">
                 <p class="m-1"><strong>Hostname:</strong> ${eq.hostname || 'N/A'}</p>
                 <p class="m-1"><strong>Nombre y Apellido:</strong> ${eq.nombreApellido || 'N/A'}</p>
-                <p class="m-1"><strong>IP:</strong> ${eq.ip || 'N/A'}</p>
                 <p class="m-1"><strong>Procesador:</strong> ${eq.procesador || 'N/A'}</p>
                 <p class="m-1"><strong>RAM:</strong> ${eq.ram || 'N/A'}</p>
                 <p class="m-1"><strong>Disco:</strong> ${eq.disco || 'N/A'}</p>
