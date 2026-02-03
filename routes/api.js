@@ -161,13 +161,13 @@ router.get(
 router.post(
   '/usuarios/:id/cambiar-password',
   verificarSesion, permitirRolesApi('admin'),
-  dashboardController.cambiarPasswordManual
+  adminController.cambiarPasswordManual
 );
 
 router.post(
   '/usuarios/:id/cambiar-rol',
   verificarSesion, permitirRolesApi('admin'),
-  dashboardController.cambiarRolManual
+  adminController.cambiarRolManual
 );
 
 /* ======================================================
