@@ -1,14 +1,141 @@
-<%- include('partials/header', { title: 'Inicio' }) %>
+<%- include('partials/header', { title: 'Telefonos' }) %>
 
+<div class="container-fluid">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h3 class="mb-0">Registro de telefonos</h3>
+      <small class="text-muted">Alta, modificacion y baja de numeros telefonicos</small>
+    </div>
 
-<div class="table-responsive">
-  
+    <button class="btn btn-primary" id="btnNuevoTelefono" type="button">
+      <i class="fa-solid fa-plus me-1"></i> Agregar
+    </button>
+  </div>
+
+  <div class="row g-2 align-items-end mb-3">
+    <div class="col-md-6 col-lg-4">
+      <label class="form-label" for="buscarTelefono">Buscar</label>
+      <input id="buscarTelefono" class="form-control" type="search" placeholder="Numero, empresa, dependencia o persona">
+    </div>
+
+    <div class="col-md-3 col-lg-2">
+      <label class="form-label" for="filtroEstadoTelefono">Estado</label>
+      <select id="filtroEstadoTelefono" class="form-select">
+        <option value="">Todos</option>
+        <option value="ACTIVO">Activos</option>
+        <option value="BAJA">Baja</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle" id="tablaTelefonos">
+      <thead class="table-dark">
+        <tr>
+          <th>Nro Telefonico</th>
+          <th>Empresa</th>
+          <th>Dependencia</th>
+          <th>Persona a Cargo</th>
+          <th>Estado</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!telefonos.length) { %>
+          <tr data-empty-row>
+            <td colspan="6" class="text-center text-muted py-4">No hay telefonos registrados</td>
+          </tr>
+        <% } %>
+
+        <% telefonos.forEach(t => { %>
+          <tr
+            data-id="<%= t._id %>"
+            data-numero="<%= t.numeroTelefonico %>"
+            data-empresa="<%= t.empresa %>"
+            data-dependencia="<%= t.dependencia %>"
+            data-persona="<%= t.personaCargo %>"
+            data-estado="<%= t.estado %>">
+            <td><%= t.numeroTelefonico %></td>
+            <td><%= t.empresa %></td>
+            <td><%= t.dependencia %></td>
+            <td><%= t.personaCargo %></td>
+            <td>
+              <span class="badge <%= t.estado === 'ACTIVO' ? 'bg-success' : 'bg-secondary' %>"><%= t.estado %></span>
+            </td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-primary" type="button" data-editar="<%= t._id %>" title="Modificar">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn btn-outline-danger" type="button" data-baja="<%= t._id %>" title="Dar de baja" <%= t.estado === 'BAJA' ? 'disabled' : '' %>>
+                  <i class="fa-solid fa-arrow-down-wide-short"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
 </div>
 
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Tu script personalizado -->
-<script src="/resources/js/graficoToners.js"></script>
+<div class="modal fade" id="modalTelefono" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" id="formTelefono">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTelefonoTitulo">Agregar telefono</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
 
+      <div class="modal-body">
+        <input type="hidden" id="telefonoId">
+
+        <div class="mb-3">
+          <label class="form-label" for="numeroTelefonico">Nro Telefonico</label>
+          <input class="form-control" id="numeroTelefonico" name="numeroTelefonico" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="empresaTelefono">Empresa</label>
+          <input class="form-control" id="empresaTelefono" name="empresa" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="dependenciaTelefono">Dependencia</label>
+          <input class="form-control" id="dependenciaTelefono" name="dependencia" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="personaCargoTelefono">Persona a Cargo</label>
+          <input class="form-control" id="personaCargoTelefono" name="personaCargo" required>
+        </div>
+
+        <div class="mb-0" id="grupoEstadoTelefono">
+          <label class="form-label" for="estadoTelefono">Estado</label>
+          <select class="form-select" id="estadoTelefono" name="estado">
+            <option value="ACTIVO">ACTIVO</option>
+            <option value="BAJA">BAJA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toastTelefonos" class="toast text-bg-success border-0">
+    <div class="d-flex">
+      <div class="toast-body" id="toastTelefonosMsg"></div>
+      <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<script src="/resources/js/telefonos.js" defer></script>
 
 <%- include('partials/footer') %>

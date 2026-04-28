@@ -3,7 +3,7 @@ const ServiceEquipo = require('../models/ServiceEquipo')
 
 
 /* ============================
-   REGISTRAR ENTRADA / SALIDA
+    REGISTRAR ENTRADA / SALIDA
 ============================ */
 exports.registrarService = async (req, res) => {
 
@@ -73,7 +73,7 @@ exports.darDeBajaEquipo = async (req, res) => {
         }
 
         equipo.estado = 'BAJA'
-        equipo.motivoBaja = motivo
+        equipo.observacionBaja = motivo
         equipo.fechaBaja = new Date()
 
         await equipo.save()
@@ -87,7 +87,7 @@ exports.darDeBajaEquipo = async (req, res) => {
 
 
 /* ============================
-   LISTAR HISTORIAL POR CÓDIGO
+    LISTAR HISTORIAL POR CÓDIGO
 ============================ */
 exports.listarPorCodigo = async (req, res) => {
     try {
@@ -109,7 +109,7 @@ exports.listarPorCodigo = async (req, res) => {
 }
 
 /* ============================
-   ÚLTIMO SERVICE DEL EQUIPO
+    ÚLTIMO SERVICE DEL EQUIPO
 ============================ */
 exports.ultimoService = async (req, res) => {
     try {

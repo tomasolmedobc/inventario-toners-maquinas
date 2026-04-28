@@ -124,7 +124,7 @@ function renderTabla(lista) {
                 <button class="btn btn-outline-primary" data-edit="${e._id}" data-bs-toggle="tooltip" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
                 <button class="btn btn-outline-info" data-traspaso="${e._id}" data-bs-toggle="tooltip" title="Traspasar"><i class="fa-solid fa-right-left"></i></button>
                 <button class="btn btn-outline-warning" data-baja="${e._id}" data-bs-toggle="tooltip" title="Dar de baja"><i class="fa-solid fa-arrow-down-wide-short"></i></button>
-                <button class="btn btn-outline-secondary" data-service="${e.codigoIdentificacion}" data-bs-toggle="tooltip" title="Service"><i class="fa-solid fa-screwdriver-wrench"></i></button>
+                <button class="btn btn-outline-secondary" data-service="${e.codigoIdentificacion}" data-id="${e._id}" data-bs-toggle="tooltip" title="Service"><i class="fa-solid fa-screwdriver-wrench"></i></button>
             </div>` : '<span class="badge bg-secondary">Inactivo</span>';
 
         tbody.insertAdjacentHTML('beforeend', `

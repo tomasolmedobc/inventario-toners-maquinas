@@ -12,6 +12,7 @@ const apiController = require('../controllers/apiController');
 const equiposController = require('../controllers/equiposController');
 const serviceEquipoController = require('../controllers/serviceEquipoController');
 const reporteController = require('../controllers/reporteController'); 
+const telefonoController = require('../controllers/telefonoController');
 
 /* ======================================================
     INVENTARIO / PRODUCTOS
@@ -171,7 +172,7 @@ router.post(
 );
 
 /* ======================================================
-   UTILIDADES
+    UTILIDADES
 ====================================================== */
 router.get(
   '/equipos/:id/historial',
@@ -274,6 +275,38 @@ router.get('/ping-sesion', (req, res) => {
   if (req.session) req.session.touch();
   res.sendStatus(200);
 });
+
+/* ======================================================
+  TELEFONOS
+====================================================== */
+
+router.get(
+  '/telefonos',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  telefonoController.listarTelefonos
+);
+
+router.post(
+  '/telefonos',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  telefonoController.crearTelefono
+);
+
+router.patch(
+  '/telefonos/:id',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  telefonoController.actualizarTelefono
+);
+
+router.patch(
+  '/telefonos/:id/baja',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  telefonoController.darDeBajaTelefono
+);
 
 
 
