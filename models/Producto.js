@@ -8,4 +8,6 @@ const productoSchema = new mongoose.Schema({
   cantidad: { type: Number, required: true, min: 0 }
 });
 
+productoSchema.index({ tipo: 1, marca: 1, modelo: 1 });
+
 module.exports = mongoose.model('Producto', productoSchema);

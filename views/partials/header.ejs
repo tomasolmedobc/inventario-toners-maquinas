@@ -6,18 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inventario</title>
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-  <!-- BoxIcons -->
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/resources/vendor/bootstrap/css/bootstrap.min.css">
   <!-- Tu archivo CSS personalizado -->
-  <link rel="stylesheet" href="/resources/css/main.css">
   <link rel="stylesheet" href="/resources/css/style.css">
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-
+  <link href="/resources/vendor/select2/css/select2.min.css" rel="stylesheet" />
+  <link href="/resources/vendor/fontawesome/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -54,19 +47,19 @@
 
         <button class="list-group-item list-group-item-action py-2" data-bs-toggle="modal"
           data-bs-target="#modalCargaInicial">
-          <li class="bx bx-plus"></li>
+          <li class="fa-solid fa-plus"></li>
           <span>Nuevo Producto</span>
         </button>
 
         <button class="list-group-item list-group-item-action py-2" data-bs-toggle="modal"
           data-bs-target="#modalReabastecimiento">
-          <li class="bx bx-repeat"></li>
+          <li class="fa-solid fa-arrows-rotate"></li>
           <span>Ingreso Stock</span>
         </button>
 
         <button class="list-group-item list-group-item-action py-2" data-bs-toggle="modal"
           data-bs-target="#modalSalida">
-          <li class="bx bx-run"></li>
+          <li class="fa-solid fa-person-running"></li>
           <span>Registrar Salida</span>
         </button>
       </div>
@@ -78,31 +71,39 @@
         </div>
 
         <a href="/" class="list-group-item list-group-item-action py-2">
-          <i class="bx bx-home"></i>
+          <i class="fa-solid fa-house"></i>
           <span>Home</span>
         </a>
 
         <a href="/dev/inventario" class="list-group-item list-group-item-action py-2">
-          <i class="bx bx-package"></i>
+          <i class="fa-solid fa-box"></i>
           <span>Inventario</span>
         </a>
 
         <a href="/dev/entregas" class="list-group-item list-group-item-action py-2">
-          <i class="bx bx-bar-chart"></i>
+          <i class="fa-solid fa-chart-bar"></i>
           <span>Informes</span>
         </a>
         <!-- <a href="/dev/Historial" class="list-group-item list-group-item-action py-2">
-        <i class='bx bx-history'></i> 
+        <i class='fa-solid fa-clock-rotate-left'></i>
         <span>Historial</span>
       </a> -->
 
         <a href="/dev/bajo-stock" class="list-group-item list-group-item-action py-2">
-          <i class="bx bx-error"></i>
+          <i class="fa-solid fa-triangle-exclamation"></i>
           <span>Bajo Stock</span>
         </a>
         <a href="/dev/equipos" class="list-group-item list-group-item-action py-2">
-          <i class="bx bx-laptop"></i>
+          <i class="fa-solid fa-laptop"></i>
           <span>Equipos</span>
+        </a>
+        <a href="/dev/servicios-internet" class="list-group-item list-group-item-action py-2">
+          <i class="fa-solid fa-wifi"></i>
+          <span>Servicios de Internet</span>
+        </a>
+        <a href="/dev/ordenes-compra" class="list-group-item list-group-item-action py-2">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+          <span>Órdenes de Compra</span>
         </a>
       </div>
 
@@ -114,12 +115,12 @@
         </div>
 
         <a href="/dashboard/consumo" class="list-group-item list-group-item-action py-2">
-          <li class="bx bx-detail"></li>
+          <li class="fa-solid fa-list"></li>
           <span>Consumo total</span>
         </a>
 
         <a href="/dashboard/consumoArea" class="list-group-item list-group-item-action py-2">
-          <li class="bx bx-detail"></li>
+          <li class="fa-solid fa-list"></li>
           <span>Consumo por area</span>
         </a>
         <% } %>
@@ -128,24 +129,31 @@
  
         <div class="list-group list-group-flush mx-3 mt-4">
 
+          <% if (usuario) { %>
           <div class="smallName">
             <small>Hola, <strong>
                 <%= usuario.nombre %>
               </strong></small>
           </div>
+          <% } %>
           <% if (esAdmin) { %>
           <div class="list-group-item fw-bold text-muted">
             Acceso Admin
           </div>
 
           <a href="/api/usuarios" class="list-group-item list-group-item-action py-2" title="Usuarios">
-            <i class="bx bx-user"></i>
+            <i class="fa-solid fa-user"></i>
             <span class="sidebar-text">Usuarios</span>
           </a>
 
           <a href="/dashboard/areas" class="list-group-item list-group-item-action py-2" title="Áreas">
-            <i class="bx bx-map"></i>
+            <i class="fa-solid fa-map"></i>
             <span class="sidebar-text">Áreas</span>
+          </a>
+
+          <a href="/dev/vencimientos" class="list-group-item list-group-item-action py-2" title="Vencimientos">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span class="sidebar-text">Vencimientos</span>
           </a>
         </div>
         <% } %>
@@ -158,7 +166,7 @@
         
           <a href="/auth/logout"
             class="list-group-item list-group-item-action py-2 text-danger">
-            <i class="bx bx-log-out"></i>
+            <i class="fa-solid fa-right-from-bracket"></i>
             <span class="sidebar-text">Cerrar sesión</span>
           </a>
         </div>

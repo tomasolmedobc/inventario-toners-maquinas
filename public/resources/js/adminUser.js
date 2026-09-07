@@ -82,29 +82,42 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   
-    // Eliminar usuario
-    document.querySelectorAll('.btn-eliminar').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const userId = btn.dataset.id;
-        if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
-  
-        fetch(`/api/usuarios/${userId}`, {
-          method: 'DELETE'
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              alert('Usuario eliminado correctamente.');
-              location.reload();
-            } else {
-              alert(data.error || 'Error al eliminar usuario.');
-            }
-          })
-          .catch(err => {
-            alert('Error de red al eliminar usuario.');
-            console.error(err);
-          });
-      });
+    // Reiniciar servidor
+    const btnReiniciar = document.getElementById('btnReiniciarServidor');
+    btnReiniciar?.addEventListener('click', async () => {
+      if (!confirm('Esto va a desconectar a TODOS los usuarios por unos segundos. ¿Reiniciar el servidor ahora?')) return;
+
+      btnReiniciar.disabled = true;
+      btnReiniciar.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Reiniciando...';
+
+      try {
+        await fetch('/api/usuarios/reiniciar-servidor', { method: 'POST' });
+      } catch (err) {
+        // Es esperable: el servidor se cae justo al responder o mientras responde.
+      }
+
+      esperarReconexion(btnReiniciar);
     });
+
+    const esperarReconexion = (boton, intentos = 0) => {
+      if (intentos > 30) {
+        boton.innerHTML = 'No se pudo confirmar el reinicio, recargá manualmente';
+        return;
+      }
+
+      setTimeout(async () => {
+        try {
+          const res = await fetch('/auth/login', { method: 'HEAD' });
+          if (res.ok) {
+            location.reload();
+            return;
+          }
+        } catch (err) {
+          // Todavía no volvió a levantar, seguimos esperando.
+        }
+        esperarReconexion(boton, intentos + 1);
+      }, 1000);
+    };
+
   });
   

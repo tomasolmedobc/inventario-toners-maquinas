@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const helmet = require('helmet');
 const connectDB = require('./config/db');
 const userLocals = require('./middleware/userLocals');
 const areasMiddleware = require('./middleware/areasMiddleware');
@@ -30,6 +31,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // Middlewares
+// CSP y COEP desactivados: la app carga Bootstrap/jQuery/Select2/etc desde varios
+// CDNs y usa scripts inline en algunas vistas; los defaults de helmet los bloquearían.
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
@@ -104,6 +108,16 @@ app.listen(PORT, () => {
 const HOST = '0.0.0.0'; // Esto escucha en todas las interfaces de red
 const PORT = 5000;
 
+function obtenerIpLocal() {
+  const interfaces = require('os').networkInterfaces();
+  for (const nombre of Object.keys(interfaces)) {
+    for (const iface of interfaces[nombre]) {
+      if (iface.family === 'IPv4' && !iface.internal) return iface.address;
+    }
+  }
+  return '10.240.21.226';
+}
+
 app.listen(PORT, HOST, () => {
-    console.log(`✅ Servidor corriendo en http://${require('os').networkInterfaces().eth0?.[0]?.address || '10.240.21.226'}:${PORT}`);
+    console.log(`✅ Servidor corriendo en http://${obtenerIpLocal()}:${PORT}`);
 });

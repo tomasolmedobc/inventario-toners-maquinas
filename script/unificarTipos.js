@@ -5,7 +5,7 @@ const Movimiento = require('../models/Movimiento');
 
 async function unificarTipos() {
   try {
-    await mongoose.connect(process.env.MONGO_URI); // ✅ ahora sí va a leer bien
+    await mongoose.connect(process.env.MONGODB_URI); // ✅ ahora sí va a leer bien
 
     const productos = await Producto.find();
 

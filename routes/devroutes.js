@@ -9,6 +9,9 @@ const { verificarSesion, permitirRolesApi } = require('../middleware/auth');
 const dashboardController = require('../controllers/dashboardController');
 const equiposController = require('../controllers/equiposController');
 const apiController = require('../controllers/apiController');
+const servicioInternetController = require('../controllers/servicioInternetController');
+const vencimientoController = require('../controllers/vencimientoController');
+const ordenCompraController = require('../controllers/ordenCompraController');
 
 /* ======================================================
    DASHBOARD (VISTA)
@@ -70,5 +73,38 @@ router.get('/movimientos', verificarSesion, permitirRolesApi('user', 'jefe', 'ad
 router.get('/bajo-stock', verificarSesion, permitirRolesApi('user', 'jefe', 'admin'), (req, res) => {
   res.render('bajo-stock');
 });
+
+/* ======================================================
+   SERVICIOS DE INTERNET (VISTA)
+====================================================== */
+
+router.get(
+  '/servicios-internet',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  servicioInternetController.mostrarServiciosInternet
+);
+
+/* ======================================================
+   VENCIMIENTOS (VISTA) - Solo admin
+====================================================== */
+
+router.get(
+  '/vencimientos',
+  verificarSesion,
+  permitirRolesApi('admin'),
+  vencimientoController.mostrarVencimientos
+);
+
+/* ======================================================
+   ORDENES DE COMPRA (VISTA)
+====================================================== */
+
+router.get(
+  '/ordenes-compra',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  ordenCompraController.mostrarOrdenesCompra
+);
 
 module.exports = router;

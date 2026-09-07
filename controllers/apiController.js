@@ -3,7 +3,10 @@ const Movimiento = require('../models/Movimiento');
 const Area = require('../models/Area');
 const User = require('../models/User');
 
-
+// Escapa metacaracteres de regex para que el input del usuario se use como texto literal
+function escaparRegex(texto) {
+  return texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 const crearProducto = async (req, res) => {
   try {
@@ -30,9 +33,9 @@ const crearProducto = async (req, res) => {
 
     // Buscar si ya existe ese producto
     const productoExistente = await Producto.findOne({
-      tipo: { $regex: new RegExp(`^${tipo}$`, 'i') },
-      marca: { $regex: new RegExp(`^${marca}$`, 'i') },
-      modelo: { $regex: new RegExp(`^${modelo}$`, 'i') }
+      tipo: { $regex: new RegExp(`^${escaparRegex(tipo)}$`, 'i') },
+      marca: { $regex: new RegExp(`^${escaparRegex(marca)}$`, 'i') },
+      modelo: { $regex: new RegExp(`^${escaparRegex(modelo)}$`, 'i') }
     });
 
     if (productoExistente) {

@@ -1,8 +1,14 @@
 <%- include('partials/header') %>
 
 <div class="container mt-4">
-  <h2>Usuarios</h2>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Usuarios</h2>
+    <button class="btn btn-outline-danger" id="btnReiniciarServidor" type="button">
+      <i class="fa-solid fa-power-off me-1"></i> Reiniciar servidor
+    </button>
+  </div>
 
+  <div class="table-responsive">
   <table class="table table-bordered table-hover">
     <thead class="table-dark">
       <tr>
@@ -26,13 +32,13 @@
             <td>
               <button class="btn btn-sm btn-warning btn-cambiar-pass" data-id="<%= u._id %>">🔒 Contraseña</button>
               <button class="btn btn-sm btn-primary btn-editar-rol" data-id="<%= u._id %>" data-rol="<%= u.rol %>">📝 Rol</button>
-              <button class="btn btn-sm btn-danger btn-eliminar" data-id="<%= u._id %>">🗑️ Eliminar</button>
             </td>
           </tr>
         <% }) %>
       <% } %>
     </tbody>
   </table>
+  </div>
 </div>
 
 <!-- Modal Cambiar Contraseña -->

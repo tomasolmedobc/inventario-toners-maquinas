@@ -35,10 +35,23 @@
         </div>
     </div>
     <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<% if (usuario && usuario.rol === 'admin') { %>
+<div id="alertaVencimientos" class="alerta-vencimientos d-none">
+  <div class="av-header">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span class="av-titulo">Vencimientos</span>
+    <button type="button" class="av-cerrar" aria-label="Cerrar">&times;</button>
+  </div>
+  <div class="av-body" id="avBody"></div>
+</div>
+<script src="/resources/js/alertaVencimientos.js" defer></script>
+<% } %>
+
+<script src="/resources/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/resources/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+<script src="/resources/vendor/jquery/jquery.min.js"></script>
+<script src="/resources/vendor/select2/js/select2.min.js"></script>
 
 <script src="/resources/js/modal.js" defer></script>
 <script src="/resources/js/sidebar.js" defer></script>

@@ -58,10 +58,17 @@ const cambiarRolManual = async (req, res) => {
   }
 };
 
-
+// Reinicia el proceso. El servicio de Windows (NSSM) está configurado para
+// levantarlo de nuevo automáticamente apenas el proceso termina.
+const reiniciarServidor = async (req, res) => {
+  console.log(`🔁 Reinicio solicitado por ${req.session.usuario?.nombre || 'desconocido'}`);
+  res.json({ success: true, message: 'Reiniciando el servidor...' });
+  setTimeout(() => process.exit(0), 500);
+};
 
 module.exports = {
   listarUsuarios,
   cambiarPasswordManual,
-  cambiarRolManual
+  cambiarRolManual,
+  reiniciarServidor
 };

@@ -1,0 +1,195 @@
+<%- include('partials/header', { title: 'Órdenes de Compra' }) %>
+
+<%
+function formatoFecha(fecha) {
+  if (!fecha) return '-';
+  return new Date(fecha).toLocaleDateString('es-AR', { timeZone: 'UTC' });
+}
+
+function formatoMesAnio(fecha) {
+  if (!fecha) return '-';
+  const [anio, mes] = new Date(fecha).toISOString().slice(0, 7).split('-');
+  return `${mes}/${anio}`;
+}
+
+function fechaInput(fecha) {
+  if (!fecha) return '';
+  return new Date(fecha).toISOString().slice(0, 10);
+}
+
+function mesInput(fecha) {
+  if (!fecha) return '';
+  return new Date(fecha).toISOString().slice(0, 7);
+}
+%>
+
+<div class="container-fluid">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h3 class="mb-0">Órdenes de Compra</h3>
+      <small class="text-muted">Registro de órdenes de compra y sus facturas</small>
+    </div>
+
+    <button class="btn btn-primary" id="btnNuevaOrdenCompra" type="button">
+      <i class="fa-solid fa-plus me-1"></i> Agregar
+    </button>
+  </div>
+
+  <div class="row g-2 align-items-end mb-3">
+    <div class="col-md-6 col-lg-4">
+      <label class="form-label" for="buscarOrdenCompra">Buscar</label>
+      <input id="buscarOrdenCompra" class="form-control" type="search" placeholder="N° de orden o empresa">
+    </div>
+    <div class="col-md-3 col-lg-2">
+      <label class="form-label" for="filtroDesdeOrdenCompra">Emisión desde</label>
+      <input type="date" id="filtroDesdeOrdenCompra" class="form-control">
+    </div>
+    <div class="col-md-3 col-lg-2">
+      <label class="form-label" for="filtroHastaOrdenCompra">Emisión hasta</label>
+      <input type="date" id="filtroHastaOrdenCompra" class="form-control">
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle" id="tablaOrdenesCompra">
+      <thead class="table-dark">
+        <tr>
+          <th>N° Orden</th>
+          <th>Empresa</th>
+          <th>Emisión</th>
+          <th>Finalización</th>
+          <th>Facturas</th>
+          <th>Estado</th>
+          <th>Detalles</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!ordenes.length) { %>
+          <tr data-empty-row>
+            <td colspan="8" class="text-center text-muted py-4">No hay órdenes de compra registradas</td>
+          </tr>
+        <% } %>
+
+        <% ordenes.forEach(o => { %>
+          <tr
+            data-id="<%= o._id %>"
+            data-numero-orden="<%= o.numeroOrden %>"
+            data-empresa="<%= o.empresa %>"
+            data-emision="<%= fechaInput(o.fechaEmision) %>"
+            data-finalizacion="<%= fechaInput(o.fechaFinalizacion) %>"
+            data-detalles="<%= o.detalles %>"
+            data-cantidad="<%= o.cantidadFacturas %>"
+            data-facturas='<%- JSON.stringify((o.facturas || []).map(f => ({ numero: f.numero, mesAnio: mesInput(f.mesAnio) }))).replace(/</g, "\\u003c").replace(/'/g, "\\u0027") %>'
+            data-busqueda="<%= [o.numeroOrden, o.empresa].join(' ').toLowerCase() %>">
+            <td><%= o.numeroOrden %></td>
+            <td><%= o.empresa %></td>
+            <td><%= formatoFecha(o.fechaEmision) %></td>
+            <td><%= formatoFecha(o.fechaFinalizacion) %></td>
+            <td>
+              <%= o.facturas.length %>/<%= o.cantidadFacturas %>
+              <% if (o.facturas.length) { %>
+                <br><small class="text-muted"><%= o.facturas.map(f => `${f.numero} (${formatoMesAnio(f.mesAnio)})`).join(', ') %></small>
+              <% } %>
+            </td>
+            <td>
+              <span class="badge text-bg-<%= o.estado === 'Finalizado' ? 'success' : 'warning' %>"><%= o.estado %></span>
+            </td>
+            <td><%= o.detalles %></td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-primary" type="button" data-editar="<%= o._id %>" title="Modificar">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn btn-outline-danger" type="button" data-eliminar="<%= o._id %>" title="Eliminar">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal fade" id="modalOrdenCompra" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form class="modal-content" id="formOrdenCompra">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalOrdenCompraTitulo">Agregar orden de compra</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="ordenCompraId">
+        <p class="text-muted small mb-3">Los campos marcados con <span class="text-danger">*</span> son obligatorios.</p>
+
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label requerido" for="empresaOrdenCompra">Nombre de empresa</label>
+            <input class="form-control" id="empresaOrdenCompra" name="empresa" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label requerido" for="numeroOrdenOrdenCompra">N° Orden de Compra</label>
+            <input class="form-control" id="numeroOrdenOrdenCompra" name="numeroOrden" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label requerido" for="fechaEmisionOrdenCompra">Fecha de emisión</label>
+            <input type="date" class="form-control" id="fechaEmisionOrdenCompra" name="fechaEmision" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="fechaFinalizacionOrdenCompra">Fecha de finalización</label>
+            <input type="date" class="form-control" id="fechaFinalizacionOrdenCompra" name="fechaFinalizacion">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label requerido" for="cantidadFacturasOrdenCompra">Cantidad de facturas</label>
+            <input type="number" min="1" step="1" class="form-control" id="cantidadFacturasOrdenCompra" name="cantidadFacturas" required>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label" for="detallesOrdenCompra">Agregado de detalles</label>
+            <textarea class="form-control" id="detallesOrdenCompra" name="detalles" rows="2"></textarea>
+          </div>
+
+          <div class="col-12">
+            <div class="border rounded p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Facturas cargadas</strong>
+                <span class="badge text-bg-secondary" id="progresoFacturasOrdenCompra">0/0</span>
+              </div>
+
+              <div id="listaFacturasOrdenCompra"></div>
+
+              <button type="button" class="btn btn-sm btn-outline-primary mt-1" id="btnAgregarFactura">
+                <i class="fa-solid fa-plus me-1"></i> Agregar factura
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toastOrdenesCompra" class="toast text-bg-success border-0">
+    <div class="d-flex">
+      <div class="toast-body" id="toastOrdenesCompraMsg"></div>
+      <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<script src="/resources/js/ordenesCompra.js" defer></script>
+
+<%- include('partials/footer') %>

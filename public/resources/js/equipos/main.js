@@ -164,14 +164,14 @@ tbody.onclick = async e => {
         const eq = await API.getDetalle(id);
         document.getElementById('detalleEquipo').innerHTML = `
             <div class="list-group list-group-flush">
-                <p class="m-1"><strong>Hostname:</strong> ${eq.hostname || 'N/A'}</p>
-                <p class="m-1"><strong>Nombre y Apellido:</strong> ${eq.nombreApellido || 'N/A'}</p>
-                <p class="m-1"><strong>Procesador:</strong> ${eq.procesador || 'N/A'}</p>
-                <p class="m-1"><strong>RAM:</strong> ${eq.ram || 'N/A'}</p>
-                <p class="m-1"><strong>Disco:</strong> ${eq.disco || 'N/A'}</p>
-                <p class="m-1"><strong>Sistema Operativo:</strong> ${eq.sistemaOp || 'N/A'}</p>
-                <p class="m-1"><strong>Codigo:</strong> ${eq.codigoIdentificacion || 'N/A'}</p>
-                <p class="m-1"><strong>IP:</strong> ${eq.ip || 'N/A'}</p>
+                <p class="m-1 equipo-detalle-texto"><strong>Hostname:</strong> ${eq.hostname || 'N/A'}</p>
+                <p class="m-1 equipo-detalle-texto"><strong>Nombre y Apellido:</strong> ${eq.nombreApellido || 'N/A'}</p>
+                <p class="m-1 equipo-detalle-texto"><strong>Procesador:</strong> ${eq.procesador || 'N/A'}</p>
+                <p class="m-1 equipo-detalle-texto"><strong>RAM:</strong> ${eq.ram || 'N/A'}</p>
+                <p class="m-1 equipo-detalle-texto"><strong>Disco:</strong> ${eq.disco || 'N/A'}</p>
+                <p class="m-1 equipo-detalle-texto"><strong>Sistema Operativo:</strong> ${eq.sistemaOp || 'N/A'}</p>
+                <p class="m-1 equipo-detalle-texto"><strong>Codigo:</strong> ${eq.codigoIdentificacion || 'N/A'}</p>
+                <p class="m-1 equipo-detalle-texto"><strong>IP:</strong> ${eq.ip || 'N/A'}</p>
             </div>`;
 
 

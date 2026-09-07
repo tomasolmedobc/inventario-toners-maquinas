@@ -13,6 +13,9 @@ const equiposController = require('../controllers/equiposController');
 const serviceEquipoController = require('../controllers/serviceEquipoController');
 const reporteController = require('../controllers/reporteController'); 
 const telefonoController = require('../controllers/telefonoController');
+const servicioInternetController = require('../controllers/servicioInternetController');
+const vencimientoController = require('../controllers/vencimientoController');
+const ordenCompraController = require('../controllers/ordenCompraController');
 
 /* ======================================================
     INVENTARIO / PRODUCTOS
@@ -171,6 +174,12 @@ router.post(
   adminController.cambiarRolManual
 );
 
+router.post(
+  '/usuarios/reiniciar-servidor',
+  verificarSesion, permitirRolesApi('admin'),
+  adminController.reiniciarServidor
+);
+
 /* ======================================================
     UTILIDADES
 ====================================================== */
@@ -306,6 +315,109 @@ router.patch(
   verificarSesion,
   permitirRolesApi('user', 'jefe', 'admin'),
   telefonoController.darDeBajaTelefono
+);
+
+/* ======================================================
+  SERVICIOS DE INTERNET
+====================================================== */
+
+router.get(
+  '/servicios-internet',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  servicioInternetController.listarServiciosInternet
+);
+
+router.post(
+  '/servicios-internet',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  servicioInternetController.crearServicioInternet
+);
+
+router.patch(
+  '/servicios-internet/:id',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  servicioInternetController.actualizarServicioInternet
+);
+
+router.delete(
+  '/servicios-internet/:id',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  servicioInternetController.eliminarServicioInternet
+);
+
+/* ======================================================
+  VENCIMIENTOS (solo admin)
+====================================================== */
+
+router.get(
+  '/vencimientos',
+  verificarSesion,
+  permitirRolesApi('admin'),
+  vencimientoController.listarVencimientos
+);
+
+router.post(
+  '/vencimientos',
+  verificarSesion,
+  permitirRolesApi('admin'),
+  vencimientoController.crearVencimiento
+);
+
+router.patch(
+  '/vencimientos/:id',
+  verificarSesion,
+  permitirRolesApi('admin'),
+  vencimientoController.actualizarVencimiento
+);
+
+router.post(
+  '/vencimientos/:id/pagar',
+  verificarSesion,
+  permitirRolesApi('admin'),
+  vencimientoController.pagarVencimiento
+);
+
+router.delete(
+  '/vencimientos/:id',
+  verificarSesion,
+  permitirRolesApi('admin'),
+  vencimientoController.eliminarVencimiento
+);
+
+/* ======================================================
+  ORDENES DE COMPRA
+====================================================== */
+
+router.get(
+  '/ordenes-compra',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  ordenCompraController.listarOrdenesCompra
+);
+
+router.post(
+  '/ordenes-compra',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  ordenCompraController.crearOrdenCompra
+);
+
+router.patch(
+  '/ordenes-compra/:id',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  ordenCompraController.actualizarOrdenCompra
+);
+
+router.delete(
+  '/ordenes-compra/:id',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  ordenCompraController.eliminarOrdenCompra
 );
 
 

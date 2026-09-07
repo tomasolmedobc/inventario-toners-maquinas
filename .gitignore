@@ -21,3 +21,6 @@ limpiarMovimientos.js
 # Temporales
 /tmp
 .cache
+
+# Logs del servicio de Windows (NSSM)
+/logs/
