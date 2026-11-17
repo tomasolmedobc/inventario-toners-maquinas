@@ -12,6 +12,7 @@ const apiController = require('../controllers/apiController');
 const servicioInternetController = require('../controllers/servicioInternetController');
 const vencimientoController = require('../controllers/vencimientoController');
 const ordenCompraController = require('../controllers/ordenCompraController');
+const preventivaController = require('../controllers/preventivaController');
 
 /* ======================================================
    DASHBOARD (VISTA)
@@ -105,6 +106,17 @@ router.get(
   verificarSesion,
   permitirRolesApi('user', 'jefe', 'admin'),
   ordenCompraController.mostrarOrdenesCompra
+);
+
+/* ======================================================
+   PREVENTIVAS (VISTA)
+====================================================== */
+
+router.get(
+  '/preventivas',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  preventivaController.mostrarPreventivas
 );
 
 module.exports = router;

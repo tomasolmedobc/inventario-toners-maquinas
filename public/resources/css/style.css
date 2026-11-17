@@ -3,8 +3,6 @@
    ========================================================================== */
 :root {
   --color-text-secondary: #5d68fb;
-  --background-secondary-color: #f4f4f4;
-  --dex-text-color: #333;
 }
 
 [data-theme='light'] {
@@ -55,8 +53,8 @@ footer {
   --bs-gutter-x: 0 !important;
   width: 100%;
   padding: 10px;
-  background-color: var(--background-secondary-color);
-  color: var(--dex-text-color);
+  background-color: var(--secondary-bg-color);
+  color: var(--primary-text-color);
 }
 
 @media (max-width: 576px) {
@@ -125,6 +123,32 @@ footer {
     top: 8px;
     left: 8px;
     gap: 8px;
+  }
+}
+
+/* Switch de tema: flotante del lado derecho para no quedar tapado por el sidebar */
+.theme-toggle-flotante {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 2200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background-color: var(--secondary-bg-color, #fff);
+  color: var(--primary-text-color, #333);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.theme-toggle-flotante i {
+  font-size: 0.9rem;
+}
+@media (max-width: 576px) {
+  .theme-toggle-flotante {
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
   }
 }
 
@@ -296,6 +320,12 @@ main {
   opacity: 0.8;
 }
 
+/* --- Tarjeta de login/registro --- */
+.card {
+  background-color: var(--secondary-bg-color);
+  color: var(--primary-text-color);
+}
+
 /* --- Formularios: campos obligatorios --- */
 .form-label.requerido::after {
   content: " *";
@@ -423,3 +453,30 @@ main {
 .av-item-texto small {
   color: var(--secondary-text-color, #6c757d);
 }
+
+/* ==========================================================================
+   7. SEMAFORO DE PREVENTIVAS
+   ========================================================================== */
+.prev-pendiente {
+  background-color: rgba(255, 193, 7, 0.35) !important;
+  border-left: 4px solid #ffc107;
+}
+.prev-recibido {
+  background-color: rgba(13, 202, 240, 0.25) !important;
+  border-left: 4px solid #0dcaf0;
+}
+.prev-facturado {
+  background-color: rgba(25, 135, 84, 0.35) !important;
+  border-left: 4px solid #198754;
+}
+.prev-leyenda {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.prev-leyenda.prev-pendiente { background-color: #ffc107; border-left: none; }
+.prev-leyenda.prev-recibido { background-color: #0dcaf0; border-left: none; }
+.prev-leyenda.prev-facturado { background-color: #198754; border-left: none; }

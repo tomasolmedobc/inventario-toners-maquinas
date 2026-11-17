@@ -1,0 +1,175 @@
+<%- include('partials/header', { title: 'Preventivas' }) %>
+
+<%
+function formatoFecha(fecha) {
+  if (!fecha) return '-';
+  return new Date(fecha).toLocaleDateString('es-AR', { timeZone: 'UTC' });
+}
+
+function fechaInput(fecha) {
+  if (!fecha) return '';
+  return new Date(fecha).toISOString().slice(0, 10);
+}
+
+function claseEstado(estado) {
+  if (estado === 'facturado') return 'prev-facturado';
+  if (estado === 'recibido') return 'prev-recibido';
+  return 'prev-pendiente';
+}
+
+function etiquetaEstado(estado) {
+  if (estado === 'facturado') return 'Facturado';
+  if (estado === 'recibido') return 'Recibido';
+  return 'Pendiente';
+}
+%>
+
+<div class="container-fluid">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h3 class="mb-0">Preventivas</h3>
+      <small class="text-muted">Registro de preventivas por área</small>
+    </div>
+
+    <button class="btn btn-primary" id="btnNuevaPreventiva" type="button">
+      <i class="fa-solid fa-plus me-1"></i> Agregar
+    </button>
+  </div>
+
+  <div class="row g-2 align-items-end mb-3">
+    <div class="col-md-6 col-lg-4">
+      <label class="form-label" for="buscarPreventiva">Buscar</label>
+      <input id="buscarPreventiva" class="form-control" type="search" placeholder="N° de preventiva, detalles o área">
+    </div>
+    <div class="col-md-4 col-lg-3">
+      <label class="form-label" for="filtroEstadoPreventiva">Estado</label>
+      <select id="filtroEstadoPreventiva" class="form-select">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="recibido">Recibido</option>
+        <option value="facturado">Facturado</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="mb-3 d-flex flex-wrap gap-3 small">
+    <span><span class="prev-leyenda prev-pendiente"></span> Pendiente</span>
+    <span><span class="prev-leyenda prev-recibido"></span> Recibido</span>
+    <span><span class="prev-leyenda prev-facturado"></span> Facturado</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle" id="tablaPreventivas">
+      <thead class="table-dark">
+        <tr>
+          <th>N° Preventiva</th>
+          <th>Detalles</th>
+          <th>Fecha</th>
+          <th>Área</th>
+          <th>Estado</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!preventivas.length) { %>
+          <tr data-empty-row>
+            <td colspan="6" class="text-center text-muted py-4">No hay preventivas registradas</td>
+          </tr>
+        <% } %>
+
+        <% preventivas.forEach(p => { %>
+          <tr
+            class="<%= claseEstado(p.estado) %>"
+            data-id="<%= p._id %>"
+            data-numero="<%= p.numeroPreventiva %>"
+            data-detalles="<%= p.detalles %>"
+            data-fecha="<%= fechaInput(p.fecha) %>"
+            data-area-id="<%= p.area?._id || '' %>"
+            data-area-nombre="<%= p.area?.nombre || '' %>"
+            data-estado="<%= p.estado %>">
+            <td><%= p.numeroPreventiva %></td>
+            <td><%= p.detalles %></td>
+            <td><%= formatoFecha(p.fecha) %></td>
+            <td><%= p.area?.nombre || 'Sin área' %></td>
+            <td><%= etiquetaEstado(p.estado) %></td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-primary" type="button" data-editar="<%= p._id %>" title="Modificar">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn btn-outline-danger" type="button" data-eliminar="<%= p._id %>" title="Eliminar">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal fade" id="modalPreventiva" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" id="formPreventiva">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalPreventivaTitulo">Agregar preventiva</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="preventivaId">
+        <p class="text-muted small mb-3">Los campos marcados con <span class="text-danger">*</span> son obligatorios.</p>
+
+        <div class="mb-3">
+          <label class="form-label requerido" for="numeroPreventiva">N° Preventiva</label>
+          <input class="form-control" id="numeroPreventiva" name="numeroPreventiva" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label requerido" for="detallesPreventiva">Detalles (breve descripción)</label>
+          <textarea class="form-control" id="detallesPreventiva" name="detalles" rows="2" required></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label requerido" for="fechaPreventiva">Fecha</label>
+          <input type="date" class="form-control" id="fechaPreventiva" name="fecha" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label requerido" for="areaPreventiva">Área</label>
+          <select class="form-select" id="areaPreventiva" name="area" required>
+            <option value="">Seleccionar área</option>
+          </select>
+        </div>
+
+        <div class="mb-0">
+          <label class="form-label requerido" for="estadoPreventiva">Estado</label>
+          <select class="form-select" id="estadoPreventiva" name="estado" required>
+            <option value="pendiente">Pendiente</option>
+            <option value="recibido">Recibido</option>
+            <option value="facturado">Facturado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toastPreventivas" class="toast text-bg-success border-0">
+    <div class="d-flex">
+      <div class="toast-body" id="toastPreventivasMsg"></div>
+      <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<script src="/resources/js/preventivas.js" defer></script>
+
+<%- include('partials/footer') %>

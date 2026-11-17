@@ -19,13 +19,15 @@
     <button id="toggleSidebar" class="btn btn-outline-secondary">
       ☰
     </button>
+  </div>
 
-    <div class="checkbox ms-2">
-      <input type="checkbox" id="theme-checkbox">
-      <label class="toggle" for="theme-checkbox">
-        <span></span>
-      </label>
-    </div>
+  <div class="theme-toggle-flotante checkbox">
+    <i class="fa-solid fa-sun"></i>
+    <input type="checkbox" id="theme-checkbox">
+    <label class="toggle" for="theme-checkbox">
+      <span></span>
+    </label>
+    <i class="fa-solid fa-moon"></i>
   </div>
   <%
   const rol = usuario?.rol || null;
@@ -104,6 +106,10 @@
         <a href="/dev/ordenes-compra" class="list-group-item list-group-item-action py-2">
           <i class="fa-solid fa-file-invoice-dollar"></i>
           <span>Órdenes de Compra</span>
+        </a>
+        <a href="/dev/preventivas" class="list-group-item list-group-item-action py-2">
+          <i class="fa-solid fa-screwdriver-wrench"></i>
+          <span>Preventivas</span>
         </a>
       </div>
 

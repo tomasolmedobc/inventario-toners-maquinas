@@ -16,6 +16,7 @@ const telefonoController = require('../controllers/telefonoController');
 const servicioInternetController = require('../controllers/servicioInternetController');
 const vencimientoController = require('../controllers/vencimientoController');
 const ordenCompraController = require('../controllers/ordenCompraController');
+const preventivaController = require('../controllers/preventivaController');
 
 /* ======================================================
     INVENTARIO / PRODUCTOS
@@ -420,6 +421,36 @@ router.delete(
   ordenCompraController.eliminarOrdenCompra
 );
 
+/* ======================================================
+  PREVENTIVAS
+====================================================== */
 
+router.get(
+  '/preventivas',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  preventivaController.listarPreventivas
+);
+
+router.post(
+  '/preventivas',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  preventivaController.crearPreventiva
+);
+
+router.patch(
+  '/preventivas/:id',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  preventivaController.actualizarPreventiva
+);
+
+router.delete(
+  '/preventivas/:id',
+  verificarSesion,
+  permitirRolesApi('user', 'jefe', 'admin'),
+  preventivaController.eliminarPreventiva
+);
 
 module.exports = router;
